@@ -1,0 +1,83 @@
+{
+  "events": [
+    {
+      "id": "tounoi-wingles-2025",
+      "title": "Tournoi amical de Wingles",
+      "description": "Tournoi amical à wingles. Auberge Espagnole le midi.",
+      "date": "2025-07-15T09:00:00.000Z",
+      "time": "8h30 - 18h00",
+      "type": "tournament",
+      "location": "Complexe Michel Bernard de Wingles",
+      "registrationOpen": false,
+      "registrationDeadline": "2025-07-10T23:59:59.000Z",
+      "price": 0,
+      "contact": {
+        "name": "Cédric DELGEHIER",
+        "role": "Secrétaire"
+      }
+    },
+    {
+      "id": "tournoi-sur-invitation",
+      "title": "Tournoi sur invitation",
+      "description": "3 jours de compétition. Les incriptions sont gérées par le club de Carvin.",
+      "date": "2025-09-05T19:00:00.000Z",
+      "endDate": "2025-09-07T18:00:00.000Z",
+      "time": "8h30 - 18h00",
+      "type": "tournament",
+      "price": 5,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      },
+      "multiDay": true
+    },
+    {
+      "id": "libercourt-plage-2025",
+      "title": "Libercourt plage 2025",
+      "description": "10 jours où le club tiendra le cabanon des glaces.",
+      "date": "2025-07-31T15:00:00.000Z",
+      "endDate": "2025-08-09T22:00:00.000Z",
+      "time": "15h - 19h00",
+      "type": "other",
+      "location": "Base de loisirs de Libercourt - Etang des Marlières",
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      },
+      "multiDay": true
+    },
+    {
+      "id": "loto-2025",
+      "title": "Loto 2025",
+      "description": "Loto annuel du club avec de nombreuse cartes cadeaux à gagner",
+      "date": "2025-10-04T13:00:00.000Z",
+      "endDate": "2025-10-04T20:30:00.000Z",
+      "time": "13h00 - 20h30",
+      "type": "other",
+      "location": "Salle DELFOSSE, à côté de la mairie",
+      "currentParticipants": 0,
+      "maxParticipants": 300,
+      "registrationOpen": true,
+      "registrationDeadline": "2025-10-04T14:30:00.000Z",
+      "price": 15,
+      "contact": {
+        "name": "Nathalie GUILBERT",
+        "role": "Responsable Evénements"
+      }
+    },
+    {
+      "id": "ag-2025-05-21",
+      "title": "Assemblée Générale 2025",
+      "description": "AG annuelle avec bilan de saison - Ouverte à tous les membres",
+      "date": "2025-05-21T10:00:00.000Z",
+      "time": "10h00",
+      "type": "meeting",
+      "currentParticipants": 42,
+      "registrationOpen": false,
+      "contact": {
+        "name": "Thierry Guilbert",
+        "role": "Président"
+      }
+    }
+  ]
+}

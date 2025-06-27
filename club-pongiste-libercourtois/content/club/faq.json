@@ -1,0 +1,118 @@
+{
+  "categories": [
+    {
+      "id": "inscription",
+      "name": "Inscription & Adhésion",
+      "icon": "i-heroicons-user-plus",
+      "questions": [
+        {
+          "id": "comment-inscrire",
+          "question": "Comment puis-je m'inscrire au club ?",
+          "answer": "Vous pouvez vous inscrire en contactant notre club par email ou par téléphone. Vous pouvez également vous rendre aux permanences du mardi et jeudi de 18h à 20h à la salle.",
+          "tags": ["inscription", "contact", "permanence"]
+        },
+        {
+          "id": "changement-licence",
+          "question": "Puis-je changer de licence en cours d'année ?",
+          "answer": "Absolument ! Si vous commencez avec une licence Loisir et souhaitez faire de la compétition plus tard dans l'année, un complément de 35€ sera demandé pour passer en licence Compétition.",
+          "tags": ["licence", "changement", "upgrade"]
+        },
+        {
+          "id": "periode-inscription",
+          "question": "Quand puis-je m'inscrire ?",
+          "answer": "Les inscriptions sont ouvertes de juin à septembre. Cependant, il est possible de rejoindre le club en cours de saison selon les places disponibles. N'hésitez pas à nous contacter pour connaître les modalités.",
+          "tags": ["inscription", "periode", "saison"]
+        },
+        {
+          "id": "documents-inscription",
+          "question": "Quels documents faut-il pour s'inscrire ?",
+          "answer": "Vous devez fournir : la fiche d'inscription complétée, un certificat médical de non contre-indication, le feuillet d'assurance de la fédération et le règlement (chèque ou virement uniquement).",
+          "tags": ["documents", "inscription", "medical"]
+        }
+      ]
+    },
+    {
+      "id": "tarifs",
+      "name": "Tarifs & Licences",
+      "icon": "i-heroicons-currency-euro",
+      "questions": [
+        {
+          "id": "prix-licences",
+          "question": "Combien coûte une licence et que comprend-elle ?",
+          "answer": "Nous proposons 2 types de licences : Licence Loisir (45€) qui donne accès au jeu libre tous les soirs de semaine de 17h30 à 20h30 et au cours loisirs le mercredi de 18h30 à 20h. Licence Compétition (80€) qui inclut tout ce qui est dans la licence Loisir plus les entraînements du lundi et jeudi avec encadrement.",
+          "tags": ["tarifs", "licence", "prix"]
+        },
+        {
+          "id": "aides-financieres",
+          "question": "Y a-t-il des aides financières ?",
+          "answer": "Oui ! Nous acceptons le Passeport de l'État (50€) via pass.sports.gouv.fr et le Pass Sport de l'agglo (30€) via le site de l'agglomération Hénin-Carvin. Ces aides peuvent considérablement réduire le coût de votre licence.",
+          "tags": ["aides", "passeport", "reduction"]
+        }
+      ]
+    },
+    {
+      "id": "horaires",
+      "name": "Horaires & Planning",
+      "icon": "i-heroicons-clock",
+      "questions": [
+        {
+          "id": "horaires-entrainement",
+          "question": "Quels sont les horaires d'entraînement ?",
+          "answer": "Jeu libre : tous les soirs de semaine de 17h30 à 20h30. Cours loisirs : mercredi de 18h30 à 20h. Entraînements compétition : Lundi (groupe 1 à 18h, groupe 2 à 19h) et Jeudi (groupe A à 18h, groupe B à 19h). Merci d'arriver 15 minutes avant pour l'échauffement.",
+          "tags": ["horaires", "entrainement", "planning"]
+        }
+      ]
+    },
+    {
+      "id": "pratique",
+      "name": "Pratique & Matériel",
+      "icon": "i-heroicons-play",
+      "questions": [
+        {
+          "id": "essais-gratuits",
+          "question": "Y a-t-il des séances d'essai ?",
+          "answer": "Oui ! Nous offrons 2 séances d'essai gratuites, que ce soit en entraînement compétitif ou en cours loisir. Contactez-nous pour planifier vos essais selon votre niveau et vos disponibilités.",
+          "tags": ["essai", "gratuit", "test"]
+        },
+        {
+          "id": "materiel-personnel",
+          "question": "Faut-il apporter son propre matériel ?",
+          "answer": "Pour débuter, nous pouvons prêter des raquettes ponctuellement. Cependant, nous conseillons rapidement d'avoir sa propre raquette pour un meilleur confort de jeu. Le club peut vous conseiller sur le choix du matériel.",
+          "tags": ["materiel", "raquette", "equipement"]
+        },
+        {
+          "id": "competitions",
+          "question": "Le club organise-t-il des compétitions ?",
+          "answer": "Oui, nous participons aux championnats FFTT avec nos équipes jeunes (samedi après-midi) et adultes (dimanche matin). Nous organisons aussi des tournois internes et le tournoi annuel de Libercourt.",
+          "tags": ["competition", "tournoi", "championnat"]
+        }
+      ]
+    },
+    {
+      "id": "club",
+      "name": "Le Club",
+      "icon": "i-heroicons-building-storefront",
+      "questions": [
+        {
+          "id": "localisation",
+          "question": "Où se trouve la salle et comment s'y rendre ?",
+          "answer": "Nous jouons au complexe sportif Leo Lagrange à Libercourt. Parking gratuit sur place, et PMR.",
+          "tags": ["localisation", "adresse", "transport"]
+        },
+        {
+          "id": "nombre-licencies",
+          "question": "Combien de licenciés compte le club ?",
+          "answer": "Notre club compte actuellement des licenciés actifs répartis sur plusieurs équipes. Le nombre exact est mis à jour en temps réel sur notre site grâce aux données officielles de la FFTT.",
+          "tags": ["effectifs", "licencies", "equipes"]
+        }
+      ]
+    }
+  ],
+  "popular": [
+    "comment-inscrire",
+    "prix-licences",
+    "essais-gratuits",
+    "horaires-entrainement",
+    "aides-financieres"
+  ]
+}

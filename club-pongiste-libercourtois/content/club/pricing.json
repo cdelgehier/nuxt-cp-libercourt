@@ -1,0 +1,76 @@
+{
+  "pricing": {
+    "annual": [
+      {
+        "category": "Licence Loisir",
+        "ageRange": "Tous âges",
+        "price": 45,
+        "includes": [
+          "Accès au jeu libre tous les soirs de semaine dès 17h30 jusqu'à 20h30",
+          "Accès au cours loisirs le mercredi de 18h30 à 20h",
+          "2 séances d'essai offertes",
+          "Licence FFTT loisir"
+        ],
+        "details": {
+          "access": "Jeu libre du lundi au vendredi 17h30-20h30",
+          "training": "Cours loisirs mercredi 18h30-20h00",
+          "trial": "2 essais gratuits possibles"
+        }
+      },
+      {
+        "category": "Licence Compétition",
+        "ageRange": "Tous âges",
+        "price": 80,
+        "includes": [
+          "Tout ce qui est inclus dans la licence Loisir",
+          "Entraînements du lundi (groupe 1 à 18h / groupe 2 à 19h)",
+          "Entraînements du jeudi (groupe A à 18h / groupe B à 19h)",
+          "Participation aux compétitions officielles",
+          "Licence FFTT compétition"
+        ],
+        "details": {
+          "access": "Accès à tous les créneaux",
+          "training": "Entraînements dirigés lundi et jeudi",
+          "requirements": "Arriver 15 minutes avant pour l'échauffement",
+          "trial": "2 essais gratuits possibles"
+        }
+      }
+    ],
+    "additional": [
+      {
+        "service": "Tenue de compétition",
+        "price": 10,
+        "unit": "tenue (valable 3 ans)",
+        "description": "Tenue officielle du club pour les compétitions"
+      }
+    ],
+    "discounts": [
+      {
+        "name": "Réduction famille",
+        "type": "Famille",
+        "description": "10€ de réduction pour 2 licences compétition au sein d'un même foyer",
+        "amount": 10,
+        "discount": 22,
+        "condition": "2 licences compétition minimum"
+      },
+      {
+        "name": "Passeport de l'État",
+        "type": "Pass'Sport État",
+        "description": "Aide de l'État de 50€ pour encourager la pratique sportive",
+        "amount": 50,
+        "discount": 62,
+        "condition": "Conditions d'éligibilité sur pass.sports.gouv.fr",
+        "url": "https://www.pass.sports.gouv.fr/v2/pro/accueil"
+      },
+      {
+        "name": "Pass Sport Agglo",
+        "type": "Pass'Sport Agglo",
+        "description": "Aide de l'agglomération Hénin-Carvin de 30€",
+        "amount": 30,
+        "discount": 38,
+        "condition": "Résidents de l'agglomération Hénin-Carvin",
+        "url": "https://www.agglo-henincarvin.fr/Vie-quotidienne/Pass-Sport-Pass-Culture"
+      }
+    ]
+  }
+}

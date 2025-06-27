@@ -1,0 +1,151 @@
+{
+  "schedules": {
+    "training": [
+      {
+        "day": "Lundi",
+        "hours": "17h30 - 20h30",
+        "sessions": [
+          {
+            "time": "17h30 - 20h30",
+            "category": "Jeu libre pour tous",
+            "level": "Tous niveaux",
+            "type": "libre",
+            "coach": "Libre"
+          },
+          {
+            "time": "18h00 - 19h00",
+            "category": "Training Compét' Jr Groupe 1",
+            "level": "Juniors compétition",
+            "type": "entrainement",
+            "coach": "Entraînement dirigé"
+          },
+          {
+            "time": "19h00 - 20h00",
+            "category": "Training Compét' Jr Groupe 2",
+            "level": "Juniors compétition",
+            "type": "entrainement",
+            "coach": "Entraînement dirigé"
+          }
+        ]
+      },
+      {
+        "day": "Mardi",
+        "hours": "17h30 - 20h30",
+        "sessions": [
+          {
+            "time": "17h30 - 20h30",
+            "category": "Jeu libre pour tous",
+            "level": "Tous niveaux",
+            "type": "libre",
+            "coach": "Libre"
+          }
+        ]
+      },
+      {
+        "day": "Mercredi",
+        "hours": "17h30 - 20h00",
+        "sessions": [
+          {
+            "time": "17h30 - 20h00",
+            "category": "Training Loisirs Baby",
+            "level": "Jeunes débutants",
+            "type": "entrainement",
+            "coach": "Entraînement dirigé"
+          },
+          {
+            "time": "18h30 - 20h00",
+            "category": "Training Loisirs Junior",
+            "level": "Juniors loisir",
+            "type": "entrainement",
+            "coach": "Entraînement dirigé"
+          }
+        ]
+      },
+      {
+        "day": "Jeudi",
+        "hours": "17h30 - 20h30",
+        "sessions": [
+          {
+            "time": "17h30 - 20h30",
+            "category": "Jeu libre pour tous",
+            "level": "Tous niveaux",
+            "type": "libre",
+            "coach": "Libre"
+          },
+          {
+            "time": "18h00 - 19h00",
+            "category": "Training Compét' Jr Groupe A",
+            "level": "Juniors compétition",
+            "type": "entrainement",
+            "coach": "Entraînement dirigé"
+          },
+          {
+            "time": "19h00 - 20h00",
+            "category": "Training Compét' Jr Groupe B",
+            "level": "Juniors compétition",
+            "type": "entrainement",
+            "coach": "Entraînement dirigé"
+          }
+        ]
+      },
+      {
+        "day": "Vendredi",
+        "hours": "17h30 - 20h30",
+        "sessions": [
+          {
+            "time": "17h30 - 20h30",
+            "category": "Jeu libre pour tous",
+            "level": "Tous niveaux",
+            "type": "libre",
+            "coach": "Libre"
+          }
+        ]
+      },
+      {
+        "day": "Samedi",
+        "sessions": [
+          {
+            "time": "Après-midi",
+            "category": "Compétitions Juniors",
+            "level": "Équipes jeunes",
+            "type": "competition",
+            "coach": "Encadrement"
+          }
+        ]
+      },
+      {
+        "day": "Dimanche",
+        "sessions": [
+          {
+            "time": "Matin",
+            "category": "Compétitions Adultes",
+            "level": "Équipes seniors",
+            "type": "competition",
+            "coach": "Encadrement"
+          }
+        ]
+      }
+    ],
+    "openHours": {
+      "Lundi": "17h30 - 20h30",
+      "Mardi": "17h30 - 20h30",
+      "Mercredi": "17h30 - 20h00",
+      "Jeudi": "17h30 - 20h30",
+      "Vendredi": "17h30 - 20h30"
+    },
+    "competitions": [
+      {
+        "day": "Samedi",
+        "time": "Après-midi",
+        "description": "Compétitions équipes juniors",
+        "note": "Calendrier variable selon les rencontres"
+      },
+      {
+        "day": "Dimanche",
+        "time": "Matin",
+        "description": "Compétitions équipes adultes",
+        "note": "Selon calendrier fédéral"
+      }
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+# Prettier ignore file
+# Build outputs
+dist/
+.nuxt/
+.output/
+node_modules/
+
+# Package files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment files
+.env
+.env.*
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git files
+.git/
+
+# Docker files
+Dockerfile*
+
+# Documentation that should keep specific formatting
+CHANGELOG.md
+LICENSE

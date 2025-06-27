@@ -65,7 +65,9 @@
               <h3 class="text-xl font-semibold adaptive-title">
                 {{ activity.title }}
               </h3>
-              <p class="text-gray-600">{{ activity.description }}</p>
+              <p class="text-gray-600">
+                {{ activity.description }}
+              </p>
               <div class="pt-2">
                 <span
                   class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-club-green/10 text-club-green"
@@ -113,7 +115,9 @@
               <h3 class="text-lg font-semibold adaptive-title">
                 {{ event.title }}
               </h3>
-              <p class="adaptive-text text-sm">{{ event.description }}</p>
+              <p class="adaptive-text text-sm">
+                {{ event.description }}
+              </p>
 
               <div class="flex items-center text-sm adaptive-text">
                 <UIcon name="i-heroicons-map-pin" class="mr-1" />

@@ -48,10 +48,12 @@
         <h3 class="mt-2 text-lg font-medium text-red-800">
           Erreur de chargement
         </h3>
-        <p class="mt-1 text-red-600">{{ error }}</p>
+        <p class="mt-1 text-red-600">
+          {{ error }}
+        </p>
         <button
-          @click="refresh()"
           class="mt-4 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
+          @click="refresh()"
         >
           Réessayer
         </button>

@@ -40,7 +40,7 @@ useSeoMeta({
 
 // Force light mode on mount
 onMounted(() => {
-  if (process.client) {
+  if (import.meta.client) {
     document.documentElement.classList.remove("dark");
     document.documentElement.classList.add("light");
     document.documentElement.setAttribute("data-theme", "light");

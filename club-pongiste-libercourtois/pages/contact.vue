@@ -76,16 +76,18 @@
             </div>
             <h3 class="text-xl font-bold adaptive-title mb-4">Notre Salle</h3>
             <div class="space-y-1 adaptive-text">
-              <div class="font-medium">{{ data.address.name }}</div>
+              <div class="font-medium">
+                {{ data.address.name }}
+              </div>
               <div>{{ data.address.street }}</div>
               <div>{{ data.address.postalCode }} {{ data.address.city }}</div>
             </div>
             <UButton
-              @click="scrollToSection('map')"
               variant="outline"
               color="primary"
               size="sm"
               class="mt-4"
+              @click="scrollToSection('map')"
             >
               <UIcon name="i-heroicons-map" class="mr-2" />
               Voir sur la carte
@@ -193,7 +195,9 @@
           </h3>
 
           <div class="mb-6 text-center">
-            <p class="adaptive-text">{{ data.schedule.availability.note }}</p>
+            <p class="adaptive-text">
+              {{ data.schedule.availability.note }}
+            </p>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -210,7 +214,9 @@
                   class="text-club-navy text-xl"
                 />
               </div>
-              <h4 class="font-bold adaptive-title mb-2">{{ session.day }}</h4>
+              <h4 class="font-bold adaptive-title mb-2">
+                {{ session.day }}
+              </h4>
               <div class="text-lg font-semibold text-club-green mb-2">
                 {{ session.time }}
               </div>
@@ -247,7 +253,7 @@
         </div>
 
         <div class="adaptive-card rounded-xl shadow-lg p-8">
-          <form @submit.prevent="submitForm" class="space-y-6">
+          <form class="space-y-6" @submit.prevent="submitForm">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label
@@ -493,7 +499,7 @@
                 referrerpolicy="no-referrer-when-downgrade"
                 class="rounded-xl"
                 title="Localisation du Club Pongiste Libercourtois"
-              ></iframe>
+              />
             </div>
             <div class="mt-4 text-center">
               <UButton

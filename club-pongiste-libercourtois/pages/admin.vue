@@ -90,10 +90,10 @@
 
         <div class="space-y-4">
           <UButton
-            @click="refresh()"
             :loading="pending"
             color="primary"
             icon="i-heroicons-arrow-path"
+            @click="refresh()"
           >
             Actualiser les données
           </UButton>

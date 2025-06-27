@@ -2,8 +2,8 @@
 
 ### Requirements
 
-- **Node.js 20+** (recommended: 24+)
-- **npm**, **yarn** or **pnpm**
+- **Node.js 20+** (recommended: 24+) - see `.nvmrc` file
+- **pnpm** (recommended package manager for Netlify deployment)
 
 ### ⚡ Standard Installation
 
@@ -13,12 +13,13 @@ git clone <repo-url>
 cd club-pongiste-libercourtois
 
 # Install dependencies
-npm install
+pnpm install
 
 # Start development server
-npm run dev
+pnpm dev:open
 
-# Open http://localhost:3000
+# Build for production
+pnpm build
 ```
 
 ## ✨ Main Features
@@ -144,26 +145,59 @@ club-pongiste-libercourtois/
 
 ```bash
 # Development
-npm run dev         # Development server (http://localhost:3000)
-npm run build       # Optimized production build
-npm run preview     # Preview production build
-npm run generate    # Static generation (SSG)
+pnpm dev:open       # Development server with auto-open browser
+pnpm build          # Optimized production build (Netlify compatible)
+pnpm preview        # Preview production build
+pnpm generate       # Static generation (SSG)
 
 # Code quality
-npm run lint        # Code style checking (ESLint)
-npm run typecheck   # TypeScript type checking
-npm run format      # Automatic code formatting (Prettier)
+pnpm lint           # Code style checking (ESLint)
+pnpm typecheck      # TypeScript type checking
+pnpm format         # Automatic code formatting (Prettier)
 
 # Testing and validation
-npm run test        # Run unit tests
-npm run test:e2e    # End-to-end tests (if configured)
+pnpm test           # Run unit tests
+pnpm test:e2e       # End-to-end tests (if configured)
 
-# Docker (if available)
-docker-compose up dev   # Development environment
-docker-compose up prod  # Production environment
+# Legacy npm commands still work
+npm run dev         # Alternative development command
+npm run build       # Alternative build command
 ```
 
-## 📊 APIs and Endpoints
+## � Netlify Deployment
+
+This project is fully optimized for Netlify deployment following official Nuxt 3 guidelines:
+
+### 📋 Deployment Settings
+
+- **Build Command**: `pnpm build`
+- **Development Command**: `pnpm dev:open`
+- **Package Manager**: pnpm (automatically detected)
+- **Node.js Version**: 20+ (configured in `package.json`)
+- **No preset required**: Uses standard Nuxt 3 output
+- **No netlify.toml needed**: All configuration via Netlify UI
+
+### ⚡ Netlify Features
+
+- **Automatic pnpm detection**: Faster builds with intelligent caching
+- **Edge Functions compatible**: Server routes work seamlessly
+- **Environment variables**: Secure API key management
+- **Preview deployments**: Automatic branch previews
+- **Smart CDN**: Global content delivery optimization
+
+### 🔧 Local Development vs Production
+
+```bash
+# Local development (auto-opens browser)
+pnpm dev:open
+
+# Production build (identical to Netlify)
+pnpm build
+```
+
+The project uses **server-side rendering (SSR)** by default but can be configured for static generation if needed.
+
+## �📊 APIs and Endpoints
 
 ### 🗓️ Event APIs (100% data-driven)
 
@@ -271,7 +305,7 @@ docker-compose up prod
 2. **Clone** your fork locally
 3. **Create** a feature branch (`git checkout -b feature/new-feature`)
 4. **Develop** following project conventions
-5. **Test** your changes with `npm run typecheck` and `npm run lint`
+5. **Test** your changes with `pnpm typecheck` and `pnpm lint`
 6. **Commit** your changes (`git commit -m 'Add: new feature'`)
 7. **Push** to your branch (`git push origin feature/new-feature`)
 8. **Open** a Pull Request with detailed description
@@ -290,16 +324,20 @@ docker-compose up prod
 
 ```bash
 # Nuxt cache errors
-rm -rf .nuxt node_modules/.cache && npm install
+rm -rf .nuxt node_modules/.cache && pnpm install
 
 # TypeScript type issues
-npm run typecheck -- --noEmit
+pnpm typecheck
+
+# ESLint configuration issues (using flat config)
+pnpm lint:check  # Check without fixing
+pnpm lint        # Check and auto-fix issues
 
 # API verification
 curl http://localhost:3000/api/events/upcoming
 
 # Detailed logs in development
-DEBUG=nuxt:* npm run dev
+DEBUG=nuxt:* pnpm dev
 ```
 
 ### Development Tools

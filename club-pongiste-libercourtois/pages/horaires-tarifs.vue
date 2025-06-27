@@ -39,7 +39,9 @@
             class="adaptive-card rounded-xl shadow-lg border border-gray-100 overflow-hidden"
           >
             <div class="bg-club-navy text-white px-6 py-4">
-              <h3 class="text-xl font-bold">{{ daySchedule.day }}</h3>
+              <h3 class="text-xl font-bold">
+                {{ daySchedule.day }}
+              </h3>
             </div>
             <div class="p-6 space-y-4">
               <div
@@ -60,7 +62,9 @@
                 <div class="adaptive-text-primary font-medium">
                   {{ session.category }}
                 </div>
-                <div class="text-xs adaptive-text">{{ session.level }}</div>
+                <div class="text-xs adaptive-text">
+                  {{ session.level }}
+                </div>
               </div>
             </div>
           </div>
@@ -82,7 +86,9 @@
                   name="i-heroicons-trophy"
                   class="text-club-yellow text-xl mr-2"
                 />
-                <h4 class="font-bold adaptive-title">{{ competition.day }}</h4>
+                <h4 class="font-bold adaptive-title">
+                  {{ competition.day }}
+                </h4>
               </div>
               <div class="text-sm adaptive-text mb-2">
                 {{ competition.time }}
@@ -120,7 +126,9 @@
             <div
               class="bg-gradient-to-r from-club-navy to-club-green text-white px-6 py-8 text-center"
             >
-              <h3 class="text-xl font-bold mb-2">{{ pricing.category }}</h3>
+              <h3 class="text-xl font-bold mb-2">
+                {{ pricing.category }}
+              </h3>
               <div class="text-sm text-gray-200 mb-4">
                 {{ pricing.ageRange }}
               </div>
@@ -172,8 +180,12 @@
               <div class="text-2xl font-bold text-club-green mb-1">
                 {{ service.price }}€
               </div>
-              <div class="text-sm adaptive-text mb-3">{{ service.unit }}</div>
-              <p class="text-sm adaptive-text">{{ service.description }}</p>
+              <div class="text-sm adaptive-text mb-3">
+                {{ service.unit }}
+              </div>
+              <p class="text-sm adaptive-text">
+                {{ service.description }}
+              </p>
             </div>
           </div>
         </div>

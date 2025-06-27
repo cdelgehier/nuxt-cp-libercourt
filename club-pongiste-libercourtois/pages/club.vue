@@ -117,7 +117,9 @@
                 class="adaptive-text-primary text-xl"
               />
             </div>
-            <h3 class="font-semibold adaptive-title">{{ value }}</h3>
+            <h3 class="font-semibold adaptive-title">
+              {{ value }}
+            </h3>
           </div>
         </div>
       </div>
@@ -205,7 +207,9 @@
                 <h3 class="text-xl font-bold adaptive-title mb-2">
                   {{ achievement.title }}
                 </h3>
-                <p class="adaptive-text">{{ achievement.description }}</p>
+                <p class="adaptive-text">
+                  {{ achievement.description }}
+                </p>
               </div>
               <div class="flex-shrink-0">
                 <UIcon
@@ -304,9 +308,9 @@
 
                 <!-- Boutons de navigation -->
                 <button
-                  @click="previousImage"
                   class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-colors z-10"
                   :disabled="facilityImages.length <= 1"
+                  @click="previousImage"
                 >
                   <UIcon
                     name="i-heroicons-chevron-left-20-solid"
@@ -315,9 +319,9 @@
                 </button>
 
                 <button
-                  @click="nextImage"
                   class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-colors z-10"
                   :disabled="facilityImages.length <= 1"
+                  @click="nextImage"
                 >
                   <UIcon
                     name="i-heroicons-chevron-right-20-solid"
@@ -332,12 +336,12 @@
                   <button
                     v-for="(image, index) in facilityImages"
                     :key="index"
-                    @click="goToImage(index)"
                     class="w-2 h-2 rounded-full transition-colors"
                     :class="{
                       'bg-white': currentImageIndex === index,
                       'bg-white/50': currentImageIndex !== index,
                     }"
+                    @click="goToImage(index)"
                   />
                 </div>
               </div>
@@ -429,7 +433,7 @@
                   >
                     <span
                       class="w-2 h-2 bg-club-green rounded-full mr-3 flex-shrink-0"
-                    ></span>
+                    />
                     {{ item }}
                   </li>
                 </ul>
@@ -458,7 +462,7 @@
                   block
                   class="font-semibold"
                 >
-                  <UIcon name="i-heroicons-navigation" class="mr-2" />
+                  <UIcon name="i-heroicons-map-pin" class="mr-2" />
                   Calculer l'itinéraire
                 </UButton>
               </div>

@@ -127,9 +127,7 @@
                 <h3 class="text-lg font-semibold mb-3">Collecte des données</h3>
                 <p>
                   Le site
-                  {{
-                    clubConfig?.club?.name || "Club Pongiste Libercourtois"
-                  }}
+                  {{ clubConfig?.club?.name || "Club Pongiste Libercourtois" }}
                   ne collecte des données personnelles que dans le cadre de la
                   prise de contact (formulaire de contact) ou d'inscription aux
                   activités du club.
@@ -223,9 +221,7 @@
             <div class="space-y-4 adaptive-text">
               <p>
                 Ce site peut contenir des liens vers d'autres sites web. Le
-                {{
-                  clubConfig?.club?.name || "Club Pongiste Libercourtois"
-                }}
+                {{ clubConfig?.club?.name || "Club Pongiste Libercourtois" }}
                 n'exerce aucun contrôle sur ces sites et n'assume aucune
                 responsabilité quant à leur contenu.
               </p>

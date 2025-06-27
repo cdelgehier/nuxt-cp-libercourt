@@ -1,7 +1,48 @@
 version: "3"
 
 tasks:
-  dev:
-    desc: Start development server
+  install:
+    desc: Install dependencies with pnpm
     cmds:
-      - npm run dev
+      - pnpm install
+
+  dev:
+    desc: Start development server with auto-open browser
+    cmds:
+      - pnpm dev:open
+
+  build:
+    desc: Build for production (Netlify compatible)
+    cmds:
+      - pnpm build
+
+  preview:
+    desc: Preview production build
+    cmds:
+      - pnpm preview
+
+  lint:
+    desc: Run ESLint code checking
+    cmds:
+      - pnpm lint
+
+  typecheck:
+    desc: Run TypeScript type checking
+    cmds:
+      - pnpm typecheck
+
+  format:
+    desc: Format code with Prettier
+    cmds:
+      - pnpm format
+
+  quality:
+    desc: Run all quality checks
+    cmds:
+      - pnpm run quality:check
+
+  clean:
+    desc: Clean cache and reinstall dependencies
+    cmds:
+      - rm -rf .nuxt node_modules/.cache
+      - pnpm install

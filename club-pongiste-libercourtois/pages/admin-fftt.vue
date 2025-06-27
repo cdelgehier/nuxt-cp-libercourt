@@ -25,10 +25,10 @@
             <div class="flex items-center justify-between">
               <h2 class="text-xl font-semibold mb-4">État du scraping</h2>
               <UButton
-                @click="refreshDocuments"
                 :loading="loading"
                 color="primary"
                 variant="outline"
+                @click="refreshDocuments"
               >
                 <UIcon name="i-heroicons-arrow-path" class="mr-2" />
                 Actualiser
@@ -104,7 +104,9 @@
                         :class="doc ? 'text-green-500' : 'text-red-500'"
                         class="mr-2"
                       />
-                      <h3 class="font-semibold">{{ getDocumentTitle(key) }}</h3>
+                      <h3 class="font-semibold">
+                        {{ getDocumentTitle(key) }}
+                      </h3>
                     </div>
 
                     <div v-if="doc" class="space-y-2">
@@ -159,10 +161,10 @@
                 horaires-tarifs :
               </p>
               <UButton
-                @click="testIntegration"
                 :loading="testingIntegration"
                 color="green"
                 variant="outline"
+                @click="testIntegration"
               >
                 <UIcon name="i-heroicons-beaker" class="mr-2" />
                 Tester l'intégration

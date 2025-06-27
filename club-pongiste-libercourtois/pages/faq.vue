@@ -67,13 +67,13 @@
             <button
               v-for="category in allCategories"
               :key="category.key"
-              @click="selectedCategory = category.key"
               :class="[
                 'px-6 py-2 rounded-full border transition-all duration-200',
                 selectedCategory === category.key
                   ? 'bg-club-blue text-white border-club-blue'
                   : 'adaptive-card text-gray-700 border-gray-300 hover:border-club-blue hover:text-club-blue',
               ]"
+              @click="selectedCategory = category.key"
             >
               <Icon :name="category.icon" class="w-4 h-4 mr-2" />
               {{ category.label }}

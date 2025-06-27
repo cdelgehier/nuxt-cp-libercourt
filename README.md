@@ -33,15 +33,28 @@ To run the club website locally:
 cd club-pongiste-libercourtois
 
 # Install dependencies
-npm install
+pnpm install
 
 # Start development server
-npm run dev
+pnpm dev:open
 
-# Open http://localhost:3000
+# Build for production
+pnpm build
 ```
 
-## 🔧 Repository Configuration
+## � Netlify Deployment
+
+This project is optimized for Netlify deployment:
+
+- **Build Command**: `pnpm build`
+- **Development Command**: `pnpm dev -o`
+- **Package Manager**: pnpm (automatic detection)
+- **No preset needed**: Standard Nuxt 3 deployment
+- **No netlify.toml required**: Configuration via Netlify UI
+
+The project uses pnpm for faster installations and better dependency management, which is automatically detected by Netlify.
+
+## �🔧 Repository Configuration
 
 This repository includes development tools for code quality:
 
@@ -49,6 +62,7 @@ This repository includes development tools for code quality:
 - **ESLint & Prettier** for consistent code formatting
 - **Markdownlint** for documentation quality
 - **TypeScript** support with strict typing
+- **pnpm** as preferred package manager for Netlify deployment
 
 ## 📄 License
 

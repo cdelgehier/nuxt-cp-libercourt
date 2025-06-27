@@ -131,21 +131,21 @@
             v-if="event.registrationOpen"
             class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
           >
-            <div class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5"></div>
+            <div class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5" />
             Inscriptions ouvertes
           </span>
           <span
             v-else-if="event.status === 'upcoming'"
             class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
           >
-            <div class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5"></div>
+            <div class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5" />
             Inscriptions fermées
           </span>
           <span
             v-else-if="event.status === 'cancelled'"
             class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
           >
-            <div class="w-1.5 h-1.5 bg-red-400 rounded-full mr-1.5"></div>
+            <div class="w-1.5 h-1.5 bg-red-400 rounded-full mr-1.5" />
             Annulé
           </span>
         </div>
@@ -153,8 +153,8 @@
         <!-- Register Button -->
         <button
           v-if="event.registrationOpen && canRegister"
-          @click="$emit('register', event)"
           class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          @click="$emit('register', event)"
         >
           <svg
             class="w-4 h-4 mr-1.5"

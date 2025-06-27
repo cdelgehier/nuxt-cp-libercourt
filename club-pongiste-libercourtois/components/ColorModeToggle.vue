@@ -1,6 +1,5 @@
 <template>
   <button
-    @click="toggleColorMode"
     class="color-mode-toggle"
     :aria-label="
       $colorMode.preference === 'dark'
@@ -12,6 +11,7 @@
         ? 'Activer le mode clair'
         : 'Activer le mode sombre'
     "
+    @click="toggleColorMode"
   >
     <Icon
       :name="

@@ -8,9 +8,9 @@
           <!-- Background overlay -->
           <div
             class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-            @click="$emit('close')"
             aria-hidden="true"
-          ></div>
+            @click="$emit('close')"
+          />
 
           <!-- Modal panel -->
           <div
@@ -40,7 +40,9 @@
                   Inscription à l'événement
                 </h3>
                 <div class="mt-2">
-                  <p class="text-sm modal-subtitle">{{ event.title }}</p>
+                  <p class="text-sm modal-subtitle">
+                    {{ event.title }}
+                  </p>
                   <p class="text-xs modal-date mt-1">
                     {{ formatDate(event.date)
                     }}{{ event.time ? ` à ${event.time}` : "" }}
@@ -48,8 +50,8 @@
                 </div>
               </div>
               <button
-                @click="$emit('close')"
                 class="ml-4 modal-close-btn rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                @click="$emit('close')"
               >
                 <svg
                   class="h-6 w-6"
@@ -72,7 +74,9 @@
               <div class="grid grid-cols-2 gap-4 text-sm">
                 <div v-if="event.location">
                   <span class="font-medium modal-label">Lieu:</span>
-                  <p class="modal-text">{{ event.location }}</p>
+                  <p class="modal-text">
+                    {{ event.location }}
+                  </p>
                 </div>
                 <div v-if="event.price">
                   <span class="font-medium text-gray-700">Tarif:</span>
@@ -96,7 +100,7 @@
             </div>
 
             <!-- Registration Form -->
-            <form @submit.prevent="handleSubmit" class="space-y-4">
+            <form class="space-y-4" @submit.prevent="handleSubmit">
               <!-- Member selection -->
               <div>
                 <label
@@ -108,10 +112,10 @@
                 <select
                   id="licensee"
                   v-model="form.licenseeId"
-                  @change="onLicenseeSelect"
                   required
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   :class="{ 'border-red-500': errors.licenseeId }"
+                  @change="onLicenseeSelect"
                 >
                   <option value="">Choisir un licencié...</option>
                   <option
@@ -179,7 +183,7 @@
                   rows="3"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Allergies, besoins spéciaux, questions..."
-                ></textarea>
+                />
               </div>
 
               <!-- Terms and Conditions -->
@@ -206,7 +210,9 @@
                 v-if="submitError"
                 class="bg-red-50 border border-red-200 rounded-md p-3"
               >
-                <p class="text-sm text-red-800">{{ submitError }}</p>
+                <p class="text-sm text-red-800">
+                  {{ submitError }}
+                </p>
               </div>
 
               <!-- Success Display -->
@@ -214,7 +220,9 @@
                 v-if="submitSuccess"
                 class="bg-green-50 border border-green-200 rounded-md p-3"
               >
-                <p class="text-sm text-green-800">{{ submitSuccess }}</p>
+                <p class="text-sm text-green-800">
+                  {{ submitSuccess }}
+                </p>
               </div>
 
               <!-- Form Actions -->
@@ -223,9 +231,9 @@
               >
                 <button
                   type="button"
-                  @click="$emit('close')"
                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   :disabled="isSubmitting"
+                  @click="$emit('close')"
                 >
                   Annuler
                 </button>
@@ -248,12 +256,12 @@
                         r="10"
                         stroke="currentColor"
                         stroke-width="4"
-                      ></circle>
+                      />
                       <path
                         class="opacity-75"
                         fill="currentColor"
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
+                      />
                     </svg>
                     Inscription en cours...
                   </span>

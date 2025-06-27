@@ -174,7 +174,7 @@ This project is fully optimized for Netlify deployment following official Nuxt 3
 - **Development Command**: `pnpm dev:open`
 - **Package Manager**: pnpm (automatically detected)
 - **Node.js Version**: 20+ (configured in `package.json`)
-- **No preset required**: Uses standard Nuxt 3 output
+- **Nitro Preset**: netlify (for API routes support)
 - **No netlify.toml needed**: All configuration via Netlify UI
 
 ### ⚡ Netlify Features

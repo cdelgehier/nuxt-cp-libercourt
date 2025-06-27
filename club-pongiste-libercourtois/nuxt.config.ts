@@ -104,7 +104,7 @@ export default defineNuxtConfig({
 
   // Build configuration
   nitro: {
-    preset: "static",
+    preset: "netlify",
   },
 
   // Runtime config

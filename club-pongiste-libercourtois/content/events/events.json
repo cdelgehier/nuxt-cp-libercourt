@@ -66,6 +66,20 @@
       }
     },
     {
+      "id": "ping-sante-octobre-2025",
+      "title": "Ping santé",
+      "description": "Toujours en mouvement, le club propose désormais du ping santé aux plus de 60 ans. Adapté et encadré par des éducateurs spécifiquement formés, son objectif est de pratiquer le tennis de table de manière ludique mais encadrée, tout en profitant des bienfaits d'une activité physique.",
+      "date": "2025-10-01T14:00:00.000Z",
+      "time": "14h00 - 17h00",
+      "type": "other",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Nathalie GUILBERT",
+        "role": "Responsable Evénements"
+      }
+    },
+    {
       "id": "ag-2025-05-21",
       "title": "Assemblée Générale 2025",
       "description": "AG annuelle avec bilan de saison - Ouverte à tous les membres",

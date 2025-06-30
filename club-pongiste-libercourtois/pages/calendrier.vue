@@ -191,6 +191,49 @@
           </div>
         </div>
 
+        <!-- Event Filter Search -->
+        <div class="mb-8">
+          <div class="max-w-md mx-auto">
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+              >
+                <UIcon
+                  name="i-heroicons-magnifying-glass"
+                  class="h-5 w-5 text-gray-400"
+                />
+              </div>
+              <input
+                v-model="searchQuery"
+                type="text"
+                class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-club-green focus:border-club-green adaptive-text"
+                placeholder="Rechercher un événement... (ex: Adulte, Juillet, Deladerriere)"
+              />
+              <div
+                v-if="searchQuery"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <button
+                  class="text-gray-400 hover:text-gray-600 focus:outline-none"
+                  @click="searchQuery = ''"
+                >
+                  <UIcon name="i-heroicons-x-mark" class="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+            <!-- Search results summary -->
+            <div
+              v-if="searchQuery && filteredEventsCount !== null"
+              class="mt-2 text-sm text-gray-600 text-center"
+            >
+              {{ filteredEventsCount }} événement{{
+                filteredEventsCount > 1 ? "s" : ""
+              }}
+              trouvé{{ filteredEventsCount > 1 ? "s" : "" }}
+            </div>
+          </div>
+        </div>
+
         <!-- Events with Open Registration -->
         <div v-if="eventsWithOpenRegistration.length > 0" class="mb-12">
           <div class="flex items-center mb-6">
@@ -316,6 +359,52 @@ import RegistrationModal from "~/components/Events/RegistrationModal.vue";
 // Data fetching
 const { data, pending, error, refresh } = useLazyFetch("/api/events/calendar");
 
+// Search and filter functionality
+const searchQuery = ref("");
+
+// Function to check if event matches search query
+const eventMatchesSearch = (event: CalendarEvent, query: string): boolean => {
+  if (!query.trim()) return true;
+
+  const searchTerms = query.toLowerCase().trim();
+
+  // Get event date and format it for month name matching
+  const eventDate = new Date(event.date);
+  const monthNames = [
+    "janvier",
+    "février",
+    "mars",
+    "avril",
+    "mai",
+    "juin",
+    "juillet",
+    "août",
+    "septembre",
+    "octobre",
+    "novembre",
+    "décembre",
+  ];
+  const monthName = monthNames[eventDate.getMonth()];
+
+  // Create searchable text from all event properties
+  const searchableText = [
+    event.title,
+    event.description,
+    event.location,
+    event.type,
+    monthName,
+    eventDate.getFullYear().toString(),
+    event.contact?.name,
+    event.contact?.role,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  // Check if search terms match any part of the event data
+  return searchableText.includes(searchTerms);
+};
+
 // Load club configuration for dynamic content
 const { data: clubConfig } = await useFetch("/api/club/config");
 
@@ -359,11 +448,13 @@ const eventsWithOpenRegistration = computed(() => {
         ? new Date(event.registrationDeadline)
         : eventDate;
 
-      return (
+      const meetsDateCriteria =
         eventDate >= referenceDate &&
         deadlineDate >= referenceDate &&
-        event.registrationOpen
-      );
+        event.registrationOpen;
+
+      // Apply search filter
+      return meetsDateCriteria && eventMatchesSearch(event, searchQuery.value);
     })
     .sort((a: CalendarEvent, b: CalendarEvent) => {
       // Sort by event date (earliest first)
@@ -382,10 +473,12 @@ const upcomingEventsClosedRegistration = computed(() => {
         ? new Date(event.registrationDeadline)
         : eventDate;
 
-      return (
+      const meetsDateCriteria =
         eventDate >= referenceDate &&
-        (deadlineDate < referenceDate || !event.registrationOpen)
-      );
+        (deadlineDate < referenceDate || !event.registrationOpen);
+
+      // Apply search filter
+      return meetsDateCriteria && eventMatchesSearch(event, searchQuery.value);
     })
     .sort((a: CalendarEvent, b: CalendarEvent) => {
       // Sort by event date (earliest first)
@@ -399,7 +492,10 @@ const pastEvents = computed(() => {
   return data.value.events
     .filter((event: CalendarEvent) => {
       const eventDate = new Date(event.date);
-      return eventDate < referenceDate;
+      const meetsDateCriteria = eventDate < referenceDate;
+
+      // Apply search filter
+      return meetsDateCriteria && eventMatchesSearch(event, searchQuery.value);
     })
     .sort((a: CalendarEvent, b: CalendarEvent) => {
       // Sort by event date (most recent first for past events)
@@ -418,6 +514,18 @@ const eventsWithApproachingDeadline = computed(() => {
     const registrationDeadline = new Date(event.registrationDeadline);
     return registrationDeadline <= sevenDaysFromNow;
   });
+});
+
+// Total count of filtered events for search results display
+const filteredEventsCount = computed(() => {
+  if (!searchQuery.value.trim()) return null;
+
+  const totalFilteredEvents =
+    eventsWithOpenRegistration.value.length +
+    upcomingEventsClosedRegistration.value.length +
+    pastEvents.value.length;
+
+  return totalFilteredEvents;
 });
 
 // Event handlers

@@ -23,7 +23,7 @@ let cachedDocuments: FFTTDocuments | null = null;
 let lastScrapeTime = 0;
 const CACHE_DURATION = 60 * 60 * 1000; // 1 heure en millisecondes
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (_event) => {
   try {
     const now = Date.now();
 
@@ -84,7 +84,7 @@ export default defineEventHandler(async (event) => {
         /questionnaire.*m[eé]dical.*mineur/i,
         /auto.*questionnaire.*mineur/i,
         /questionnaire.*jeune/i,
-        /questionnaire.*\-.*18/i,
+        /questionnaire.*-.*18/i,
         /mineur.*questionnaire/i,
         /medical.*mineur/i,
       ],

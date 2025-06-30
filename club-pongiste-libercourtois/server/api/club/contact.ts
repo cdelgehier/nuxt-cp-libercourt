@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (_event) => {
   try {
     // Import team data from JSON file
     const teamData = await import("~/content/club/team.json");

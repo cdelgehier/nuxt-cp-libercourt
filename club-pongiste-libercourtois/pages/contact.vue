@@ -498,7 +498,7 @@
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
                 class="rounded-xl"
-                title="Localisation du Club Pongiste Libercourtois"
+                :title="`Localisation du ${clubConfig?.club?.name || 'Club Pongiste Libercourtois'}`"
               />
             </div>
             <div class="mt-4 text-center">
@@ -541,17 +541,19 @@
 </template>
 
 <script setup lang="ts">
-// Configuration SEO
+// Load contact data
+const data = await $fetch("/api/club/contact");
+
+// Load club configuration for dynamic content
+const { data: clubConfig } = await useFetch("/api/club/config");
+
+// Configuration SEO with dynamic club name
 useSeoMeta({
   title: "Contact",
-  description:
-    "Contactez le Club Pongiste Libercourtois. Trouvez toutes nos coordonnées, horaires de permanence et plan d'accès à notre salle de sport.",
+  description: `Contactez le ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"}. Trouvez toutes nos coordonnées, horaires de permanence et plan d'accès à notre salle de sport.`,
   keywords:
     "contact club tennis de table, Libercourt, horaires permanence, plan accès, formulaire contact",
 });
-
-// Load contact data
-const data = await $fetch("/api/club/contact");
 
 // Form state
 const form = ref({

@@ -128,20 +128,20 @@
 </template>
 
 <script setup lang="ts">
-// Configuration SEO
+// Load club configuration for dynamic content
+const { data: clubConfig } = await useFetch("/api/club/config");
+
+// Configuration SEO with dynamic club name
 useSeoMeta({
   title: "FAQ - Questions Fréquentes",
-  description:
-    "Trouvez les réponses aux questions les plus courantes sur le Club Pongiste Libercourtois : inscriptions, tarifs, horaires, matériel et compétitions.",
+  description: `Trouvez les réponses aux questions les plus courantes sur le ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"} : inscriptions, tarifs, horaires, matériel et compétitions.`,
   keywords:
     "FAQ tennis de table, questions fréquentes, inscriptions club, tarifs ping pong, horaires entrainement, Libercourt",
 });
 
-// Utilisation du composable FAQ
+// Use the FAQ composable to load questions
 const {
   faqData,
-  loading,
-  error,
   fetchFaqData,
   getAllQuestions,
   searchQuestions,

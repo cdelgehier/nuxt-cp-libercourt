@@ -15,4 +15,7 @@
 
 <script setup lang="ts">
 // This layout will be used by default for all pages
+defineOptions({
+  name: "DefaultLayout",
+});
 </script>

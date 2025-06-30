@@ -313,20 +313,33 @@ import type { CalendarEvent } from "~/types";
 import EventCard from "~/components/Events/EventCard.vue";
 import RegistrationModal from "~/components/Events/RegistrationModal.vue";
 
-// SEO
+// Data fetching
+const { data, pending, error, refresh } = useLazyFetch("/api/events/calendar");
+
+// Load club configuration for dynamic content
+const { data: clubConfig } = await useFetch("/api/club/config");
+
+// SEO with dynamic club name
 useHead({
-  title: "Calendrier des Événements - Club Pongiste Libercourtois",
+  title: `Calendrier des Événements - ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"}`,
   meta: [
     {
       name: "description",
-      content:
-        "Découvrez le calendrier complet des événements, tournois et compétitions du Club Pongiste Libercourtois.",
+      content: `Découvrez le calendrier complet des événements, tournois et compétitions du ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"}.`,
     },
   ],
 });
 
-// Data fetching
-const { data, pending, error, refresh } = useLazyFetch("/api/events/calendar");
+// SEO with dynamic club name
+useHead({
+  title: `Calendrier des Événements - ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"}`,
+  meta: [
+    {
+      name: "description",
+      content: `Découvrez le calendrier complet des événements, tournois et compétitions du ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"}.`,
+    },
+  ],
+});
 
 // Registration modal state
 const showRegistrationModal = ref(false);
@@ -392,25 +405,13 @@ const eventsWithApproachingDeadline = computed(() => {
   });
 });
 
-// Legacy computed properties for backward compatibility
-const upcomingEvents = computed(() => {
-  return [
-    ...eventsWithOpenRegistration.value,
-    ...upcomingEventsClosedRegistration.value,
-  ];
-});
-
-const openRegistrations = computed(() => {
-  return eventsWithOpenRegistration.value.length;
-});
-
 // Event handlers
 function handleRegister(event: CalendarEvent) {
   selectedEvent.value = event;
   showRegistrationModal.value = true;
 }
 
-function onRegister(data: any) {
+function onRegister(_data: any) {
   showRegistrationModal.value = false;
   selectedEvent.value = null;
 }

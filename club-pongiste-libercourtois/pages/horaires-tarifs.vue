@@ -399,11 +399,13 @@
 </template>
 
 <script setup lang="ts">
-// Configuration SEO
+// Load club configuration for dynamic content
+const { data: clubConfig } = await useFetch("/api/club/config");
+
+// Configuration SEO with dynamic club name
 useSeoMeta({
   title: "Horaires et Tarifs",
-  description:
-    "Découvrez les horaires d'entraînement et les tarifs du Club Pongiste Libercourtois. Des créneaux adaptés à tous les âges et tous les niveaux.",
+  description: `Découvrez les horaires d'entraînement et les tarifs du ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"}. Des créneaux adaptés à tous les âges et tous les niveaux.`,
   keywords:
     "horaires tennis de table, tarifs club, entraînement ping-pong, créneaux Libercourt, inscription club",
 });
@@ -421,13 +423,5 @@ function getDocumentIcon(type: string): string {
     payment: "i-heroicons-credit-card",
   };
   return icons[type] || "i-heroicons-document";
-}
-
-// Fonction de navigation vers une section
-function scrollToSection(sectionId: string) {
-  const element = document.getElementById(sectionId);
-  if (element) {
-    element.scrollIntoView({ behavior: "smooth" });
-  }
 }
 </script>

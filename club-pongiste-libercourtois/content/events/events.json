@@ -39,7 +39,7 @@
       "endDate": "2025-08-09T22:00:00.000Z",
       "time": "15h - 19h00",
       "type": "other",
-      "location": "Base de loisirs de Libercourt - Etang des Marlières",
+      "location": "Base de loisirs de l’Emolière - 5 Imp. des Hêtres, 62820 Libercourt",
       "contact": {
         "name": "Club Pongiste Libercourtois",
         "role": "Organisation"
@@ -110,7 +110,7 @@
       "endDate": "2025-10-04T20:30:00.000Z",
       "time": "13h00 - 20h30",
       "type": "other",
-      "location": "Salle DELFOSSE, à côté de la mairie",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
       "currentParticipants": 0,
       "maxParticipants": 300,
       "registrationOpen": true,
@@ -184,7 +184,8 @@
       "date": "2025-11-08T12:00:00.000Z",
       "time": "12h00 - 18h00",
       "type": "tournament",
-      "registrationOpen": true,
+      "location": "Tennis de Table Immercurien - Rue du 8 Mai 1945, 62223 Saint-Laurent-Blangy, France",
+      "registrationOpen": false,
       "registrationDeadline": "2025-11-06T23:59:59.000Z",
       "price": 0,
       "contact": {
@@ -367,7 +368,8 @@
       "date": "2026-01-31T12:00:00.000Z",
       "time": "12h00 - 18h00",
       "type": "tournament",
-      "registrationOpen": true,
+      "location": "Tennis de Table Immercurien - Rue du 8 Mai 1945, 62223 Saint-Laurent-Blangy, France",
+      "registrationOpen": false,
       "registrationDeadline": "2026-01-29T23:59:59.000Z",
       "price": 0,
       "contact": {
@@ -424,7 +426,8 @@
       "date": "2026-04-25T12:00:00.000Z",
       "time": "12h00 - 18h00",
       "type": "tournament",
-      "registrationOpen": true,
+      "location": "Tennis de Table Immercurien - Rue du 8 Mai 1945, 62223 Saint-Laurent-Blangy, France",
+      "registrationOpen": false,
       "registrationDeadline": "2026-04-23T23:59:59.000Z",
       "price": 0,
       "contact": {
@@ -593,7 +596,8 @@
       "date": "2026-06-13T09:00:00.000Z",
       "time": "9h00 - 18h00",
       "type": "tournament",
-      "registrationOpen": true,
+      "location": "Tennis de Table Immercurien - Rue du 8 Mai 1945, 62223 Saint-Laurent-Blangy, France",
+      "registrationOpen": false,
       "registrationDeadline": "2026-06-11T23:59:59.000Z",
       "price": 0,
       "contact": {

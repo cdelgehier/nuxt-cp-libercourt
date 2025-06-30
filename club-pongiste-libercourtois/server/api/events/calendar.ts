@@ -61,7 +61,7 @@ export default defineEventHandler(async () => {
     const allEvents: Event[] = eventsJson.events.map((evt: any) => ({
       ...evt,
       // Use event location if provided, otherwise use club default location
-      location: evt.location || config.club.salle,
+      location: evt.location || config.location.name,
       // Calculate status dynamically based on date
       status: new Date(evt.date) >= now ? "upcoming" : "past",
       contact: {

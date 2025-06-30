@@ -44,30 +44,27 @@
         "description": "Tenue officielle du club pour les compétitions"
       }
     ],
-    "discounts": [
+    "reductions": [
       {
         "name": "Réduction famille",
         "type": "Famille",
         "description": "10€ de réduction pour 2 licences compétition au sein d'un même foyer",
         "amount": 10,
-        "discount": 22,
         "condition": "2 licences compétition minimum"
       },
       {
-        "name": "Passeport de l'État",
+        "name": "Pass'Sport État",
         "type": "Pass'Sport État",
-        "description": "Aide de l'État de 50€ pour encourager la pratique sportive",
-        "amount": 50,
-        "discount": 62,
+        "description": "Aide de l'État de 70€ pour encourager la pratique sportive",
+        "amount": 70,
         "condition": "Conditions d'éligibilité sur pass.sports.gouv.fr",
-        "url": "https://www.pass.sports.gouv.fr/v2/pro/accueil"
+        "url": "https://www.pass.sports.gouv.fr"
       },
       {
-        "name": "Pass Sport Agglo",
-        "type": "Pass'Sport Agglo",
+        "name": "Pass Sport Agglo CAHC",
+        "type": "Pass'Sport Agglo CAHC",
         "description": "Aide de l'agglomération Hénin-Carvin de 30€",
         "amount": 30,
-        "discount": 38,
         "condition": "Résidents de l'agglomération Hénin-Carvin",
         "url": "https://www.agglo-henincarvin.fr/Vie-quotidienne/Pass-Sport-Pass-Culture"
       }

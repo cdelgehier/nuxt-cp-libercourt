@@ -346,7 +346,7 @@ const showRegistrationModal = ref(false);
 const selectedEvent = ref<CalendarEvent | null>(null);
 
 // Computed properties with smart event logic
-const referenceDate = new Date("2025-06-26T12:00:00.000Z");
+const referenceDate = new Date();
 
 // Events with open registration (future deadline and registrationOpen)
 const eventsWithOpenRegistration = computed(() => {

@@ -470,14 +470,10 @@
 
               <div class="mt-6 pt-6 border-t adaptive-border">
                 <UButton
-                  :href="
-                    data.address.googleMapsUrl ||
-                    `https://www.google.com/maps/search/?api=1&query=${data.address.coordinates.lat},${data.address.coordinates.lng}`
-                  "
-                  target="_blank"
                   color="primary"
                   block
                   class="font-semibold"
+                  @click="openGoogleMaps"
                 >
                   <UIcon name="i-heroicons-globe-alt" class="mr-2" />
                   Ouvrir dans Google Maps
@@ -503,12 +499,11 @@
             </div>
             <div class="mt-4 text-center">
               <UButton
-                :href="`https://www.google.com/maps/dir/?api=1&destination=${data.address.coordinates.lat},${data.address.coordinates.lng}&destination_place_id=ChIJGVfcaiwE3EcRUFH2igSTQgE`"
-                target="_blank"
                 variant="outline"
                 color="primary"
                 size="sm"
                 class="font-semibold"
+                @click="openDirections"
               >
                 <UIcon
                   name="i-heroicons-arrow-top-right-on-square"
@@ -622,6 +617,27 @@ async function submitForm() {
   } finally {
     isSubmitting.value = false;
   }
+}
+
+// Function to open Google Maps in a new tab
+function openGoogleMaps() {
+  // Use the URL from data or build one with coordinates
+  const url =
+    data.address?.googleMapsUrl ||
+    `https://www.google.com/maps/search/?api=1&query=${data.address?.coordinates?.lat || 50.48185408012125},${data.address?.coordinates?.lng || 3.017099247377654}`;
+
+  // Open Google Maps in a new tab
+  window.open(url, "_blank");
+}
+
+// Function to open Google Maps directions in a new tab
+function openDirections() {
+  // Build directions URL using address data
+  const destination = `${data.address?.name || "Salle Deladerriere"}, ${data.address?.city || "Libercourt"}`;
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
+
+  // Open directions in a new tab
+  window.open(url, "_blank");
 }
 
 // Fonction de navigation vers une section

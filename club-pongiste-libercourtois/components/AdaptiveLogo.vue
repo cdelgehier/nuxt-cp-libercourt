@@ -1,7 +1,7 @@
 <template>
   <img
     :src="logoSrc"
-    :alt="alt"
+    :alt="altText"
     :class="classes"
     class="transition-opacity duration-300"
   />
@@ -13,10 +13,19 @@ interface Props {
   classes?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  alt: "Club Pongiste Libercourtois",
+const _props = withDefaults(defineProps<Props>(), {
+  alt: undefined, // Will use clubName as fallback
   classes: "h-20 w-auto hover:scale-105 transition-transform duration-200",
 });
+
+// Get club configuration data
+const { data: clubConfig } = await useFetch("/api/club/config");
+
+// Use prop alt if provided, otherwise use club name
+const altText = computed(
+  () =>
+    _props.alt || clubConfig.value?.club?.name || "Club Pongiste Libercourtois",
+);
 
 const { $colorMode } = useNuxtApp();
 

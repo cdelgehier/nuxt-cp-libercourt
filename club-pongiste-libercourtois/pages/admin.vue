@@ -11,7 +11,8 @@
             du Club
           </h1>
           <p class="text-xl text-gray-200 max-w-3xl mx-auto">
-            Statistiques et gestion du Club Pongiste Libercourtois
+            Statistiques et gestion du
+            {{ clubConfig?.club?.name || "Club Pongiste Libercourtois" }}
           </p>
         </div>
       </div>
@@ -125,6 +126,9 @@
 </template>
 
 <script setup lang="ts">
+// Load club configuration for dynamic content
+const { data: clubConfig } = await useFetch("/api/club/config");
+
 // Configuration SEO
 useSeoMeta({
   title: "Administration",

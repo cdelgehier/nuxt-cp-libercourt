@@ -1,25 +1,7 @@
 import { spawn } from "child_process";
-import type { Licensee, ClubConfig } from "~/types";
+import type { Licensee } from "~/types";
 
 // SmartPing API integration with Python backend
-interface SmartPingLicensee {
-  licence: string;
-  nom: string;
-  prenom: string;
-  club: string;
-  nclub: string;
-  points: number;
-  classement: string;
-  echelon: string;
-  place: number;
-  natio: string;
-  sexe: string;
-  type: string;
-  certif: string;
-  valide: string;
-  echelon_mixte: string;
-}
-
 interface PythonScriptResult {
   success: boolean;
   licensees: any[];
@@ -125,7 +107,7 @@ async function executePythonScript(
           // Try to parse JSON output from Python script
           const result = JSON.parse(stdout);
           resolve(result);
-        } catch (error) {
+        } catch (_error) {
           // If not JSON, assume it's log output and return empty result
           resolve({
             success: false,
@@ -144,12 +126,12 @@ async function executePythonScript(
       }
     });
 
-    pythonProcess.on("error", (error) => {
+    pythonProcess.on("error", (_error) => {
       resolve({
         success: false,
         licensees: [],
         source: "mock",
-        error: `Failed to execute Python script: ${error.message}`,
+        error: `Failed to execute Python script: ${_error.message}`,
       });
     });
   });

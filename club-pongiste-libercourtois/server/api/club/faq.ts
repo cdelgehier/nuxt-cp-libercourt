@@ -1,6 +1,6 @@
 import type { ClubConfig } from "~/types";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (_event) => {
   try {
     // Import centralized configuration data
     const configData = await import("~/content/club/config.json");
@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
     };
 
     return enrichedFaqData;
-  } catch (error) {
+  } catch (_error) {
     throw createError({
       statusCode: 500,
       statusMessage: "Erreur lors du chargement des FAQ",

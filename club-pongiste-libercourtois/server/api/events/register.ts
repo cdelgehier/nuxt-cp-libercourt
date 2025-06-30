@@ -37,7 +37,6 @@ const RegistrationResponseSchema = z.object({
     .optional(),
 });
 
-type Registration = z.infer<typeof RegistrationSchema>;
 type RegistrationResponse = z.infer<typeof RegistrationResponseSchema>;
 
 export default defineEventHandler(async (event) => {

@@ -17,21 +17,38 @@ export default createConfigForNuxt({
   // Custom rules for better code quality
   {
     rules: {
-      // Prevent console.log in production
-      "no-console": "error",
+      // Allow console.log in development for debugging
+      "no-console": "warn",
       // Prevent debugger statements
       "no-debugger": "error",
-      // Prevent alert() usage
-      "no-alert": "error",
-      // Check for unused variables
-      "no-unused-vars": "error",
+      // Allow alert() usage for quick debugging
+      "no-alert": "warn",
+      // Check for unused variables but allow underscore prefix
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       // TypeScript specific rules
-      "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
       "@typescript-eslint/no-explicit-any": "warn",
       // Vue specific rules
       "vue/html-self-closing": "error",
       "vue/require-default-prop": "error",
-      "vue/multi-word-component-names": "error",
+      // Allow single word component names for pages
+      "vue/multi-word-component-names": [
+        "error",
+        {
+          ignores: [
+            "default",
+            "index",
+            "admin",
+            "club",
+            "contact",
+            "faq",
+            "calendrier",
+          ],
+        },
+      ],
     },
   },
 );

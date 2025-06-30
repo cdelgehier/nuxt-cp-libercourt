@@ -11,8 +11,7 @@
             <span class="text-club-yellow">Club</span>
           </h1>
           <p class="text-xl lg:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-            {{ clubInfo.name }} - Une passion partagée depuis
-            {{ clubInfo.foundedYear }}
+            {{ clubInfo.name }} - Une passion {{ clubInfo.foundedYear }}
           </p>
           <div class="flex flex-wrap justify-center gap-8 text-center">
             <div
@@ -85,7 +84,7 @@
           <div class="relative">
             <img
               src="/images/club-history.png"
-              alt="Histoire du Club Pongiste Libercourtois"
+              :alt="`Histoire du ${clubConfig.club?.name}`"
               class="rounded-xl shadow-xl w-full h-auto"
             />
           </div>
@@ -441,26 +440,24 @@
 
               <div class="space-y-3">
                 <UButton
-                  href="https://www.google.com/maps/search/?api=1&query=Complexe+Sportif+Leo+Lagrange+Libercourt"
-                  target="_blank"
                   color="primary"
                   size="sm"
                   variant="outline"
                   block
                   class="font-semibold"
+                  @click="openGoogleMaps"
                 >
                   <UIcon name="i-heroicons-map" class="mr-2" />
                   Voir sur Google Maps
                 </UButton>
 
                 <UButton
-                  href="https://www.google.com/maps/dir/?api=1&destination=Salle+des+Sports+Libercourt"
-                  target="_blank"
                   color="green"
                   size="sm"
                   variant="outline"
                   block
                   class="font-semibold"
+                  @click="openDirections"
                 >
                   <UIcon name="i-heroicons-map-pin" class="mr-2" />
                   Calculer l'itinéraire
@@ -509,17 +506,6 @@
 </template>
 
 <script setup lang="ts">
-import type { ClubMember } from "~/types";
-
-// Configuration SEO
-useSeoMeta({
-  title: "À propos du Club",
-  description:
-    "Découvrez l'histoire, la mission et l'équipe du Club Pongiste Libercourtois. Plus de 50 ans de passion pour le tennis de table à Libercourt.",
-  keywords:
-    "club tennis de table, histoire, équipe dirigeante, Libercourt, installations",
-});
-
 // Interface for club statistics
 interface ClubStats {
   licencies: number;
@@ -548,6 +534,18 @@ const clubInfo = await $fetch("/api/club/about");
 // Load team management from unified API
 const teamResponse = (await $fetch("/api/club/team")) as any;
 const teamMembers = teamResponse.team || [];
+
+// Load club configuration for Google Maps links
+const clubConfig = await $fetch("/api/club/config");
+const locationData = clubConfig.location;
+
+// Configuration SEO using dynamic club name
+useSeoMeta({
+  title: "À propos du Club",
+  description: `Découvrez l'histoire, la mission et l'équipe du ${clubConfig?.club?.name || "Club Pongiste Libercourtois"}. Plus de 50 ans de passion pour le tennis de table à Libercourt.`,
+  keywords:
+    "club tennis de table, histoire, équipe dirigeante, Libercourt, installations",
+});
 
 // Images du carousel des installations
 const facilityImages = [
@@ -625,18 +623,6 @@ onUnmounted(() => {
 });
 
 // Utilitaires pour l'affichage
-function getRoleDisplayName(role: string): string {
-  const roles: Record<string, string> = {
-    president: "Président",
-    "vice-president": "Vice-Président",
-    secretary: "Secrétaire adjoint",
-    treasurer: "Trésorier",
-    coach: "Entraîneur",
-    member: "Membre du bureau",
-  };
-  return roles[role] || role;
-}
-
 function getValueIcon(index: number): string {
   const icons = [
     "i-heroicons-users",
@@ -646,5 +632,25 @@ function getValueIcon(index: number): string {
     "i-heroicons-academic-cap",
   ];
   return icons[index] || "i-heroicons-star";
+}
+
+// Functions to handle Google Maps links
+function openGoogleMaps() {
+  // Use the URL from club configuration or build one with coordinates
+  const url =
+    locationData.googleMapsUrl ||
+    `https://www.google.com/maps/place/@${locationData.coordinates.lat},${locationData.coordinates.lng},17z`;
+
+  // Open Google Maps in a new tab
+  window.open(url, "_blank");
+}
+
+function openDirections() {
+  // Build directions URL using club location data
+  const destination = `${locationData.name}, ${locationData.city}`;
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
+
+  // Open directions in a new tab
+  window.open(url, "_blank");
 }
 </script>

@@ -15,7 +15,7 @@ let cachedStats: ClubStats | null = null;
 let lastFetch: number = 0;
 const CACHE_DURATION = 1000 * 60 * 60 * 24; // 24 hours in milliseconds
 
-export default defineEventHandler(async (event): Promise<ClubStats> => {
+export default defineEventHandler(async (_event): Promise<ClubStats> => {
   const now = Date.now();
 
   // Return cached data if still valid

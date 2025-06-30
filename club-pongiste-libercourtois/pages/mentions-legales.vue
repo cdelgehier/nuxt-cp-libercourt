@@ -59,7 +59,7 @@
               </div>
               <div>
                 <strong>Responsable de la publication :</strong><br />
-                Président du
+                Secrétaires du
                 {{ clubConfig?.club?.name || "Club Pongiste Libercourtois" }}
               </div>
             </div>

@@ -161,10 +161,10 @@
             />
             <h3 class="font-bold adaptive-title mb-2">Appelez-nous</h3>
             <a
-              href="tel:0327851234"
+              :href="`tel:${clubConfig?.club?.phone || '06 60 05 12 41'}`"
               class="text-club-green hover:underline font-medium"
             >
-              03 27 85 12 34
+              {{ clubConfig?.club?.phone || "06 60 05 12 41" }}
             </a>
           </div>
 
@@ -175,10 +175,10 @@
             />
             <h3 class="font-bold adaptive-title mb-2">Écrivez-nous</h3>
             <a
-              href="mailto:contact@club-libercourtois.fr"
+              :href="`mailto:${clubConfig?.club?.email || 'cplibercourt@gmail.com'}`"
               class="text-club-green hover:underline font-medium"
             >
-              contact@club-libercourtois.fr
+              {{ clubConfig?.club?.email || "cplibercourt@gmail.com" }}
             </a>
           </div>
         </div>

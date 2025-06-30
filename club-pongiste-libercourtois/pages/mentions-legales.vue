@@ -310,7 +310,7 @@ const { data: clubConfig } = await useFetch("/api/club/config", {
       complexe: "Complexe Sportif Léo Lagrange",
       email: "cplibercourt@gmail.com",
       phone: "06 60 05 12 41",
-      website: "cplibercourt.fr",
+      website: "cplibercourt.netlify.app",
       description:
         "Club de tennis de table à Libercourt - Passion, convivialité et performance depuis 1970",
     },

@@ -1,3 +1,5 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/c409bab5-3670-4426-be38-0e37be4ba4c1/deploy-status)](https://app.netlify.com/projects/cplibercourt/deploys)
+
 ## 🚀 Quick Start
 
 ### Requirements

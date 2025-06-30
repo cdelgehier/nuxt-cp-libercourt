@@ -351,45 +351,60 @@ const referenceDate = new Date();
 // Events with open registration (future deadline and registrationOpen)
 const eventsWithOpenRegistration = computed(() => {
   if (!data.value?.events) return [];
-  return data.value.events.filter((event: CalendarEvent) => {
-    const eventDate = new Date(event.date);
-    // If no registration deadline, use event date as deadline
-    const deadlineDate = event.registrationDeadline
-      ? new Date(event.registrationDeadline)
-      : eventDate;
+  return data.value.events
+    .filter((event: CalendarEvent) => {
+      const eventDate = new Date(event.date);
+      // If no registration deadline, use event date as deadline
+      const deadlineDate = event.registrationDeadline
+        ? new Date(event.registrationDeadline)
+        : eventDate;
 
-    return (
-      eventDate >= referenceDate &&
-      deadlineDate >= referenceDate &&
-      event.registrationOpen
-    );
-  });
+      return (
+        eventDate >= referenceDate &&
+        deadlineDate >= referenceDate &&
+        event.registrationOpen
+      );
+    })
+    .sort((a: CalendarEvent, b: CalendarEvent) => {
+      // Sort by event date (earliest first)
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
 });
 
 // Future events with closed registration (deadline passed or registrationOpen false)
 const upcomingEventsClosedRegistration = computed(() => {
   if (!data.value?.events) return [];
-  return data.value.events.filter((event: CalendarEvent) => {
-    const eventDate = new Date(event.date);
-    // If no registration deadline, use event date as deadline
-    const deadlineDate = event.registrationDeadline
-      ? new Date(event.registrationDeadline)
-      : eventDate;
+  return data.value.events
+    .filter((event: CalendarEvent) => {
+      const eventDate = new Date(event.date);
+      // If no registration deadline, use event date as deadline
+      const deadlineDate = event.registrationDeadline
+        ? new Date(event.registrationDeadline)
+        : eventDate;
 
-    return (
-      eventDate >= referenceDate &&
-      (deadlineDate < referenceDate || !event.registrationOpen)
-    );
-  });
+      return (
+        eventDate >= referenceDate &&
+        (deadlineDate < referenceDate || !event.registrationOpen)
+      );
+    })
+    .sort((a: CalendarEvent, b: CalendarEvent) => {
+      // Sort by event date (earliest first)
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
 });
 
 // Past events (event date has passed)
 const pastEvents = computed(() => {
   if (!data.value?.events) return [];
-  return data.value.events.filter((event: CalendarEvent) => {
-    const eventDate = new Date(event.date);
-    return eventDate < referenceDate;
-  });
+  return data.value.events
+    .filter((event: CalendarEvent) => {
+      const eventDate = new Date(event.date);
+      return eventDate < referenceDate;
+    })
+    .sort((a: CalendarEvent, b: CalendarEvent) => {
+      // Sort by event date (most recent first for past events)
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
 });
 
 // Events with registration deadline approaching (within 7 days)

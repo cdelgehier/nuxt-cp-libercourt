@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (_event) => {
   try {
     // Import club configuration for location data
     const configData = await import("~/content/club/config.json");
@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
       categories,
       events: transformedEvents,
     };
-  } catch (error) {
+  } catch (_error) {
     throw createError({
       statusCode: 500,
       statusMessage: "Erreur lors du chargement des événements",

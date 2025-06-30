@@ -1,4 +1,4 @@
-import type { Licensee, ClubConfig } from "~/types";
+import type { ClubConfig } from "~/types";
 import { fetchLicenseesWithSmartPing } from "~/server/utils/smartping";
 
 // TODO: To integrate the real SmartPing FFTT API
@@ -10,7 +10,7 @@ import { fetchLicenseesWithSmartPing } from "~/server/utils/smartping";
 // Documentation API SmartPing :
 // https://www.fftt.com/site/medias/shares_files/informatique-specifications-techniques-api-smartping-720.pdf
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (_event) => {
   try {
     // Load club configuration
     const configData = await import("~/content/club/config.json");

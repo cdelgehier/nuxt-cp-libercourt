@@ -4,7 +4,7 @@
       "id": "tounoi-wingles-2025",
       "title": "Tournoi amical de Wingles",
       "description": "Tournoi amical à wingles. Auberge Espagnole le midi.",
-      "date": "2025-07-15T09:00:00.000Z",
+      "date": "2025-06-29T09:00:00.000Z",
       "time": "8h30 - 18h00",
       "type": "tournament",
       "location": "Complexe Michel Bernard de Wingles",
@@ -60,6 +60,20 @@
       "registrationOpen": true,
       "registrationDeadline": "2025-10-04T14:30:00.000Z",
       "price": 15,
+      "contact": {
+        "name": "Nathalie GUILBERT",
+        "role": "Responsable Evénements"
+      }
+    },
+    {
+      "id": "ping-sante-octobre-2025",
+      "title": "Ping santé",
+      "description": "Toujours en mouvement, le club propose désormais du ping santé aux plus de 60 ans. Adapté et encadré par des éducateurs spécifiquement formés, son objectif est de pratiquer le tennis de table de manière ludique mais encadrée, tout en profitant des bienfaits d'une activité physique.",
+      "date": "2025-10-01T14:00:00.000Z",
+      "time": "14h00 - 17h00",
+      "type": "other",
+      "registrationOpen": false,
+      "price": 0,
       "contact": {
         "name": "Nathalie GUILBERT",
         "role": "Responsable Evénements"

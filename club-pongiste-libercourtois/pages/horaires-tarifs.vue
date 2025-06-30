@@ -190,37 +190,37 @@
           </div>
         </div>
 
-        <!-- Discounts -->
+        <!-- Réductions -->
         <div class="reductions-section rounded-xl shadow-lg p-8">
           <h3 class="text-2xl font-bold mb-6 text-center reductions-title">
             Réductions Disponibles
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div
-              v-for="discount in data.pricing.discounts"
-              :key="`${discount.type}-${discount.description}`"
+              v-for="reduction in data.pricing.reductions"
+              :key="`${reduction.type}-${reduction.description}`"
               class="text-center p-4 rounded-lg reduction-card transition-colors"
             >
               <div
                 class="w-16 h-16 bg-club-yellow rounded-full flex items-center justify-center mx-auto mb-4"
               >
                 <span class="text-club-navy font-bold text-xl"
-                  >{{ discount.amount }}€</span
+                  >{{ reduction.amount }}€</span
                 >
               </div>
               <h4 class="font-bold text-club-yellow mb-2">
-                {{ discount.type }}
+                {{ reduction.type }}
               </h4>
               <p class="text-sm reduction-text mb-3">
-                {{ discount.description }}
+                {{ reduction.description }}
               </p>
               <p class="text-xs reduction-subtext mb-3">
-                {{ discount.condition }}
+                {{ reduction.condition }}
               </p>
 
               <a
-                v-if="'url' in discount && discount.url"
-                :href="discount.url"
+                v-if="'url' in reduction && reduction.url"
+                :href="reduction.url"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex items-center text-xs bg-club-yellow text-club-navy px-3 py-1 rounded-full font-semibold hover:bg-yellow-300 transition-colors"
@@ -399,11 +399,13 @@
 </template>
 
 <script setup lang="ts">
-// Configuration SEO
+// Load club configuration for dynamic content
+const { data: clubConfig } = await useFetch("/api/club/config");
+
+// Configuration SEO with dynamic club name
 useSeoMeta({
   title: "Horaires et Tarifs",
-  description:
-    "Découvrez les horaires d'entraînement et les tarifs du Club Pongiste Libercourtois. Des créneaux adaptés à tous les âges et tous les niveaux.",
+  description: `Découvrez les horaires d'entraînement et les tarifs du ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"}. Des créneaux adaptés à tous les âges et tous les niveaux.`,
   keywords:
     "horaires tennis de table, tarifs club, entraînement ping-pong, créneaux Libercourt, inscription club",
 });
@@ -421,13 +423,5 @@ function getDocumentIcon(type: string): string {
     payment: "i-heroicons-credit-card",
   };
   return icons[type] || "i-heroicons-document";
-}
-
-// Fonction de navigation vers une section
-function scrollToSection(sectionId: string) {
-  const element = document.getElementById(sectionId);
-  if (element) {
-    element.scrollIntoView({ behavior: "smooth" });
-  }
 }
 </script>

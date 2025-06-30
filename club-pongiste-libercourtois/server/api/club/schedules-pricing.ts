@@ -1,6 +1,6 @@
 import type { ClubConfig } from "~/types";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (_event) => {
   try {
     // Import centralized configuration data
     const configData = await import("~/content/club/config.json");
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     let ffttDocuments;
     try {
       ffttDocuments = await $fetch("/api/fftt/documents");
-    } catch (error) {
+    } catch (_error) {
       console.warn("Could not fetch FFTT documents, using fallback URLs");
       ffttDocuments = { success: false };
     }
@@ -159,7 +159,7 @@ export default defineEventHandler(async (event) => {
     };
 
     return enrichedData;
-  } catch (error) {
+  } catch (_error) {
     throw createError({
       statusCode: 500,
       statusMessage:

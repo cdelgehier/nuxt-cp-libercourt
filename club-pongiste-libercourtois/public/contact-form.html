@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Contact Form</title>
+  </head>
+  <body>
+    <!-- Hidden form for Netlify to detect during build -->
+    <form
+      name="contact"
+      method="POST"
+      data-netlify="true"
+      data-netlify-honeypot="bot-field"
+      action="/merci"
+      style="display: none"
+    >
+      <input type="hidden" name="form-name" value="contact" />
+      <div style="display: none">
+        <label
+          >Don't fill this out if you're human: <input name="bot-field"
+        /></label>
+      </div>
+      <input type="text" name="firstName" />
+      <input type="text" name="lastName" />
+      <input type="email" name="email" />
+      <input type="tel" name="phone" />
+      <select name="subject">
+        <option value="inscription">Inscription / Renseignements</option>
+        <option value="horaires">Horaires et créneaux</option>
+        <option value="tarifs">Tarifs et modalités</option>
+        <option value="competition">Compétitions et tournois</option>
+        <option value="materiel">Matériel et équipement</option>
+        <option value="stage">Stages et cours particuliers</option>
+        <option value="partenariat">Partenariat</option>
+        <option value="autre">Autre demande</option>
+      </select>
+      <textarea name="message"></textarea>
+    </form>
+  </body>
+</html>

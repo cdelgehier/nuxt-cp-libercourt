@@ -253,7 +253,24 @@
         </div>
 
         <div class="adaptive-card rounded-xl shadow-lg p-8">
-          <form class="space-y-6" @submit.prevent="submitForm">
+          <form
+            name="contact"
+            method="POST"
+            data-netlify="true"
+            data-netlify-honeypot="bot-field"
+            action="/merci"
+            class="space-y-6"
+            @submit.prevent="submitForm"
+          >
+            <!-- Hidden input for Netlify -->
+            <input type="hidden" name="form-name" value="contact" />
+
+            <!-- Honeypot field to prevent spam (hidden) -->
+            <div style="display: none">
+              <label
+                >Don't fill this out if you're human: <input name="bot-field"
+              /></label>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label
@@ -265,6 +282,7 @@
                 <UInput
                   id="firstName"
                   v-model="form.firstName"
+                  name="firstName"
                   placeholder="Votre prénom"
                   required
                   size="lg"
@@ -282,6 +300,7 @@
                 <UInput
                   id="lastName"
                   v-model="form.lastName"
+                  name="lastName"
                   placeholder="Votre nom"
                   required
                   size="lg"
@@ -302,6 +321,7 @@
                 <UInput
                   id="email"
                   v-model="form.email"
+                  name="email"
                   type="email"
                   placeholder="votre.email@exemple.fr"
                   required
@@ -320,6 +340,7 @@
                 <UInput
                   id="phone"
                   v-model="form.phone"
+                  name="phone"
                   type="tel"
                   placeholder="06 XX XX XX XX"
                   size="lg"
@@ -339,6 +360,7 @@
               <USelect
                 id="subject"
                 v-model="form.subject"
+                name="subject"
                 :options="subjectOptions"
                 placeholder="Choisissez un sujet"
                 required
@@ -358,6 +380,7 @@
               <UTextarea
                 id="message"
                 v-model="form.message"
+                name="message"
                 placeholder="Votre message..."
                 :rows="6"
                 required
@@ -365,22 +388,6 @@
                 color="white"
                 class="adaptive-input border-gray-300 focus:border-club-green focus:ring-club-green"
               />
-            </div>
-
-            <div class="flex items-center space-x-3">
-              <UCheckbox
-                id="newsletter"
-                v-model="form.newsletter"
-                size="lg"
-                color="primary"
-                class="text-club-green focus:ring-club-green"
-              />
-              <label
-                for="newsletter"
-                class="text-sm font-medium adaptive-text cursor-pointer"
-              >
-                Je souhaite recevoir la newsletter du club
-              </label>
             </div>
 
             <div class="text-center pt-4">
@@ -558,7 +565,6 @@ const form = ref({
   phone: "",
   subject: "",
   message: "",
-  newsletter: false,
 });
 
 const isSubmitting = ref(false);
@@ -584,31 +590,30 @@ const faqItems = computed(() =>
   })),
 );
 
-// Fonction de soumission du formulaire
-async function submitForm() {
+// Form submission function for Netlify Forms
+async function submitForm(event: Event) {
   isSubmitting.value = true;
 
   try {
-    // Here you could send data to an API
+    // Get form element from event
+    const formElement = event.target as HTMLFormElement;
 
-    // Simulate sending
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Create FormData object from form
+    const formData = new FormData(formElement);
 
-    // Success message (you could use a notification)
-    alert(
-      "Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.",
-    );
+    // Submit to Netlify
+    const response = await fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(formData as any).toString(),
+    });
 
-    // Reset form
-    form.value = {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      subject: "",
-      message: "",
-      newsletter: false,
-    };
+    if (response.ok) {
+      // Redirect to thank you page
+      await navigateTo("/merci");
+    } else {
+      throw new Error("Network response was not ok");
+    }
   } catch (error) {
     console.error("Erreur lors de l'envoi:", error);
     alert(

@@ -11,9 +11,27 @@
         >
           {{ eventTypeLabel }}
         </span>
-        <span v-if="event.price" class="text-sm font-semibold event-card-price">
-          {{ event.price }}€
-        </span>
+        <div class="flex items-center gap-2">
+          <span
+            v-if="event.price"
+            class="text-sm font-semibold event-card-price"
+          >
+            {{ event.price }}€
+          </span>
+          <!-- Add to Calendar Icon - small and discrete -->
+          <button
+            v-if="!past"
+            class="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-club-green transition-colors opacity-60 hover:opacity-100"
+            :aria-label="`Ajouter ${event.title} au calendrier Google`"
+            :title="`Ajouter ${event.title} au calendrier Google`"
+            @click="addToGoogleCalendar"
+          >
+            <UIcon
+              name="i-heroicons-calendar-days"
+              class="w-4 h-4 event-card-icon"
+            />
+          </button>
+        </div>
       </div>
     </div>
 
@@ -124,60 +142,51 @@
       </div>
 
       <!-- Status and Actions -->
-      <div v-if="!past" class="flex items-center justify-between">
-        <!-- Registration Status -->
-        <div class="flex items-center">
-          <span
-            v-if="event.registrationOpen"
-            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+      <div v-if="!past" class="space-y-3">
+        <!-- Registration Status and Button Row -->
+        <div class="flex items-center justify-between">
+          <!-- Registration Status -->
+          <div class="flex items-center">
+            <span
+              v-if="event.registrationOpen"
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+            >
+              <div class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5" />
+              Inscriptions ouvertes
+            </span>
+            <span
+              v-else-if="event.status === 'upcoming'"
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+            >
+              <div class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5" />
+              Inscriptions fermées
+            </span>
+            <span
+              v-else-if="event.status === 'cancelled'"
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+            >
+              <div class="w-1.5 h-1.5 bg-red-400 rounded-full mr-1.5" />
+              Annulé
+            </span>
+          </div>
+
+          <!-- Register Button -->
+          <button
+            v-if="event.registrationOpen && canRegister"
+            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            @click="$emit('register', event)"
           >
-            <div class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5" />
-            Inscriptions ouvertes
-          </span>
+            <UIcon name="i-heroicons-plus" class="w-4 h-4 mr-1.5" />
+            S'inscrire
+          </button>
+
           <span
-            v-else-if="event.status === 'upcoming'"
-            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+            v-else-if="event.registrationOpen && !canRegister"
+            class="text-sm text-red-600 font-medium"
           >
-            <div class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5" />
-            Inscriptions fermées
-          </span>
-          <span
-            v-else-if="event.status === 'cancelled'"
-            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
-          >
-            <div class="w-1.5 h-1.5 bg-red-400 rounded-full mr-1.5" />
-            Annulé
+            Complet
           </span>
         </div>
-
-        <!-- Register Button -->
-        <button
-          v-if="event.registrationOpen && canRegister"
-          class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-          @click="$emit('register', event)"
-        >
-          <svg
-            class="w-4 h-4 mr-1.5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-          S'inscrire
-        </button>
-
-        <span
-          v-else-if="event.registrationOpen && !canRegister"
-          class="text-sm text-red-600 font-medium"
-        >
-          Complet
-        </span>
       </div>
 
       <!-- Past Event Summary -->
@@ -301,6 +310,100 @@ const formatDate = (dateString: string) => {
     month: "long",
     day: "numeric",
   });
+};
+
+// Add event to Google Calendar
+const addToGoogleCalendar = () => {
+  try {
+    // Create event start date-time
+    const eventDate = new Date(props.event.date);
+
+    // If event has a specific time, use it. Otherwise use 9:00 AM as default
+    let startTime = eventDate;
+    if (props.event.time) {
+      // Handle different time formats (e.g., "14:30", "8h30", "8h30 - 18h00")
+      const timeStr = props.event.time.split(" - ")[0]; // Take start time if range
+      const cleanTime = timeStr.replace("h", ":"); // Convert "8h30" to "8:30"
+      const timeMatch = cleanTime.match(/(\d{1,2}):?(\d{0,2})/);
+
+      if (timeMatch) {
+        const hours = parseInt(timeMatch[1]);
+        const minutes = parseInt(timeMatch[2] || "0");
+        startTime = new Date(eventDate);
+        startTime.setHours(hours, minutes, 0, 0);
+      }
+    } else {
+      startTime = new Date(eventDate);
+      startTime.setHours(9, 0, 0, 0);
+    }
+
+    // Create end time (2 hours after start by default)
+    const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000);
+
+    // Format dates for Google Calendar (YYYYMMDDTHHMMSSZ)
+    const formatGoogleDate = (date: Date) => {
+      return date
+        .toISOString()
+        .replace(/[-:]/g, "")
+        .replace(/\.\d{3}/, "");
+    };
+
+    // Build description with additional info
+    let description = props.event.description || "";
+    if (props.event.contact) {
+      description += `\n\nContact: ${props.event.contact.name}`;
+      if (props.event.contact.role) {
+        description += ` (${props.event.contact.role})`;
+      }
+    }
+    if (props.event.price !== undefined && props.event.price > 0) {
+      description += `\nTarif: ${props.event.price}€`;
+    }
+
+    // Build Google Calendar URL parameters
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: props.event.title,
+      dates: `${formatGoogleDate(startTime)}/${formatGoogleDate(endTime)}`,
+      details: description.trim(),
+      location: props.event.location || "",
+      // Add source information
+      sprop: "name:Club Pongiste Libercourtois",
+    });
+
+    // Create the Google Calendar URL
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?${params.toString()}`;
+
+    // Try to open Google Calendar in a new window
+    const popup = window.open(
+      googleCalendarUrl,
+      "_blank",
+      "noopener,noreferrer",
+    );
+
+    // Fallback: copy URL to clipboard if popup blocked
+    if (!popup || popup.closed) {
+      navigator.clipboard
+        ?.writeText(googleCalendarUrl)
+        .then(() => {
+          alert(
+            "Le lien du calendrier a été copié dans le presse-papiers. Collez-le dans votre navigateur pour ajouter l'événement.",
+          );
+        })
+        .catch(() => {
+          // Final fallback: show the URL
+          prompt(
+            "Copiez ce lien pour ajouter l'événement à votre calendrier Google:",
+            googleCalendarUrl,
+          );
+        });
+    }
+  } catch (error) {
+    console.error("Error creating calendar event:", error);
+    alert(
+      "Une erreur est survenue lors de la création de l'événement calendrier. Veuillez réessayer.",
+    );
+  }
 };
 </script>
 

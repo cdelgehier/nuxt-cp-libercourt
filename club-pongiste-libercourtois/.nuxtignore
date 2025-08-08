@@ -1,0 +1,3 @@
+# Ignore files and directories that can cause type conflicts
+/scripts/
+*.py

@@ -28,6 +28,8 @@
     "precommit:setup": "./setup-precommit.sh"
   },
   "devDependencies": {
+    "@iconify-json/heroicons": "^1.2.2",
+    "@iconify-json/simple-icons": "^1.2.46",
     "@nuxt/devtools": "latest",
     "@nuxt/eslint-config": "^0.3.13",
     "@nuxtjs/tailwindcss": "^6.12.0",

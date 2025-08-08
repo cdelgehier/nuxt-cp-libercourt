@@ -99,9 +99,9 @@
           <div>
             <h5 class="text-white font-medium mb-2 text-sm">Horaires salle</h5>
             <div class="text-gray-300 text-sm space-y-1">
-              <p>Lun-Mar: 17h30-20h30</p>
-              <p>Mer: 17h30-20h00</p>
-              <p>Jeu-Ven: 17h30-20h30</p>
+              <p v-for="schedule in computedOpenHours" :key="schedule.day">
+                {{ formatDayName(schedule.day) }}: {{ schedule.hours }}
+              </p>
             </div>
           </div>
         </div>
@@ -143,6 +143,9 @@ import type { NavigationItem } from "~/types";
 // Load centralized configuration
 const { data: config } = await useFetch("/api/club/config");
 
+// Load schedules data for dynamic opening hours
+const { data: schedulesData } = await useFetch("/api/club/schedules-pricing");
+
 // Current year for copyright
 const currentYear = new Date().getFullYear();
 
@@ -154,4 +157,70 @@ const footerNavigation: NavigationItem[] = [
   { label: "Horaires & Tarifs", href: "/horaires-tarifs" },
   { label: "Contact", href: "/contact" },
 ];
+
+// Format day names for display
+const formatDayName = (day: string): string => {
+  const dayMap: Record<string, string> = {
+    Lundi: "Lun",
+    Mardi: "Mar",
+    Mercredi: "Mer",
+    Jeudi: "Jeu",
+    Vendredi: "Ven",
+    Samedi: "Sam",
+    Dimanche: "Dim"
+  };
+  return dayMap[day] || day;
+};
+
+// Parse time string to minutes for comparison
+const parseTimeToMinutes = (timeStr: string): number => {
+  const match = timeStr.match(/(\d{1,2})h(\d{2})/);
+  if (match) {
+    return parseInt(match[1]) * 60 + parseInt(match[2]);
+  }
+  return 0;
+};
+
+// Format minutes back to time string
+const formatMinutesToTime = (minutes: number): string => {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return `${hours}h${mins.toString().padStart(2, '0')}`;
+};
+
+// Compute opening hours from training schedules
+const computedOpenHours = computed(() => {
+  if (!schedulesData.value?.schedules?.training) return [];
+
+  return schedulesData.value.schedules.training
+    .filter(day => day.sessions && day.sessions.length > 0)
+    .map(day => {
+      const times: number[] = [];
+
+      // Extract all start and end times from sessions
+      day.sessions.forEach(session => {
+        if (session.time && session.time.includes(' - ')) {
+          const [start, end] = session.time.split(' - ');
+          times.push(parseTimeToMinutes(start.trim()));
+          times.push(parseTimeToMinutes(end.trim()));
+        } else if (session.time && session.time.includes('h')) {
+          // Single time (like "18h00")
+          times.push(parseTimeToMinutes(session.time.trim()));
+        }
+      });
+
+      if (times.length === 0) return null;
+
+      const minTime = Math.min(...times);
+      const maxTime = Math.max(...times);
+
+      return {
+        day: day.day,
+        hours: `${formatMinutesToTime(minTime)} - ${formatMinutesToTime(maxTime)}`
+      };
+    })
+    .filter((schedule): schedule is NonNullable<typeof schedule> =>
+      schedule !== null && !['Samedi', 'Dimanche'].includes(schedule.day)
+    ); // Remove null entries and exclude weekend competitions
+});
 </script>

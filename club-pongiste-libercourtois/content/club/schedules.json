@@ -46,7 +46,7 @@
         "hours": "17h30 - 20h00",
         "sessions": [
           {
-            "time": "17h30 - 20h00",
+            "time": "17h30 - 18h30",
             "category": "Training Loisirs Baby",
             "level": "Jeunes débutants",
             "type": "entrainement",
@@ -126,13 +126,6 @@
         ]
       }
     ],
-    "openHours": {
-      "Lundi": "17h30 - 20h30",
-      "Mardi": "17h30 - 20h30",
-      "Mercredi": "17h30 - 20h00",
-      "Jeudi": "17h30 - 20h30",
-      "Vendredi": "17h30 - 20h30"
-    },
     "competitions": [
       {
         "day": "Samedi",

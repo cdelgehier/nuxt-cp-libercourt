@@ -11,12 +11,6 @@ export default function () {
   } = useLazyFetch<ClubStats>("/api/club/stats", {
     // Cache for 1 hour on client side
     key: "club-stats",
-    default: () => ({
-      licencies: 78,
-      equipes: 9,
-      annees: new Date().getFullYear() - 1970,
-      lastUpdated: new Date().toISOString(),
-    }),
   });
 
   return {

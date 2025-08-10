@@ -1,17 +1,9 @@
+import { clubConfig } from "~/server/utils/clubConfig";
+
 export default defineEventHandler(async (_event) => {
   try {
-    // Import club configuration data from JSON file
-    const configData = await import("~/content/club/config.json");
-
-    // Make sure we have the correct data structure
-    const config = configData.default || configData;
-
-    // Check that essential data is present
-    if (!config.club || !config.location) {
-      throw new Error("Club configuration is incomplete");
-    }
-
-    return config;
+    // Use centralized club configuration utility
+    return clubConfig;
   } catch (error) {
     console.error("Error loading club configuration:", error);
 

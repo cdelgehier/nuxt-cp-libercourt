@@ -99,6 +99,7 @@ const mobileMenuOpen = ref(false);
 const navigation: NavigationItem[] = [
   { label: "Accueil", href: "/" },
   { label: "Le Club", href: "/club" },
+  { label: "Licenciés", href: "/licencies" },
   { label: "Calendrier", href: "/calendrier" },
   { label: "Horaires & Tarifs", href: "/horaires-tarifs" },
   { label: "FAQ", href: "/faq" },

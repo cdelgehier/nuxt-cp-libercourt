@@ -32,8 +32,6 @@ export default defineEventHandler(async (_event) => {
       return cachedDocuments;
     }
 
-    console.log("Scraping FFTT documents...");
-
     // FFTT download page URL
     const ffttUrl =
       "https://www.fftt.com/doc/administratif/telechargement.html";
@@ -251,8 +249,6 @@ export default defineEventHandler(async (_event) => {
     // Update cache
     cachedDocuments = validatedDocuments;
     lastScrapeTime = now;
-
-    console.log(`Found ${foundDocuments} FFTT documents`);
 
     return validatedDocuments;
   } catch (error) {

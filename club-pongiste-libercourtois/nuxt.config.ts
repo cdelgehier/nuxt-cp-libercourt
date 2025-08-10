@@ -1,3 +1,5 @@
+import clubConfigData from './content/club/config.json';
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
   compatibilityDate: "2025-06-23",
@@ -110,12 +112,19 @@ export default defineNuxtConfig({
 
   // Runtime config
   runtimeConfig: {
+    // Private keys (only available on server-side)
+    smartpingAppCode: process.env.SMARTPING_APP_CODE,
+    smartpingPassword: process.env.SMARTPING_PASSWORD,
+    smartpingEmail: process.env.SMARTPING_EMAIL,
+
+    // Public keys (exposed to client-side)
     public: {
-      siteName: "Club Pongiste Libercourtois",
-      siteDescription: "Club de tennis de table à Libercourt depuis 1970",
-      clubEmail: "cplibercourt@gmail.com",
-      clubPhone: "06 60 05 12 41",
-      clubAddress: "Salle Deladerriere - Complexe Leo Lagrange, Libercourt",
+      siteName: clubConfigData.club.name,
+      siteDescription: clubConfigData.club.description,
+      clubEmail: clubConfigData.club.email,
+      clubPhone: clubConfigData.club.phone,
+      clubAddress: `${clubConfigData.location.salle} - ${clubConfigData.location.complexe}, ${clubConfigData.location.city}`,
+      clubId: clubConfigData.club.id, // Safe to expose for client-side queries
     },
   },
 

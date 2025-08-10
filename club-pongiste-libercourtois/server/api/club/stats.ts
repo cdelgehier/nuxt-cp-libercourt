@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { fetchLicenseesWithSmartPing } from "~/server/utils/smartping";
+import { getClubId } from "~/server/utils/clubConfig";
 
 // Schema for club statistics
 const ClubStatsSchema = z.object({
@@ -6,6 +8,10 @@ const ClubStatsSchema = z.object({
   equipes: z.number(),
   annees: z.number(),
   lastUpdated: z.string(),
+  debug: z.object({
+    source: z.string().optional(),
+    message: z.string().optional(),
+  }).optional(),
 });
 
 type ClubStats = z.infer<typeof ClubStatsSchema>;
@@ -24,24 +30,22 @@ export default defineEventHandler(async (_event): Promise<ClubStats> => {
   }
 
   try {
-    // Fetch data from PingPocket website
-    const response = await $fetch<string>(
-      "https://www.pingpocket.fr/app/fftt/clubs/07620112",
-      {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; Club-Libercourtois-Bot/1.0)",
-        },
-      },
-    );
+    // Fetch real data from SmartPing API
+    // Get club ID from configuration
+    const clubId = getClubId();
+    const licenseesData = await fetchLicenseesWithSmartPing(clubId);
 
-    // Extract number of licencies from HTML
-    const licenciesMatch = response.match(/n° \d+ - (\d+) licenciés/);
-    const licencies = licenciesMatch ? parseInt(licenciesMatch[1], 10) : 78;
+    if (!licenseesData.success || !licenseesData.data) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Failed to fetch licensees: ${licenseesData.error}`
+      });
+    }
 
-    // Extract number of teams from HTML
-    const equipesMatch = response.match(/Liste des équipes (\d+)/);
-    const equipes = equipesMatch ? parseInt(equipesMatch[1], 10) : 9;
+    const licencies = licenseesData.data.length;
 
+    // Default number of teams (could be fetched from another API in the future)
+    let equipes = 0;
     // Calculate years since club foundation (1970)
     const currentYear = new Date().getFullYear();
     const annees = currentYear - 1970;
@@ -52,6 +56,10 @@ export default defineEventHandler(async (_event): Promise<ClubStats> => {
       equipes,
       annees,
       lastUpdated: new Date().toISOString(),
+      debug: {
+        source: licenseesData.source,
+        message: licenseesData.error || 'Success',
+      },
     };
 
     // Validate data with Zod schema
@@ -65,14 +73,9 @@ export default defineEventHandler(async (_event): Promise<ClubStats> => {
   } catch (error) {
     console.error("Error fetching club stats:", error);
 
-    // Return fallback data if API fails
-    const fallbackStats: ClubStats = {
-      licencies: 78,
-      equipes: 9,
-      annees: new Date().getFullYear() - 1970,
-      lastUpdated: new Date().toISOString(),
-    };
-
-    return fallbackStats;
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Unable to fetch club statistics"
+    });
   }
 });

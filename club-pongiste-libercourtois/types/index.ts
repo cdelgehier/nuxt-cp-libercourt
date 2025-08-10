@@ -262,14 +262,16 @@ export interface ContactMessage {
   status: "nouveau" | "lu" | "traite" | "archive";
 }
 
-// Club licensee (data from Ping Pocket)
+// Club licensee (data from SmartPing API - real data only)
 export interface Licensee {
   id: string;
   firstName: string;
   lastName: string;
   licenseNumber: string;
-  age: number;
-  category:
+  age?: number; // Age retrieved from xml_licence_c.php API only
+  gender?: "M" | "F"; // Gender retrieved from xml_licence_c.php API only
+  ranking?: string; // Points or ranking (e.g., "1200", "NC")
+  category?: // Category calculated from real age when available
     | "poussin"
     | "benjamin"
     | "minime"
@@ -281,6 +283,10 @@ export interface Licensee {
   email?: string;
   phone?: string;
   active: boolean;
+  // Real SmartPing data fields (when available)
+  clast?: string; // Real FFTT classification (5, 6, 7, etc.)
+  point?: string; // Real FFTT points (500, 523, etc.)
+  categ?: string; // Real FFTT category (B2, C1, B1, etc.)
 }
 
 // Types pour les composants UI

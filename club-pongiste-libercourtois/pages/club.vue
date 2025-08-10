@@ -19,9 +19,7 @@
             >
               <div class="text-3xl font-bold text-club-yellow">
                 {{
-                  pending
-                    ? "..."
-                    : (clubStats?.licencies ?? clubInfo.statistics.members)
+                  pending ? "..." : clubStats?.licencies
                 }}
               </div>
               <div class="text-sm text-gray-300">Licenciés</div>
@@ -31,9 +29,7 @@
             >
               <div class="text-3xl font-bold text-club-yellow">
                 {{
-                  pending
-                    ? "..."
-                    : (clubStats?.equipes ?? clubInfo.statistics.teams)
+                  pending ? "..." : clubStats?.equipes
                 }}
               </div>
               <div class="text-sm text-gray-300">Équipes</div>
@@ -43,10 +39,7 @@
             >
               <div class="text-3xl font-bold text-club-yellow">
                 {{
-                  pending
-                    ? "..."
-                    : (clubStats?.annees ??
-                      clubInfo.statistics.yearsOfExistence)
+                  pending ? "..." : clubStats?.annees
                 }}
               </div>
               <div class="text-sm text-gray-300">Années</div>
@@ -519,12 +512,6 @@ const { data: clubStats, pending } = await useLazyFetch<ClubStats>(
   "/api/club/stats",
   {
     key: "club-page-stats",
-    default: () => ({
-      licencies: 78,
-      equipes: 9,
-      annees: new Date().getFullYear() - 1970,
-      lastUpdated: new Date().toISOString(),
-    }),
   },
 );
 

@@ -50,6 +50,7 @@
     "@nuxtjs/color-mode": "^3.5.2",
     "@pinia/nuxt": "^0.5.1",
     "@vueuse/nuxt": "^10.10.0",
+    "fast-xml-parser": "^5.2.5",
     "googleapis": "^150.0.1",
     "jsdom": "^26.1.0",
     "pinia": "^2.1.7",

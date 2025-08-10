@@ -105,7 +105,7 @@
             <p>
               • Source :
               <a
-                href="https://www.pingpocket.fr/app/fftt/clubs/07620112"
+                :href="`https://www.pingpocket.fr/app/fftt/clubs/${$config.public.clubId}`"
                 target="_blank"
                 class="text-club-green hover:underline"
                 >PingPocket FFTT</a

@@ -46,13 +46,15 @@ export default defineEventHandler(async (_event) => {
     // Initialize SmartPing API with proper authentication
     const smartPing = new SmartPingAPI(appCode, password, email);
 
-    // Get licensees list with ranking from SmartPing API
-    const result = await smartPing.getClubLicenseesWithRanking(clubId);
+    // Get licensees list with complete information from SmartPing API using xml_licence_b (more accurate data)
+    const result = await smartPing.getClubLicenseesWithCategories(clubId);
 
     if (result.success && result.data) {
-      // Filter active licensees (valide field empty or 'O')
+      // Filter licensees who belong to our club only
       const validLicensees = result.data.filter((licensee: any) => {
-        return !licensee.valide || licensee.valide === 'O';
+        // Check if licensee belongs to our club (handle with/without leading zeros)
+        const belongsToOurClub = licensee.nclub === clubId || licensee.nclub === clubId.replace(/^0+/, '');
+        return belongsToOurClub;
       });
 
       // Convert FFTT format to our format

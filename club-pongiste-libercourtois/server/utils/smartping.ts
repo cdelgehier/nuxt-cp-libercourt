@@ -287,7 +287,6 @@ export class SmartPingAPI {
     });
 
     try {
-      console.log('FFTT xml_licence_b club API call:', { url, clubId });
 
       const response = await fetch(`${url}?${params}`, {
         method: 'GET',
@@ -302,13 +301,6 @@ export class SmartPingAPI {
       const decoder = new TextDecoder('iso-8859-1');
       const responseText = decoder.decode(buffer);
 
-      console.log('FFTT xml_licence_b club Response:', {
-        status: response.status,
-        responseLength: responseText.length,
-        hasLicences: responseText.includes('<licence'),
-        licenceCount: (responseText.match(/<licence/g) || []).length
-      });
-
       if (!response.ok) {
         return { success: false, error: `HTTP ${response.status}: ${responseText}` };
       }
@@ -320,11 +312,7 @@ export class SmartPingAPI {
       }
 
       if (responseText.includes('<licence')) {
-        const licensees = this.parseXMLLicenseesWithRanking(responseText);
-        console.log('SmartPing xml_licence_b club SUCCESS:', {
-          licenseesCount: licensees.length,
-          sampleLicensee: licensees.length > 0 ? licensees[0] : null
-        });
+        const licensees = this.parseXMLLicenceB(responseText);
         return { success: true, data: licensees };
       }
 
@@ -637,6 +625,60 @@ export class SmartPingAPI {
     };
 
     return licensee;
+  }
+
+  /**
+   * Parse XML response from xml_licence_b.php for club licensees
+   * This API returns <licence> elements instead of <joueur> elements
+   */
+  private parseXMLLicenceB(xmlResponse: string): LicenseeData[] {
+    // Configure XML parser options
+    const options = {
+      ignoreAttributes: false,
+      parseAttributeValue: false,
+      parseNodeValue: true,
+      parseTrueNumberOnly: false,
+      arrayMode: false,
+      alwaysCreateTextNode: false,
+      trimValues: true
+    };
+
+    const parser = new XMLParser(options);
+    const result = parser.parse(xmlResponse);
+
+    // xml_licence_b.php returns <liste><licence>...</licence>...</liste>
+    const licences = result?.liste?.licence;
+
+    if (!licences) {
+      console.log('No licence elements found in parsed XML');
+      return [];
+    }
+
+    // Handle both single licence and array of licences
+    const licenceArray = Array.isArray(licences) ? licences : [licences];
+
+    const licensees: LicenseeData[] = licenceArray.map((licence: any) => ({
+      licence: String(licence.licence || ''), // License number from FFTT doc
+      nom: this.fixEncoding(String(licence.nom || '')), // Fix encoding for names
+      prenom: this.fixEncoding(String(licence.prenom || '')), // Fix encoding for first names
+      club: String(licence.nomclub || ''), // Club name = nomclub according to FFTT doc
+      nclub: String(licence.numclub || ''), // Club number = numclub according to FFTT doc
+      clast: String(licence.point || ''), // Use point as clast (classement points)
+      cat: String(licence.cat || ''), // Category from FFTT doc
+      pointm: String(licence.pointm || ''), // Monthly points from FFTT doc
+      points: parseInt(String(licence.pointm || licence.point || '0')), // Monthly or regular points
+      classement: String(licence.point || ''), // Use point as classement
+      echelon: String(licence.echelon || ''),
+      place: parseInt(String(licence.place || '0')),
+      natio: String(licence.natio || ''),
+      sexe: String(licence.sexe || ''),
+      type: String(licence.type || ''),
+      certif: String(licence.certif || ''),
+      valide: String(licence.validation || ''), // validation according to FFTT doc
+      echelon_mixte: String(licence.echelon_mixte || '')
+    }));
+
+    return licensees;
   }
 
   /**

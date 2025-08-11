@@ -15,8 +15,8 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Statistiques simples -->
-      <div class="mb-6">
+      <!-- Statistiques avec répartition par genre et âge -->
+      <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center">
           <div class="text-2xl font-bold text-club-green">
             {{ filteredLicensees.length }}
@@ -25,17 +25,119 @@
             Total licenciés
           </div>
         </div>
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center">
+          <div class="text-2xl font-bold text-pink-600">
+            {{ filteredLicensees.filter(l => (l as any).sexe === 'F').length }}
+          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            ♀ Femmes
+          </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center">
+          <div class="text-2xl font-bold text-blue-600">
+            {{ filteredLicensees.filter(l => (l as any).sexe === 'M').length }}
+          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            ♂ Hommes
+          </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center">
+          <div class="text-2xl font-bold text-green-600">
+            {{ filteredLicensees.filter(l => getAgeGroup((l as any).cat || '') === 'junior').length }}
+          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            🧸 Juniors
+          </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center">
+          <div class="text-2xl font-bold text-purple-600">
+            {{ filteredLicensees.filter(l => getAgeGroup((l as any).cat || '') === 'adult').length }}
+          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            🐻 Adultes
+          </div>
+        </div>
       </div>
 
-      <!-- Recherche simple -->
-      <div class="mb-6">
-        <UInput
-          v-model="searchQuery"
-          icon="i-heroicons-magnifying-glass"
-          placeholder="Rechercher par nom, prénom ou licence..."
-          class="w-full max-w-md mx-auto"
-        />
-      </div>      <!-- Liste des licenciés -->
+      <!-- Filtres de recherche, genre et âge -->
+      <div class="mb-6 space-y-4">
+        <!-- Barre de recherche -->
+        <div class="flex justify-center">
+          <UInput
+            v-model="searchQuery"
+            icon="i-heroicons-magnifying-glass"
+            placeholder="Rechercher par nom, prénom ou licence..."
+            class="w-full max-w-md"
+          />
+        </div>
+
+        <!-- Filtres par boutons -->
+        <div class="flex flex-col sm:flex-row gap-6 items-center justify-center">
+          <!-- Filtre par genre -->
+          <div class="flex flex-col items-center">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Genre</span>
+            <div class="flex gap-2">
+              <UButton
+                :variant="genderFilter === 'all' ? 'solid' : 'outline'"
+                :color="genderFilter === 'all' ? 'primary' : 'gray'"
+                size="sm"
+                @click="genderFilter = 'all'"
+              >
+                Tous
+              </UButton>
+              <UButton
+                :variant="genderFilter === 'F' ? 'solid' : 'outline'"
+                :color="genderFilter === 'F' ? 'pink' : 'gray'"
+                size="sm"
+                @click="genderFilter = 'F'"
+              >
+                ♀ Femmes
+              </UButton>
+              <UButton
+                :variant="genderFilter === 'M' ? 'solid' : 'outline'"
+                :color="genderFilter === 'M' ? 'blue' : 'gray'"
+                size="sm"
+                @click="genderFilter = 'M'"
+              >
+                ♂ Hommes
+              </UButton>
+            </div>
+          </div>
+
+          <!-- Filtre par âge -->
+          <div class="flex flex-col items-center">
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Âge</span>
+            <div class="flex gap-2">
+              <UButton
+                :variant="ageFilter === 'all' ? 'solid' : 'outline'"
+                :color="ageFilter === 'all' ? 'primary' : 'gray'"
+                size="sm"
+                @click="ageFilter = 'all'"
+              >
+                Tous âges
+              </UButton>
+              <UButton
+                :variant="ageFilter === 'junior' ? 'solid' : 'outline'"
+                :color="ageFilter === 'junior' ? 'green' : 'gray'"
+                size="sm"
+                @click="ageFilter = 'junior'"
+              >
+                🧸 Juniors
+              </UButton>
+              <UButton
+                :variant="ageFilter === 'adult' ? 'solid' : 'outline'"
+                :color="ageFilter === 'adult' ? 'purple' : 'gray'"
+                size="sm"
+                @click="ageFilter = 'adult'"
+              >
+                🐻 Adultes
+              </UButton>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liste des licenciés -->
       <div v-if="pending" class="text-center py-12">
         <UIcon name="i-heroicons-arrow-path" class="animate-spin text-4xl text-club-green mb-4" />
         <p class="text-gray-600 dark:text-gray-400">Chargement des licenciés...</p>
@@ -60,31 +162,41 @@
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <div
           v-for="licensee in filteredLicensees"
-          :key="licensee.id"
-          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow p-4 hover:shadow-lg transition-all cursor-pointer hover:scale-105"
+          :key="(licensee as any).id"
+          :class="[
+            'bg-white dark:bg-gray-800 border rounded-lg shadow p-4 hover:shadow-lg transition-all cursor-pointer hover:scale-105',
+            // Different border colors for gender
+            (licensee as any).sexe === 'F'
+              ? 'border-pink-300 dark:border-pink-600 bg-gradient-to-br from-pink-50 to-white dark:from-pink-950/20 dark:to-gray-800'
+              : 'border-gray-200 dark:border-gray-700'
+          ]"
           @click="openLicenseeDetails(licensee)"
         >
           <!-- Avatar avec classement et info principale -->
           <div class="flex items-center mb-3">
-            <div :class="[
-              'w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm',
-              getClassificationColor(licensee.clast || 5)
-            ]">
-              {{ licensee.clast || "NC" }}
+            <div class="relative">
+              <div :class="[
+                'w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm',
+                getClassificationColor((licensee as any).clast || 500)
+              ]">
+                {{ getDisplayClassification((licensee as any).clast) }}
+              </div>
             </div>
             <div class="ml-3 flex-1">
               <h3 class="text-base font-semibold text-gray-900 dark:text-white">
-                {{ licensee.firstName }} {{ licensee.lastName }}
+                {{ (licensee as any).firstName }} {{ (licensee as any).lastName }}
               </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ getCategoryLabel((licensee as any).cat) }}
+                <span v-if="(licensee as any).sexe === 'F'" class="ml-1 text-pink-600 dark:text-pink-400">♀</span>
+                <span v-else class="ml-1 text-blue-600 dark:text-blue-400">♂</span>
               </p>
             </div>
           </div>
 
           <!-- Numéro de licence -->
           <div class="text-center">
-            <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ licensee.licence }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ (licensee as any).licence }}</span>
           </div>
         </div>
       </div>
@@ -96,15 +208,19 @@
         <template #header>
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
-              <div :class="[
-                'w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg',
-                getClassificationColor(selectedLicensee?.clast || 5)
-              ]">
-                {{ selectedLicensee?.clast || "NC" }}
+              <div class="relative">
+                <div :class="[
+                  'w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg',
+                  getClassificationColor(selectedLicensee?.clast || 500)
+                ]">
+                  {{ getDisplayClassification(selectedLicensee?.clast) }}
+                </div>
               </div>
               <div>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
                   {{ selectedLicensee?.firstName }} {{ selectedLicensee?.lastName }}
+                  <span v-if="(selectedLicensee as any)?.sexe === 'F'" class="ml-2 text-pink-600 dark:text-pink-400">♀</span>
+                  <span v-else class="ml-2 text-blue-600 dark:text-blue-400">♂</span>
                 </h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                   Licence {{ selectedLicensee?.licence }}
@@ -159,26 +275,16 @@
                 <p class="text-xs text-gray-500">Chargement</p>
               </template>
               <template v-else>
-                <div class="space-y-1">
-                  <p class="font-bold text-lg text-purple-600">
-                    {{ licenseeDetails.licensee?.categoryDecoded || decodeFfttCategory(licenseeDetails.licensee?.cat || '') }}
-                  </p>
-                  <span
-                    v-if="licenseeDetails.licensee?.cat"
-                    :class="[
-                      'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium',
-                      getCategoryColor(licenseeDetails.licensee.cat)
-                    ]"
-                  >
-                    {{ getCategoryIcon(licenseeDetails.licensee.cat) }} {{ licenseeDetails.licensee.cat }}
-                  </span>
-                </div>
+                <p class="font-bold text-lg text-purple-600">
+                  {{ licenseeDetails.licensee?.categoryDecoded || decodeFfttCategory(licenseeDetails.licensee?.cat || '') }}
+                </p>
               </template>
             </div>
             <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-              <span class="text-gray-600 dark:text-gray-400 text-sm">Genre</span>
+              <span class="text-gray-600 dark:text-gray-400 text-sm">Groupe d'âge</span>
               <p class="font-bold text-lg">
-                {{ licenseeDetails.licensee?.sexe === 'F' ? '♀' : licenseeDetails.licensee?.sexe === 'M' ? '♂' : 'N/A' }}
+                {{ getAgeGroup(licenseeDetails.licensee?.cat || '') === 'junior' ? '🧸' : '🐻' }}
+                {{ getAgeGroup(licenseeDetails.licensee?.cat || '') === 'junior' ? 'Junior' : 'Adulte' }}
               </p>
             </div>
           </div>
@@ -196,10 +302,12 @@ definePageMeta({
 });
 
 // Import FFTT category utilities
-const { decodeFfttCategory, getCategoryType, getCategoryColor, getCategoryIcon } = useFfttCategories();
+const { decodeFfttCategory, getCategoryType, getCategoryColor, getCategoryIcon, getAgeGroup } = useFfttCategories();
 
 // État des filtres
 const searchQuery = ref("");
+const genderFilter = ref("all");
+const ageFilter = ref("all");
 
 // Chargement des données
 const { data, pending, error } = await useFetch("/api/club/licensees");
@@ -222,6 +330,19 @@ const filteredLicensees = computed(() => {
     );
   }
 
+  // Filtre par genre
+  if (genderFilter.value !== "all") {
+    filtered = filtered.filter((licensee: any) => licensee.sexe === genderFilter.value);
+  }
+
+  // Filtre par âge
+  if (ageFilter.value !== "all") {
+    filtered = filtered.filter((licensee: any) => {
+      const ageGroup = getAgeGroup(licensee.cat || '');
+      return ageGroup === ageFilter.value;
+    });
+  }
+
   // Tri par classement décroissant (plus forts en haut) puis alphabétique
   filtered.sort((a: any, b: any) => {
     // Convertir les classements en nombres (valeur par défaut 0 pour les NC)
@@ -230,10 +351,10 @@ const filteredLicensees = computed(() => {
 
     // Tri par classement décroissant (plus haut classement = plus fort)
     if (classA !== classB) {
-      return classB - classA; // Ordre décroissant
+      return classB - classA;
     }
 
-    // Si même classement, tri alphabétique par nom puis prénom
+    // Si même classement, tri alphabétique par nom de famille
     if (a.lastName !== b.lastName) {
       return a.lastName.localeCompare(b.lastName);
     }
@@ -249,13 +370,38 @@ function getCategoryLabel(category: string): string {
   return category ? decodeFfttCategory(category) : "";
 }
 
+// Function to convert FFTT points to classification display
+// Converts 500 -> "5", 600 -> "6", etc.
+function getDisplayClassification(clast: string | number | null | undefined): string {
+  if (!clast) return "NC";
+
+  const points = typeof clast === 'string' ? parseInt(clast) : clast;
+  if (!points || points === 0) return "NC";
+
+  // Convert FFTT points to classification
+  if (points >= 100) {
+    return Math.floor(points / 100).toString();
+  }
+
+  // If it's already in classification format, return as is
+  return points.toString();
+}
+
 // Function to get color based on FFTT classification (clast)
 // Higher numbers = better level = cooler colors (green/blue)
 // Lower numbers = beginner level = warmer colors (orange/red)
-// Optimized for small clubs where most players are between 5-14
+// Handles FFTT points format (500, 600, etc.) by converting to classification (5, 6, etc.)
 function getClassificationColor(clast: string | number): string {
-  // Convert to number, default to 5 (beginner) if not valid
-  const classification = typeof clast === 'string' ? parseInt(clast) || 5 : clast;
+  // Convert FFTT points to classification by dividing by 100
+  let classification: number;
+
+  if (typeof clast === 'string') {
+    const points = parseInt(clast) || 500; // Default to 500 (= classement 5) if invalid
+    classification = Math.floor(points / 100);
+  } else {
+    // If it's already a number, check if it's points format (>= 100) or classification format
+    classification = clast >= 100 ? Math.floor(clast / 100) : clast;
+  }
 
   // Fine-tuned color scale for small club reality (most players 5-14)
   if (classification <= 5) {
@@ -277,17 +423,17 @@ function getClassificationColor(clast: string | number): string {
   } else if (classification === 13) {
     return 'bg-cyan-500'; // Good+ level - cyan
   } else if (classification === 14) {
-    return 'bg-blue-500'; // Very good level - blue
+    return 'bg-sky-500'; // Strong level - sky
   } else if (classification >= 15) {
-    return 'bg-blue-600'; // Elite level - deep blue
+    return 'bg-blue-500'; // Elite level - blue
   } else {
-    return 'bg-gray-500'; // New player or NC - gray
+    return 'bg-gray-500'; // Unknown/fallback - gray
   }
 }
 
-// État pour la modal de détails
-const selectedLicensee = ref<any>(null);
+// État du modal de détails
 const isDetailsModalOpen = ref(false);
+const selectedLicensee = ref<any>(null);
 const licenseeDetails = ref<any>(null);
 const loadingDetails = ref(false);
 
@@ -299,29 +445,13 @@ async function openLicenseeDetails(licensee: any) {
   licenseeDetails.value = null;
 
   try {
-    // Call the detailed API to get complete information
-    const detailsResponse = await $fetch(`/api/club/licensee/${licensee.licence}`);
-
-    if (detailsResponse.success) {
-      licenseeDetails.value = detailsResponse;
-    } else {
-      // No fallback data invention - show error or empty state
-      licenseeDetails.value = null;
-    }
+    const response = await $fetch(`/api/club/licensee/${licensee.licence}`);
+    licenseeDetails.value = response;
   } catch (error) {
-    console.error('Error loading licensee details:', error);
-    // No fallback data invention - show error or empty state
+    console.error("Erreur lors du chargement des détails du licencié:", error);
     licenseeDetails.value = null;
   } finally {
     loadingDetails.value = false;
   }
 }
-
-// Métadonnées SEO
-useSeoMeta({
-  title: "Licenciés du Club Pongiste Libercourtois",
-  description: "Liste complète des licenciés du Club Pongiste Libercourtois avec statistiques et filtres de recherche",
-  ogTitle: "Licenciés - Club Pongiste Libercourtois",
-  ogDescription: "Découvrez tous les membres licenciés de notre club de tennis de table",
-});
 </script>

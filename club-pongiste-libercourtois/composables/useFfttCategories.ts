@@ -144,10 +144,39 @@ export const useFfttCategories = () => {
     }
   };
 
+  /**
+   * Get age group for filtering: junior or adult
+   * Juniors: Poussin + Benjamin + Minime + Cadet
+   * Adults: Junior + Senior + Veteran
+   */
+  const getAgeGroup = (categoryCode: string): 'junior' | 'adult' | 'unknown' => {
+    if (!categoryCode) return 'unknown';
+
+    const normalizedCode = categoryCode.toUpperCase();
+
+    // Juniors (enfants et jeunes jusqu'aux cadets)
+    if (normalizedCode.startsWith('P') || // Poussin
+        normalizedCode.startsWith('B') || // Benjamin
+        normalizedCode.startsWith('M') || // Minime
+        normalizedCode.startsWith('C')) { // Cadet
+      return 'junior';
+    }
+
+    // Adults (juniors FFTT et plus)
+    if (normalizedCode.startsWith('J') || // Junior
+        normalizedCode.startsWith('S') || // Senior
+        normalizedCode.startsWith('V')) { // Veteran
+      return 'adult';
+    }
+
+    return 'unknown';
+  };
+
   return {
     decodeFfttCategory,
     getCategoryType,
     getCategoryColor,
-    getCategoryIcon
+    getCategoryIcon,
+    getAgeGroup
   };
 };

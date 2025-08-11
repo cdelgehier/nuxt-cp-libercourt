@@ -1,0 +1,14 @@
+[build]
+  publish = "dist"
+  functions = "netlify/functions"
+  command = "pnpm build"
+
+[build.environment]
+  # Exclude certain paths from secrets scanning
+  SECRETS_SCAN_OMIT_PATHS = ".env.example,.netlify/functions-internal/**,.nuxt/**"
+
+[context.production]
+  command = "pnpm build"
+
+[context.deploy-preview]
+  command = "pnpm build"

@@ -1,52 +1,6 @@
 {
   "events": [
     {
-      "id": "tounoi-wingles-2025",
-      "title": "Tournoi amical de Wingles",
-      "description": "Tournoi amical à wingles. Auberge Espagnole le midi.",
-      "date": "2025-06-29T09:00:00.000Z",
-      "time": "8h30 - 18h00",
-      "type": "tournament",
-      "location": "Complexe Michel Bernard de Wingles",
-      "registrationOpen": false,
-      "registrationDeadline": "2025-07-10T23:59:59.000Z",
-      "price": 0,
-      "contact": {
-        "name": "Cédric DELGEHIER",
-        "role": "Secrétaire"
-      }
-    },
-    {
-      "id": "tournoi-sur-invitation",
-      "title": "Tournoi sur invitation",
-      "description": "3 jours de compétition. Les incriptions sont gérées par le club de Carvin.",
-      "date": "2025-09-05T19:00:00.000Z",
-      "endDate": "2025-09-07T18:00:00.000Z",
-      "time": "8h30 - 18h00",
-      "type": "tournament",
-      "price": 5,
-      "contact": {
-        "name": "Club Pongiste Libercourtois",
-        "role": "Organisation"
-      },
-      "multiDay": true
-    },
-    {
-      "id": "libercourt-plage-2025",
-      "title": "Libercourt plage 2025",
-      "description": "10 jours où le club tiendra le cabanon des glaces.",
-      "date": "2025-07-31T15:00:00.000Z",
-      "endDate": "2025-08-09T22:00:00.000Z",
-      "time": "15h - 19h00",
-      "type": "other",
-      "location": "Base de loisirs de l’Emolière - 5 Imp. des Hêtres, 62820 Libercourt",
-      "contact": {
-        "name": "Club Pongiste Libercourtois",
-        "role": "Organisation"
-      },
-      "multiDay": true
-    },
-    {
       "id": "adulte-phase1-j1",
       "title": "Jour 1 Phase 1 - Adulte",
       "description": "Première journée de compétition adulte de la Phase 1",
@@ -184,7 +138,7 @@
       "date": "2025-11-08T12:00:00.000Z",
       "time": "12h00 - 18h00",
       "type": "tournament",
-      "location": "Tennis de Table Immercurien - Rue du 8 Mai 1945, 62223 Saint-Laurent-Blangy, France",
+      "location": "ATT Carvin, 980 Bd de la Justice, 62220 Carvin, France",
       "registrationOpen": false,
       "registrationDeadline": "2025-11-06T23:59:59.000Z",
       "price": 0,
@@ -242,20 +196,6 @@
       "date": "2025-12-13T13:30:00.000Z",
       "time": "13h30 - 16h30",
       "type": "competition",
-      "registrationOpen": false,
-      "price": 0,
-      "contact": {
-        "name": "Club Pongiste Libercourtois",
-        "role": "Organisation"
-      }
-    },
-    {
-      "id": "top-detection-departemental-2025",
-      "title": "Top de détection départemental",
-      "description": "Journée de détection des jeunes talents du département",
-      "date": "2025-12-06T09:00:00.000Z",
-      "time": "9h00 - 18h00",
-      "type": "other",
       "registrationOpen": false,
       "price": 0,
       "contact": {
@@ -596,27 +536,13 @@
       "date": "2026-06-13T09:00:00.000Z",
       "time": "9h00 - 18h00",
       "type": "tournament",
-      "location": "Tennis de Table Immercurien - Rue du 8 Mai 1945, 62223 Saint-Laurent-Blangy, France",
+      "location": "Salle des sports Yourcenar, Rue du Moulin à Tabac, 62400 BETHUNE, France",
       "registrationOpen": false,
       "registrationDeadline": "2026-06-11T23:59:59.000Z",
       "price": 0,
       "contact": {
         "name": "Club Pongiste Libercourtois",
         "role": "Organisation"
-      }
-    },
-    {
-      "id": "ag-2025-05-21",
-      "title": "Assemblée Générale 2025",
-      "description": "AG annuelle avec bilan de saison - Ouverte à tous les membres",
-      "date": "2025-05-21T10:00:00.000Z",
-      "time": "10h00",
-      "type": "meeting",
-      "currentParticipants": 42,
-      "registrationOpen": false,
-      "contact": {
-        "name": "Thierry Guilbert",
-        "role": "Président"
       }
     }
   ]

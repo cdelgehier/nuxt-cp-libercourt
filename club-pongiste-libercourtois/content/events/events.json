@@ -67,8 +67,7 @@
       "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
       "currentParticipants": 0,
       "maxParticipants": 300,
-      "registrationOpen": true,
-      "registrationDeadline": "2025-10-04T14:30:00.000Z",
+      "registrationOpen": false,
       "price": 15,
       "contact": {
         "name": "Nathalie GUILBERT",

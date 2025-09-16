@@ -18,9 +18,7 @@
               class="bg-white/10 backdrop-blur-sm rounded-lg p-4 min-w-[120px]"
             >
               <div class="text-3xl font-bold text-club-yellow">
-                {{
-                  pending ? "..." : clubStats?.licencies
-                }}
+                {{ pending ? "..." : clubStats?.licencies }}
               </div>
               <div class="text-sm text-gray-300">Licenciés</div>
             </div>
@@ -28,9 +26,7 @@
               class="bg-white/10 backdrop-blur-sm rounded-lg p-4 min-w-[120px]"
             >
               <div class="text-3xl font-bold text-club-yellow">
-                {{
-                  pending ? "..." : clubStats?.equipes
-                }}
+                {{ pending ? "..." : clubStats?.equipes }}
               </div>
               <div class="text-sm text-gray-300">Équipes</div>
             </div>
@@ -38,9 +34,7 @@
               class="bg-white/10 backdrop-blur-sm rounded-lg p-4 min-w-[120px]"
             >
               <div class="text-3xl font-bold text-club-yellow">
-                {{
-                  pending ? "..." : clubStats?.annees
-                }}
+                {{ pending ? "..." : clubStats?.annees }}
               </div>
               <div class="text-sm text-gray-300">Années</div>
             </div>
@@ -112,54 +106,6 @@
             <h3 class="font-semibold adaptive-title">
               {{ value }}
             </h3>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Management team -->
-    <section class="py-16 page-section">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold adaptive-title mb-4">
-            Équipe Dirigeante
-          </h2>
-          <p class="text-lg text-gray-600">
-            Une équipe dévouée au service du club et de ses membres
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div
-            v-for="member in teamMembers"
-            :key="member.id"
-            class="adaptive-card rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-          >
-            <div
-              class="h-48 bg-gradient-to-br from-club-green to-club-navy relative"
-            >
-              <div class="absolute inset-0 flex items-center justify-center">
-                <div
-                  class="w-20 h-20 bg-white rounded-full flex items-center justify-center"
-                >
-                  <UIcon
-                    name="i-heroicons-user"
-                    class="text-3xl text-club-navy"
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="p-6">
-              <h3 class="font-bold text-lg adaptive-title mb-1">
-                {{ member.firstName }} {{ member.lastName }}
-              </h3>
-              <p class="text-club-green font-medium mb-3">
-                {{ member.fullRole }}
-              </p>
-              <p v-if="member.bio" class="text-gray-600 text-sm">
-                {{ member.bio }}
-              </p>
-            </div>
           </div>
         </div>
       </div>
@@ -517,10 +463,6 @@ const { data: clubStats, pending } = await useLazyFetch<ClubStats>(
 
 // Chargement des informations du club (static data)
 const clubInfo = await $fetch("/api/club/about");
-
-// Load team management from unified API
-const teamResponse = (await $fetch("/api/club/team")) as any;
-const teamMembers = teamResponse.team || [];
 
 // Load club configuration for Google Maps links
 const clubConfig = await $fetch("/api/club/config");

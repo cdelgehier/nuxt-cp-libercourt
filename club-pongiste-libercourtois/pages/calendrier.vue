@@ -207,7 +207,7 @@
                 v-model="searchQuery"
                 type="text"
                 class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-club-green focus:border-club-green adaptive-text"
-                placeholder="Rechercher un événement... (ex: Adulte, Juillet, Deladerriere)"
+                placeholder="Rechercher... (ex: Adulte, cp 1, Septembre)"
               />
               <div
                 v-if="searchQuery"

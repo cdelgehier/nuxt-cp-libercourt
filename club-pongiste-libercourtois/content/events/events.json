@@ -1,12 +1,73 @@
 {
   "events": [
     {
-      "id": "adulte-phase1-j1",
-      "title": "Jour 1 Phase 1 - Adulte",
-      "description": "Première journée de compétition adulte de la Phase 1",
+      "id": "match-cp1-j1",
+      "title": "🏠 LIBERCOURT CP 1 vs ARRAS TT 3",
+      "description": "Match à domicile - Journée 1",
       "date": "2025-09-21T08:00:00.000Z",
       "time": "8h00 - 13h00",
       "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp2-j1",
+      "title": "🚌 NOYEL/GODAU PPC vs LIBERCOURT CP 2",
+      "description": "Match à l'extérieur - Journée 1",
+      "date": "2025-09-21T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "NOYEL/GODAU PPC",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp3-j1",
+      "title": "🚌 BETHUNE-B ASTT vs LIBERCOURT CP 3",
+      "description": "Match à l'extérieur - Journée 1",
+      "date": "2025-09-21T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "BETHUNE-B ASTT",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp4-j1",
+      "title": "🏠 LIBERCOURT CP 4 vs NOYELLES GODAULT TTSM",
+      "description": "Match à domicile - Journée 1",
+      "date": "2025-09-21T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp5-j1",
+      "title": "🚌 DAINVILLE ASTT vs LIBERCOURT CP 5",
+      "description": "Match à l'extérieur - Journée 1",
+      "date": "2025-09-21T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "DAINVILLE ASTT",
       "registrationOpen": false,
       "price": 0,
       "contact": {
@@ -29,12 +90,73 @@
       }
     },
     {
-      "id": "adulte-phase1-j2",
-      "title": "Jour 2 Phase 1 - Adulte",
-      "description": "Deuxième journée de compétition adulte de la Phase 1",
+      "id": "match-cp1-j2",
+      "title": "🚌 STE CATHERINE vs LIBERCOURT CP 1",
+      "description": "Match à l'extérieur - Journée 2",
       "date": "2025-09-28T08:00:00.000Z",
       "time": "8h00 - 13h00",
       "type": "competition",
+      "location": "STE CATHERINE",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp2-j2",
+      "title": "🏠 LIBERCOURT CP 2 vs BETHUNE-BEUVRY ASTT",
+      "description": "Match à domicile - Journée 2",
+      "date": "2025-09-28T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp3-j2",
+      "title": "🏠 LIBERCOURT CP 3 vs ARLEUX/GOHELLE",
+      "description": "Match à domicile - Journée 2",
+      "date": "2025-09-28T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp4-j2",
+      "title": "🚌 WINGLES CLL TT vs LIBERCOURT CP 4",
+      "description": "Match à l'extérieur - Journée 2",
+      "date": "2025-09-28T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "WINGLES CLL TT",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp5-j2",
+      "title": "🏠 LIBERCOURT CP 5 vs FOUQUIERES/LENS",
+      "description": "Match à domicile - Journée 2",
+      "date": "2025-09-28T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
       "registrationOpen": false,
       "price": 0,
       "contact": {
@@ -103,12 +225,73 @@
       }
     },
     {
-      "id": "adulte-phase1-j3",
-      "title": "Jour 3 Phase 1 - Adulte",
-      "description": "Troisième journée de compétition adulte de la Phase 1",
+      "id": "match-cp1-j3",
+      "title": "🏠 LIBERCOURT CP 1 vs NOYEL/GODAU PPC",
+      "description": "Match à domicile - Journée 3",
       "date": "2025-10-12T08:00:00.000Z",
       "time": "8h00 - 13h00",
       "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp2-j3",
+      "title": "🚌 AVION TT vs LIBERCOURT CP 2",
+      "description": "Match à l'extérieur - Journée 3",
+      "date": "2025-10-12T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "AVION TT",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp3-j3",
+      "title": "🚌 LEFOREST TT vs LIBERCOURT CP 3",
+      "description": "Match à l'extérieur - Journée 3",
+      "date": "2025-10-12T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "LEFOREST TT",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp4-j3",
+      "title": "🏠 LIBERCOURT CP 4 vs Exempt",
+      "description": "Match à domicile - Journée 3",
+      "date": "2025-10-12T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp5-j3",
+      "title": "🏠 LIBERCOURT CP 5 vs STE CATHERINE",
+      "description": "Match à domicile - Journée 3",
+      "date": "2025-10-12T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "MAZINGARBE",
       "registrationOpen": false,
       "price": 0,
       "contact": {
@@ -147,12 +330,73 @@
       }
     },
     {
-      "id": "adulte-phase1-j4",
-      "title": "Jour 4 Phase 1 - Adulte",
-      "description": "Quatrième journée de compétition adulte de la Phase 1",
+      "id": "match-cp1-j4",
+      "title": "🚌 FOUQUIERES/LENS vs LIBERCOURT CP 1",
+      "description": "Match à l'extérieur - Journée 4",
       "date": "2025-11-16T08:00:00.000Z",
       "time": "8h00 - 13h00",
       "type": "competition",
+      "location": "FOUQUIERES/LENS",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp2-j4",
+      "title": "🏠 LIBERCOURT CP 2 vs BILLY BERCLAU TT",
+      "description": "Match à domicile - Journée 4",
+      "date": "2025-11-16T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp3-j4",
+      "title": "🏠 LIBERCOURT CP 3 vs DUISANS ES",
+      "description": "Match à domicile - Journée 4",
+      "date": "2025-11-16T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp4-j4",
+      "title": "🚌 BIACHE TT vs LIBERCOURT CP 4",
+      "description": "Match à l'extérieur - Journée 4",
+      "date": "2025-11-16T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "BIACHE TT",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp5-j4",
+      "title": "🚌 BETHUNE-B ASTT vs LIBERCOURT CP 5",
+      "description": "Match à l'extérieur - Journée 4",
+      "date": "2025-11-16T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "BETHUNE-B ASTT",
       "registrationOpen": false,
       "price": 0,
       "contact": {
@@ -175,12 +419,73 @@
       }
     },
     {
-      "id": "adulte-phase1-j5",
-      "title": "Jour 5 Phase 1 - Adulte",
-      "description": "Cinquième journée de compétition adulte de la Phase 1",
+      "id": "match-cp1-j5",
+      "title": "🏠 LIBERCOURT CP 1 vs LABOURSE TT",
+      "description": "Match à domicile - Journée 5",
       "date": "2025-11-30T08:00:00.000Z",
       "time": "8h00 - 13h00",
       "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp2-j5",
+      "title": "🚌 NOYELLES GODAULT TTSM vs LIBERCOURT CP 2",
+      "description": "Match à l'extérieur - Journée 5",
+      "date": "2025-11-30T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "NOYELLES GODAULT TTSM",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp3-j5",
+      "title": "🚌 TILLOY MOFF TT vs LIBERCOURT CP 3",
+      "description": "Match à l'extérieur - Journée 5",
+      "date": "2025-11-30T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "TILLOY MOFF TT",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp4-j5",
+      "title": "🏠 LIBERCOURT CP 4 vs ST LAUREN/BLANG",
+      "description": "Match à domicile - Journée 5",
+      "date": "2025-11-30T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp5-j5",
+      "title": "🏠 LIBERCOURT CP 5 vs VIOLAINES TT",
+      "description": "Match à domicile - Journée 5",
+      "date": "2025-11-30T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
       "registrationOpen": false,
       "price": 0,
       "contact": {
@@ -203,12 +508,73 @@
       }
     },
     {
-      "id": "adulte-phase1-j6",
-      "title": "Jour 6 Phase 1 - Adulte",
-      "description": "Sixième journée de compétition adulte de la Phase 1",
+      "id": "match-cp1-j6",
+      "title": "🚌 DAINVILLE ASTT vs LIBERCOURT CP 1 ",
+      "description": "Match à l'extérieur - Journée 6",
       "date": "2025-12-14T08:00:00.000Z",
       "time": "8h00 - 13h00",
       "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp2-j6",
+      "title": "🏠 LIBERCOURT CP 2 vs PONT A VENDIN",
+      "description": "Match à domicile - Journée 6",
+      "date": "2025-12-14T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp3-j6",
+      "title": "🚌 MEURCHIN ESPOIR CP 3 vs ARRAS",
+      "description": "Match à l'extérieur - Journée 6",
+      "date": "2025-12-14T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "MEURCHIN ESPOIR",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp4-j6",
+      "title": "🏠 LIBERCOURT CP 4 vs AVION TT",
+      "description": "Match à domicile - Journée 6",
+      "date": "2025-12-14T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp5-j6",
+      "title": "🚌 AVION TT vs LIBERCOURT CP 5",
+      "description": "Match à l'extérieur - Journée 6",
+      "date": "2025-12-14T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "AVION TT",
       "registrationOpen": false,
       "price": 0,
       "contact": {
@@ -231,12 +597,73 @@
       }
     },
     {
-      "id": "adulte-phase1-j7",
-      "title": "Jour 7 Phase 1 - Adulte",
-      "description": "Septième journée de compétition adulte de la Phase 1",
+      "id": "match-cp1-j7",
+      "title": "🏠 LIBERCOURT CP 1 vs CARVIN ATT",
+      "description": "Match à domicile - Journée 7",
       "date": "2026-01-11T08:00:00.000Z",
       "time": "8h00 - 13h00",
       "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp2-j7",
+      "title": "🚌 QUIERY LA MOTTE vs LIBERCOURT CP 2",
+      "description": "Match à l'extérieur - Journée 7",
+      "date": "2026-01-11T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "QUIERY LA MOTTE",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp3-j7",
+      "title": "🏠 LIBERCOURT CP 3 vs HAISNES-HULLUCH",
+      "description": "Match à domicile - Journée 7",
+      "date": "2026-01-11T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp4-j7",
+      "title": "🚌 NOYEL/GODAU PPC vs LIBERCOURT CP 4",
+      "description": "Match à l'extérieur - Journée 7",
+      "date": "2026-01-11T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "NOYEL/GODAU PPC",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "match-cp5-j7",
+      "title": "🏠 LIBERCOURT CP 5 vs NOYEL/GODAU PPC",
+      "description": "Match à domicile - Journée 7",
+      "date": "2026-01-11T08:00:00.000Z",
+      "time": "8h00 - 13h00",
+      "type": "competition",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
       "registrationOpen": false,
       "price": 0,
       "contact": {

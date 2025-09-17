@@ -16,6 +16,21 @@
       }
     },
     {
+      "id": "arbre-noel-2025",
+      "title": "Arbre de Noël 2025",
+      "description": "Le père noêl viendra rendre visite aux enfants du club pour leur offrir un cadeau",
+      "date": "2025-12-14T08:00:00.000Z",
+      "time": "14h00 - 18h00",
+      "type": "other",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
       "id": "match-cp2-j1",
       "title": "🚌 NOYEL/GODAU PPC vs LIBERCOURT CP 2",
       "description": "Match à l'extérieur - Journée 1",

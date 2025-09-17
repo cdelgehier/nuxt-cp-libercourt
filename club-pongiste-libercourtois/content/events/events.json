@@ -61,6 +61,21 @@
       }
     },
     {
+      "id": "champ-pdc",
+      "title": "🏠 Championnat du Pas de Calais",
+      "description": "Événement à domicile",
+      "date": "2026-02-14T08:00:00.000Z",
+      "time": "8h00 - 18h00",
+      "type": "tournament",
+      "location": "Salle Léon Delfosse - Rue Cyprien Quinet, 62820 Libercourt",
+      "registrationOpen": false,
+      "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
       "id": "match-cp5-j1",
       "title": "🚌 DAINVILLE ASTT vs LIBERCOURT CP 5",
       "description": "Match à l'extérieur - Journée 1",

@@ -1,5 +1,5 @@
-import crypto from 'crypto';
-import { XMLParser } from 'fast-xml-parser';
+import crypto from "crypto";
+import { XMLParser } from "fast-xml-parser";
 
 // Types for FFTT API responses
 interface LicenseeData {
@@ -24,11 +24,51 @@ interface LicenseeData {
 }
 
 interface TeamData {
+  idequipe: string;
   libequipe: string;
   libdivision: string;
   liendivision: string;
   idepr: string;
   libepr: string;
+}
+
+interface MatchData {
+  equa: string;
+  equb: string;
+  scorea: string;
+  scoreb: string;
+  resa: string;
+  resb: string;
+  dateprevue: string;
+  datereelle: string;
+  heuredebut: string;
+  lien: string;
+  nomjour: string;
+  // IDs des équipes pour un filtrage précis
+  equipId1: string;
+  equipId2: string;
+  // Informations additionnelles pour Google Maps
+  opponentClub?: ClubDetails;
+  googleMapsUrl?: string;
+}
+
+interface ClubDetails {
+  numero: string;
+  nom: string;
+  adresse: string;
+  codepostal: string;
+  ville: string;
+  telephone: string;
+  courrielligue: string;
+  web: string;
+  latitude?: string;
+  longitude?: string;
+}
+
+interface ClubSearchResult {
+  numero: string;
+  nom: string;
+  ville: string;
 }
 
 // Type definitions for SmartPing API responses
@@ -44,7 +84,7 @@ interface SmartPingResult<T> {
  * Based on official FFTT API documentation (fftt_api.md)
  */
 export class SmartPingAPI {
-  private baseUrl = 'https://www.fftt.com/mobile/pxml/';
+  private baseUrl = "https://www.fftt.com/mobile/pxml/";
   private appCode: string;
   private password: string;
   private email: string;
@@ -62,25 +102,32 @@ export class SmartPingAPI {
   private getAuthParams() {
     // Generate timestamp in FFTT format: YYYYMMDDHHMMSSmmm
     const now = new Date();
-    const tm = now.getFullYear().toString() +
-               (now.getMonth() + 1).toString().padStart(2, '0') +
-               now.getDate().toString().padStart(2, '0') +
-               now.getHours().toString().padStart(2, '0') +
-               now.getMinutes().toString().padStart(2, '0') +
-               now.getSeconds().toString().padStart(2, '0') +
-               now.getMilliseconds().toString().padStart(3, '0');
+    const tm =
+      now.getFullYear().toString() +
+      (now.getMonth() + 1).toString().padStart(2, "0") +
+      now.getDate().toString().padStart(2, "0") +
+      now.getHours().toString().padStart(2, "0") +
+      now.getMinutes().toString().padStart(2, "0") +
+      now.getSeconds().toString().padStart(2, "0") +
+      now.getMilliseconds().toString().padStart(3, "0");
 
     // Hash password with MD5 (as per FFTT spec)
-    const hashedPassword = crypto.createHash('md5').update(this.password).digest('hex');
+    const hashedPassword = crypto
+      .createHash("md5")
+      .update(this.password)
+      .digest("hex");
 
     // Generate HMAC-SHA1 signature of timestamp
-    const tmc = crypto.createHmac('sha1', hashedPassword).update(tm).digest('hex');
+    const tmc = crypto
+      .createHmac("sha1", hashedPassword)
+      .update(tm)
+      .digest("hex");
 
     return {
       serie: this.email, // Use email as serie for now
       tm: tm,
       tmc: tmc,
-      id: this.appCode
+      id: this.appCode,
     };
   }
 
@@ -88,7 +135,9 @@ export class SmartPingAPI {
    * Get club licensees using xml_liste_joueur_o.php (SPID database)
    * According to FFTT documentation: "Liste des licenciés de la base SPID"
    */
-  async getClubLicensees(clubId: string): Promise<SmartPingResult<LicenseeData[]>> {
+  async getClubLicensees(
+    clubId: string,
+  ): Promise<SmartPingResult<LicenseeData[]>> {
     const url = `${this.baseUrl}xml_liste_joueur_o.php`;
     const authParams = this.getAuthParams();
 
@@ -97,55 +146,62 @@ export class SmartPingAPI {
       tm: authParams.tm,
       tmc: authParams.tmc,
       id: authParams.id,
-      club: clubId
+      club: clubId,
     });
 
     try {
-
       const response = await fetch(`${url}?${params}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'User-Agent': 'Club Pongiste Libercourtois',
-          'Accept': 'application/xml, text/xml, */*'
-        }
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
       });
 
       // Handle ISO-8859-1 encoding properly using TextDecoder (2025 modern approach)
       const buffer = await response.arrayBuffer();
-      const decoder = new TextDecoder('iso-8859-1');
+      const decoder = new TextDecoder("iso-8859-1");
       const responseText = decoder.decode(buffer);
 
-      console.log('FFTT Response:', {
+      console.log("FFTT Response:", {
         status: response.status,
         responseLength: responseText.length,
-        hasJoueurs: responseText.includes('<joueur'),
-        joueurCount: (responseText.match(/<joueur/g) || []).length
+        hasJoueurs: responseText.includes("<joueur"),
+        joueurCount: (responseText.match(/<joueur/g) || []).length,
       });
 
       if (!response.ok) {
-        return { success: false, error: `HTTP ${response.status}: ${responseText}` };
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
       }
 
-      if (responseText.includes('<erreurs>') || responseText.includes('<erreur>')) {
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
         const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
-        const errorMessage = errorMatch ? errorMatch[1] : 'Unknown FFTT error';
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
         return { success: false, error: `FFTT Error: ${errorMessage}` };
       }
 
-      if (responseText.includes('<joueur')) {
+      if (responseText.includes("<joueur")) {
         const licensees = this.parseXMLLicensees(responseText);
-        console.log('SmartPing API SUCCESS:', {
+        console.log("SmartPing API SUCCESS:", {
           licenseesCount: licensees.length,
-          sampleLicensee: licensees.length > 0 ? licensees[100] : null
+          sampleLicensee: licensees.length > 0 ? licensees[100] : null,
         });
         return { success: true, data: licensees };
       }
 
       return { success: true, data: [] };
-
     } catch (error) {
-      console.error('Licensees API request failed:', error);
-      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+      console.error("Licensees API request failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
@@ -153,7 +209,9 @@ export class SmartPingAPI {
    * Get club licensees from FFTT using xml_liste_joueur.php
    * Returns: licence, nom, prenom, club, nclub, clast
    */
-  async getClubLicenseesWithRanking(clubId: string): Promise<SmartPingResult<LicenseeData[]>> {
+  async getClubLicenseesWithRanking(
+    clubId: string,
+  ): Promise<SmartPingResult<LicenseeData[]>> {
     const url = `${this.baseUrl}xml_liste_joueur.php`;
     const authParams = this.getAuthParams();
 
@@ -162,45 +220,51 @@ export class SmartPingAPI {
       tm: authParams.tm,
       tmc: authParams.tmc,
       id: authParams.id,
-      club: clubId
+      club: clubId,
     });
 
     try {
-
       const response = await fetch(`${url}?${params}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'User-Agent': 'Club Pongiste Libercourtois',
-          'Accept': 'application/xml, text/xml, */*'
-        }
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
       });
 
       // Handle ISO-8859-1 encoding properly
       const buffer = await response.arrayBuffer();
-      const decoder = new TextDecoder('iso-8859-1');
+      const decoder = new TextDecoder("iso-8859-1");
       const responseText = decoder.decode(buffer);
 
-
       if (!response.ok) {
-        return { success: false, error: `HTTP ${response.status}: ${responseText}` };
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
       }
 
-      if (responseText.includes('<erreurs>') || responseText.includes('<erreur>')) {
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
         const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
-        const errorMessage = errorMatch ? errorMatch[1] : 'Unknown FFTT error';
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
         return { success: false, error: `FFTT Error: ${errorMessage}` };
       }
 
-      if (responseText.includes('<licence')) {
+      if (responseText.includes("<licence")) {
         const licensees = this.parseXMLLicenseesWithRanking(responseText);
         return { success: true, data: licensees };
       }
 
       return { success: true, data: [] };
-
     } catch (error) {
-      console.error('xml_liste_joueur API request failed:', error);
-      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+      console.error("xml_liste_joueur API request failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
@@ -217,56 +281,62 @@ export class SmartPingAPI {
       tm: authParams.tm,
       tmc: authParams.tmc,
       id: authParams.id,
-      numclu: clubId, // FFTT doc specifies 'numclu' for team queries
-      type: '' // Empty for all teams (M=masculine, F=feminine, A=both championships)
+      numclu: clubId, // FFTT doc specifies 'numclu' for team queries - format 07XXXXXX required
     });
 
     try {
-
       const response = await fetch(`${url}?${params}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'User-Agent': 'Club Pongiste Libercourtois',
-          'Accept': 'application/xml, text/xml, */*'
-        }
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
       });
 
       // Handle ISO-8859-1 encoding properly
       const buffer = await response.arrayBuffer();
-      const decoder = new TextDecoder('iso-8859-1');
+      const decoder = new TextDecoder("iso-8859-1");
       const responseText = decoder.decode(buffer);
 
-      console.log('FFTT Teams Response:', {
+      console.log("FFTT Teams Response:", {
         status: response.status,
         responseLength: responseText.length,
-        hasEquipes: responseText.includes('<equipe'),
-        equipeCount: (responseText.match(/<equipe/g) || []).length
+        hasEquipes: responseText.includes("<equipe"),
+        equipeCount: (responseText.match(/<equipe/g) || []).length,
       });
 
       if (!response.ok) {
-        return { success: false, error: `HTTP ${response.status}: ${responseText}` };
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
       }
 
-      if (responseText.includes('<erreurs>') || responseText.includes('<erreur>')) {
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
         const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
-        const errorMessage = errorMatch ? errorMatch[1] : 'Unknown FFTT error';
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
         return { success: false, error: `FFTT Error: ${errorMessage}` };
       }
 
-      if (responseText.includes('<equipe')) {
+      if (responseText.includes("<equipe")) {
         const teams = this.parseXMLTeams(responseText);
-        console.log('Teams API SUCCESS:', {
+        console.log("Teams API SUCCESS:", {
           teamsCount: teams.length,
-          sampleTeam: teams.length > 0 ? teams[0] : null
+          sampleTeam: teams.length > 0 ? teams[0] : null,
         });
         return { success: true, data: teams };
       }
 
       return { success: true, data: [] };
-
     } catch (error) {
-      console.error('Teams API request failed:', error);
-      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+      console.error("Teams API request failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
@@ -274,7 +344,9 @@ export class SmartPingAPI {
    * Get club licensees with complete information including categories using xml_licence_b.php
    * This API returns more detailed info including the "cat" field for categories
    */
-  async getClubLicenseesWithCategories(clubId: string): Promise<SmartPingResult<LicenseeData[]>> {
+  async getClubLicenseesWithCategories(
+    clubId: string,
+  ): Promise<SmartPingResult<LicenseeData[]>> {
     const url = `${this.baseUrl}xml_licence_b.php`;
     const authParams = this.getAuthParams();
 
@@ -283,44 +355,51 @@ export class SmartPingAPI {
       tm: authParams.tm,
       tmc: authParams.tmc,
       id: authParams.id,
-      club: clubId // Use 'club' parameter to get all club licensees
+      club: clubId, // Use 'club' parameter to get all club licensees
     });
 
     try {
-
       const response = await fetch(`${url}?${params}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'User-Agent': 'Club Pongiste Libercourtois',
-          'Accept': 'application/xml, text/xml, */*'
-        }
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
       });
 
       // Handle ISO-8859-1 encoding properly
       const buffer = await response.arrayBuffer();
-      const decoder = new TextDecoder('iso-8859-1');
+      const decoder = new TextDecoder("iso-8859-1");
       const responseText = decoder.decode(buffer);
 
       if (!response.ok) {
-        return { success: false, error: `HTTP ${response.status}: ${responseText}` };
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
       }
 
-      if (responseText.includes('<erreurs>') || responseText.includes('<erreur>')) {
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
         const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
-        const errorMessage = errorMatch ? errorMatch[1] : 'Unknown FFTT error';
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
         return { success: false, error: `FFTT Error: ${errorMessage}` };
       }
 
-      if (responseText.includes('<licence')) {
+      if (responseText.includes("<licence")) {
         const licensees = this.parseXMLLicenceB(responseText);
         return { success: true, data: licensees };
       }
 
       return { success: true, data: [] };
-
     } catch (error) {
-      console.error('xml_licence_b club API request failed:', error);
-      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+      console.error("xml_licence_b club API request failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
@@ -332,23 +411,23 @@ export class SmartPingAPI {
     const joueurMatches = xmlResponse.match(/<joueur>[\s\S]*?<\/joueur>/g);
 
     if (joueurMatches) {
-      joueurMatches.forEach(match => {
+      joueurMatches.forEach((match) => {
         const licensee: LicenseeData = {
-          licence: this.extractTagValue(match, 'licence') || '',
-          nom: this.extractTagValue(match, 'nom') || '',
-          prenom: this.extractTagValue(match, 'prenom') || '',
-          club: this.extractTagValue(match, 'club') || '',
-          nclub: this.extractTagValue(match, 'nclub') || '',
-          points: parseInt(this.extractTagValue(match, 'points') || '0'),
-          classement: this.extractTagValue(match, 'classement') || '',
-          echelon: this.extractTagValue(match, 'echelon') || '',
-          place: parseInt(this.extractTagValue(match, 'place') || '0'),
-          natio: this.extractTagValue(match, 'natio') || '',
-          sexe: this.extractTagValue(match, 'sexe') || '',
-          type: this.extractTagValue(match, 'type') || '',
-          certif: this.extractTagValue(match, 'certif') || '',
-          valide: this.extractTagValue(match, 'valide') || '',
-          echelon_mixte: this.extractTagValue(match, 'echelon_mixte') || ''
+          licence: this.extractTagValue(match, "licence") || "",
+          nom: this.extractTagValue(match, "nom") || "",
+          prenom: this.extractTagValue(match, "prenom") || "",
+          club: this.extractTagValue(match, "club") || "",
+          nclub: this.extractTagValue(match, "nclub") || "",
+          points: parseInt(this.extractTagValue(match, "points") || "0"),
+          classement: this.extractTagValue(match, "classement") || "",
+          echelon: this.extractTagValue(match, "echelon") || "",
+          place: parseInt(this.extractTagValue(match, "place") || "0"),
+          natio: this.extractTagValue(match, "natio") || "",
+          sexe: this.extractTagValue(match, "sexe") || "",
+          type: this.extractTagValue(match, "type") || "",
+          certif: this.extractTagValue(match, "certif") || "",
+          valide: this.extractTagValue(match, "valide") || "",
+          echelon_mixte: this.extractTagValue(match, "echelon_mixte") || "",
         };
         licensees.push(licensee);
       });
@@ -366,24 +445,24 @@ export class SmartPingAPI {
 
     // Map common malformed sequences to correct characters
     const encodingFixes: Record<string, string> = {
-      'Ã©': 'é', // é
-      'Ã¨': 'è', // è
-      'Ãª': 'ê', // ê
-      'Ã ': 'à', // à
-      'Ã´': 'ô', // ô
-      'Ã§': 'ç', // ç
-      'Ã¹': 'ù', // ù
-      'Ã»': 'û', // û
-      'Ã®': 'î', // î
-      'Ã¯': 'ï', // ï
-      'Ã‰': 'É', // É
-      'Ã€': 'À', // À
-      'Ã‡': 'Ç'  // Ç
+      "Ã©": "é", // é
+      "Ã¨": "è", // è
+      Ãª: "ê", // ê
+      "Ã ": "à", // à
+      "Ã´": "ô", // ô
+      "Ã§": "ç", // ç
+      "Ã¹": "ù", // ù
+      "Ã»": "û", // û
+      "Ã®": "î", // î
+      "Ã¯": "ï", // ï
+      "Ã‰": "É", // É
+      "Ã€": "À", // À
+      "Ã‡": "Ç", // Ç
     };
 
     let fixed = text;
     for (const [malformed, correct] of Object.entries(encodingFixes)) {
-      fixed = fixed.replace(new RegExp(malformed, 'g'), correct);
+      fixed = fixed.replace(new RegExp(malformed, "g"), correct);
     }
 
     return fixed;
@@ -394,7 +473,6 @@ export class SmartPingAPI {
    * No more regex hell - clean XML parsing with fast-xml-parser
    */
   private parseXMLLicenseesWithRanking(xmlResponse: string): LicenseeData[] {
-
     // Configure XML parser options
     const options = {
       ignoreAttributes: false,
@@ -406,13 +484,12 @@ export class SmartPingAPI {
       trimValues: true, // Trim whitespace
       isArray: (name: string, jpath: string) => {
         // Make sure 'joueur' elements are always treated as array
-        return jpath === 'liste.joueur';
-      }
+        return jpath === "liste.joueur";
+      },
     };
 
     const parser = new XMLParser(options);
     const result = parser.parse(xmlResponse);
-
 
     const licensees: LicenseeData[] = [];
 
@@ -421,31 +498,29 @@ export class SmartPingAPI {
     const joueurArray = Array.isArray(joueurs) ? joueurs : [joueurs];
 
     joueurArray.forEach((joueur: any, index: number) => {
-
       const licensee: LicenseeData = {
-        licence: String(joueur.licence || ''), // License number from FFTT
-        nom: this.fixEncoding(String(joueur.nom || '')), // Fix encoding for names
-        prenom: this.fixEncoding(String(joueur.prenom || '')), // Fix encoding for first names
-        club: String(joueur.club || ''), // Club name
-        nclub: String(joueur.nclub || ''), // Club number
-        clast: String(joueur.clast || ''), // Last classement
-        cat: String(joueur.cat || ''), // Category
-        pointm: String(joueur.pointm || ''), // Monthly points
-        points: parseInt(String(joueur.pointm || '0')), // Monthly points as number
-        classement: String(joueur.clast || ''), // Use clast as classement for compatibility
-        echelon: String(joueur.echelon || ''),
-        place: parseInt(String(joueur.place || '0')),
-        natio: String(joueur.natio || ''),
-        sexe: String(joueur.sexe || ''),
-        type: String(joueur.type || ''),
-        certif: String(joueur.certif || ''),
-        valide: String(joueur.valide || ''),
-        echelon_mixte: String(joueur.echelon_mixte || '')
+        licence: String(joueur.licence || ""), // License number from FFTT
+        nom: this.fixEncoding(String(joueur.nom || "")), // Fix encoding for names
+        prenom: this.fixEncoding(String(joueur.prenom || "")), // Fix encoding for first names
+        club: String(joueur.club || ""), // Club name
+        nclub: String(joueur.nclub || ""), // Club number
+        clast: String(joueur.clast || ""), // Last classement
+        cat: String(joueur.cat || ""), // Category
+        pointm: String(joueur.pointm || ""), // Monthly points
+        points: parseInt(String(joueur.pointm || "0")), // Monthly points as number
+        classement: String(joueur.clast || ""), // Use clast as classement for compatibility
+        echelon: String(joueur.echelon || ""),
+        place: parseInt(String(joueur.place || "0")),
+        natio: String(joueur.natio || ""),
+        sexe: String(joueur.sexe || ""),
+        type: String(joueur.type || ""),
+        certif: String(joueur.certif || ""),
+        valide: String(joueur.valide || ""),
+        echelon_mixte: String(joueur.echelon_mixte || ""),
       };
 
       licensees.push(licensee);
     });
-
 
     return licensees;
   }
@@ -459,25 +534,25 @@ export class SmartPingAPI {
     const joueurMatches = xmlResponse.match(/<joueur>[\s\S]*?<\/joueur>/g);
 
     if (joueurMatches) {
-      joueurMatches.forEach(match => {
+      joueurMatches.forEach((match) => {
         const licensee: LicenseeData = {
-          licence: this.extractTagValue(match, 'licence') || '',
-          nom: this.extractTagValue(match, 'nom') || '',
-          prenom: this.extractTagValue(match, 'prenom') || '',
-          club: this.extractTagValue(match, 'club') || '',
-          nclub: this.extractTagValue(match, 'nclub') || '',
-          clast: this.extractTagValue(match, 'clast') || '',
+          licence: this.extractTagValue(match, "licence") || "",
+          nom: this.extractTagValue(match, "nom") || "",
+          prenom: this.extractTagValue(match, "prenom") || "",
+          club: this.extractTagValue(match, "club") || "",
+          nclub: this.extractTagValue(match, "nclub") || "",
+          clast: this.extractTagValue(match, "clast") || "",
           // These fields are not available in xml_liste_joueur.php but needed for interface
           points: 0,
-          classement: this.extractTagValue(match, 'clast') || '', // Map clast to classement for compatibility
-          echelon: '',
+          classement: this.extractTagValue(match, "clast") || "", // Map clast to classement for compatibility
+          echelon: "",
           place: 0,
-          natio: '',
-          sexe: '',
-          type: '',
-          certif: '',
-          valide: '',
-          echelon_mixte: ''
+          natio: "",
+          sexe: "",
+          type: "",
+          certif: "",
+          valide: "",
+          echelon_mixte: "",
         };
         licensees.push(licensee);
       });
@@ -495,23 +570,23 @@ export class SmartPingAPI {
     const joueurMatches = xmlResponse.match(/<joueur>[\s\S]*?<\/joueur>/g);
 
     if (joueurMatches) {
-      joueurMatches.forEach(match => {
+      joueurMatches.forEach((match) => {
         const licensee: LicenseeData = {
-          licence: this.extractTagValue(match, 'licence') || '',
-          nom: this.extractTagValue(match, 'nom') || '',
-          prenom: this.extractTagValue(match, 'prenom') || '',
-          club: this.extractTagValue(match, 'nclub') || '', // nclub is the club number
-          nclub: this.extractTagValue(match, 'club') || '', // club is the club name
+          licence: this.extractTagValue(match, "licence") || "",
+          nom: this.extractTagValue(match, "nom") || "",
+          prenom: this.extractTagValue(match, "prenom") || "",
+          club: this.extractTagValue(match, "nclub") || "", // nclub is the club number
+          nclub: this.extractTagValue(match, "club") || "", // club is the club name
           points: 0, // Not available in xml_liste_joueur.php
-          classement: this.extractTagValue(match, 'clast') || '', // clast contains the ranking
-          echelon: '',
+          classement: this.extractTagValue(match, "clast") || "", // clast contains the ranking
+          echelon: "",
           place: 0,
-          natio: '',
-          sexe: '', // Not available in xml_liste_joueur.php
-          type: '',
-          certif: '',
-          valide: '',
-          echelon_mixte: ''
+          natio: "",
+          sexe: "", // Not available in xml_liste_joueur.php
+          type: "",
+          certif: "",
+          valide: "",
+          echelon_mixte: "",
         };
         licensees.push(licensee);
       });
@@ -524,7 +599,9 @@ export class SmartPingAPI {
    * Get detailed licensee information using xml_licence_b.php (SPID + classement)
    * Used when clicking on a licensee card for detailed view
    */
-  async getLicenseeDetails(licenceNumber: string): Promise<SmartPingResult<LicenseeData | null>> {
+  async getLicenseeDetails(
+    licenceNumber: string,
+  ): Promise<SmartPingResult<LicenseeData | null>> {
     const url = `${this.baseUrl}xml_licence_b.php`;
     const authParams = this.getAuthParams();
 
@@ -533,44 +610,51 @@ export class SmartPingAPI {
       tm: authParams.tm,
       tmc: authParams.tmc,
       id: authParams.id,
-      licence: licenceNumber
+      licence: licenceNumber,
     });
 
     try {
-
       const response = await fetch(`${url}?${params}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'User-Agent': 'Club Pongiste Libercourtois',
-          'Accept': 'application/xml, text/xml, */*'
-        }
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
       });
 
       // Handle ISO-8859-1 encoding properly
       const buffer = await response.arrayBuffer();
-      const decoder = new TextDecoder('iso-8859-1');
+      const decoder = new TextDecoder("iso-8859-1");
       const responseText = decoder.decode(buffer);
 
       if (!response.ok) {
-        return { success: false, error: `HTTP ${response.status}: ${responseText}` };
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
       }
 
-      if (responseText.includes('<erreurs>') || responseText.includes('<erreur>')) {
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
         const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
-        const errorMessage = errorMatch ? errorMatch[1] : 'Unknown FFTT error';
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
         return { success: false, error: `FFTT Error: ${errorMessage}` };
       }
 
-      if (responseText.includes('<licence')) {
+      if (responseText.includes("<licence")) {
         const licensee = this.parseXMLLicenseeDetails(responseText);
         return { success: true, data: licensee };
       }
 
       return { success: true, data: null };
-
     } catch (error) {
-      console.error('Licensee details API request failed:', error);
-      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+      console.error("Licensee details API request failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
@@ -579,7 +663,6 @@ export class SmartPingAPI {
    * This API returns detailed info for a single license
    */
   private parseXMLLicenseeDetails(xmlResponse: string): LicenseeData | null {
-
     // Configure XML parser options
     const options = {
       ignoreAttributes: false,
@@ -588,7 +671,7 @@ export class SmartPingAPI {
       parseTrueNumberOnly: false,
       arrayMode: false,
       alwaysCreateTextNode: false,
-      trimValues: true
+      trimValues: true,
     };
 
     const parser = new XMLParser(options);
@@ -598,30 +681,29 @@ export class SmartPingAPI {
     const licence = result?.liste?.licence;
 
     if (!licence) {
-      console.log('No licence element found in parsed XML');
+      console.log("No licence element found in parsed XML");
       return null;
     }
 
-
     const licensee: LicenseeData = {
-      licence: String(licence.licence || ''), // License number from FFTT doc
-      nom: this.fixEncoding(String(licence.nom || '')), // Fix encoding for names
-      prenom: this.fixEncoding(String(licence.prenom || '')), // Fix encoding for first names
-      club: String(licence.nomclub || ''), // Club name = nomclub according to FFTT doc
-      nclub: String(licence.numclub || ''), // Club number = numclub according to FFTT doc
-      clast: String(licence.point || ''), // Use point as clast (classement points)
-      cat: String(licence.cat || ''), // Category from FFTT doc
-      pointm: String(licence.pointm || ''), // Monthly points from FFTT doc
-      points: parseInt(String(licence.pointm || licence.point || '0')), // Monthly or regular points
-      classement: String(licence.point || ''), // Use point as classement
-      echelon: String(licence.echelon || ''),
-      place: parseInt(String(licence.place || '0')),
-      natio: String(licence.natio || ''),
-      sexe: String(licence.sexe || ''),
-      type: String(licence.type || ''),
-      certif: String(licence.certif || ''),
-      valide: String(licence.validation || ''), // validation according to FFTT doc
-      echelon_mixte: String(licence.echelon_mixte || '')
+      licence: String(licence.licence || ""), // License number from FFTT doc
+      nom: this.fixEncoding(String(licence.nom || "")), // Fix encoding for names
+      prenom: this.fixEncoding(String(licence.prenom || "")), // Fix encoding for first names
+      club: String(licence.nomclub || ""), // Club name = nomclub according to FFTT doc
+      nclub: String(licence.numclub || ""), // Club number = numclub according to FFTT doc
+      clast: String(licence.point || ""), // Use point as clast (classement points)
+      cat: String(licence.cat || ""), // Category from FFTT doc
+      pointm: String(licence.pointm || ""), // Monthly points from FFTT doc
+      points: parseInt(String(licence.pointm || licence.point || "0")), // Monthly or regular points
+      classement: String(licence.point || ""), // Use point as classement
+      echelon: String(licence.echelon || ""),
+      place: parseInt(String(licence.place || "0")),
+      natio: String(licence.natio || ""),
+      sexe: String(licence.sexe || ""),
+      type: String(licence.type || ""),
+      certif: String(licence.certif || ""),
+      valide: String(licence.validation || ""), // validation according to FFTT doc
+      echelon_mixte: String(licence.echelon_mixte || ""),
     };
 
     return licensee;
@@ -640,7 +722,7 @@ export class SmartPingAPI {
       parseTrueNumberOnly: false,
       arrayMode: false,
       alwaysCreateTextNode: false,
-      trimValues: true
+      trimValues: true,
     };
 
     const parser = new XMLParser(options);
@@ -650,7 +732,7 @@ export class SmartPingAPI {
     const licences = result?.liste?.licence;
 
     if (!licences) {
-      console.log('No licence elements found in parsed XML');
+      console.log("No licence elements found in parsed XML");
       return [];
     }
 
@@ -658,24 +740,24 @@ export class SmartPingAPI {
     const licenceArray = Array.isArray(licences) ? licences : [licences];
 
     const licensees: LicenseeData[] = licenceArray.map((licence: any) => ({
-      licence: String(licence.licence || ''), // License number from FFTT doc
-      nom: this.fixEncoding(String(licence.nom || '')), // Fix encoding for names
-      prenom: this.fixEncoding(String(licence.prenom || '')), // Fix encoding for first names
-      club: String(licence.nomclub || ''), // Club name = nomclub according to FFTT doc
-      nclub: String(licence.numclub || ''), // Club number = numclub according to FFTT doc
-      clast: String(licence.point || ''), // Use point as clast (classement points)
-      cat: String(licence.cat || ''), // Category from FFTT doc
-      pointm: String(licence.pointm || ''), // Monthly points from FFTT doc
-      points: parseInt(String(licence.pointm || licence.point || '0')), // Monthly or regular points
-      classement: String(licence.point || ''), // Use point as classement
-      echelon: String(licence.echelon || ''),
-      place: parseInt(String(licence.place || '0')),
-      natio: String(licence.natio || ''),
-      sexe: String(licence.sexe || ''),
-      type: String(licence.type || ''),
-      certif: String(licence.certif || ''),
-      valide: String(licence.validation || ''), // validation according to FFTT doc
-      echelon_mixte: String(licence.echelon_mixte || '')
+      licence: String(licence.licence || ""), // License number from FFTT doc
+      nom: this.fixEncoding(String(licence.nom || "")), // Fix encoding for names
+      prenom: this.fixEncoding(String(licence.prenom || "")), // Fix encoding for first names
+      club: String(licence.nomclub || ""), // Club name = nomclub according to FFTT doc
+      nclub: String(licence.numclub || ""), // Club number = numclub according to FFTT doc
+      clast: String(licence.point || ""), // Use point as clast (classement points)
+      cat: String(licence.cat || ""), // Category from FFTT doc
+      pointm: String(licence.pointm || ""), // Monthly points from FFTT doc
+      points: parseInt(String(licence.pointm || licence.point || "0")), // Monthly or regular points
+      classement: String(licence.point || ""), // Use point as classement
+      echelon: String(licence.echelon || ""),
+      place: parseInt(String(licence.place || "0")),
+      natio: String(licence.natio || ""),
+      sexe: String(licence.sexe || ""),
+      type: String(licence.type || ""),
+      certif: String(licence.certif || ""),
+      valide: String(licence.validation || ""), // validation according to FFTT doc
+      echelon_mixte: String(licence.echelon_mixte || ""),
     }));
 
     return licensees;
@@ -689,13 +771,14 @@ export class SmartPingAPI {
     const equipeMatches = xmlResponse.match(/<equipe>[\s\S]*?<\/equipe>/g);
 
     if (equipeMatches) {
-      equipeMatches.forEach(match => {
+      equipeMatches.forEach((match) => {
         const team: TeamData = {
-          libequipe: this.extractTagValue(match, 'libequipe') || '',
-          libdivision: this.extractTagValue(match, 'libdivision') || '',
-          liendivision: this.extractTagValue(match, 'liendivision') || '',
-          idepr: this.extractTagValue(match, 'idepr') || '',
-          libepr: this.extractTagValue(match, 'libepr') || ''
+          idequipe: this.extractTagValue(match, "idequipe") || "",
+          libequipe: this.extractTagValue(match, "libequipe") || "",
+          libdivision: this.extractTagValue(match, "libdivision") || "",
+          liendivision: this.extractTagValue(match, "liendivision") || "",
+          idepr: this.extractTagValue(match, "idepr") || "",
+          libepr: this.extractTagValue(match, "libepr") || "",
         };
         teams.push(team);
       });
@@ -709,16 +792,514 @@ export class SmartPingAPI {
    * No more archaïc fixEncoding - proper TextDecoder handles it in 2025
    */
   private extractTagValue(xmlMatch: string, tagName: string): string | null {
-    const regex = new RegExp(`<${tagName}>([^<]*)</${tagName}>`, 'i');
+    // Handle CDATA sections for liendivision and lien
+    if (tagName === "liendivision" || tagName === "lien") {
+      const cdataRegex = new RegExp(
+        `<${tagName}><\\!\\[CDATA\\[([^\\]]+)\\]\\]></${tagName}>`,
+        "i",
+      );
+      const cdataMatch = xmlMatch.match(cdataRegex);
+      if (cdataMatch) {
+        return cdataMatch[1];
+      }
+    }
+
+    const regex = new RegExp(`<${tagName}>([^<]*)</${tagName}>`, "i");
     const match = xmlMatch.match(regex);
     const result = match ? match[1] : null;
 
-    // Debug for first few tags to see what's happening
-    if (tagName === 'nom' || tagName === 'prenom' || tagName === 'cat') {
-      console.log(`extractTagValue debug - tag: ${tagName}, found: "${result}", in XML: ${xmlMatch.substring(0, 200)}...`);
+    return result;
+  }
+
+  /**
+   * Parse URL parameters from liendivision field
+   */
+  private parseUrlParams(urlString: string): Record<string, string> {
+    const params: Record<string, string> = {};
+    const pairs = urlString.split("&");
+
+    for (const pair of pairs) {
+      const [key, value] = pair.split("=");
+      if (key && value) {
+        params[key] = value;
+      }
     }
 
-    return result;
+    return params;
+  }
+
+  /**
+   * Parse XML matches response from xml_result_equ.php
+   */
+  private parseXMLMatches(xmlResponse: string): MatchData[] {
+    const matches: MatchData[] = [];
+    const tourMatches = xmlResponse.match(/<tour>[\s\S]*?<\/tour>/g);
+
+    if (tourMatches) {
+      tourMatches.forEach((match) => {
+        const lienContent = this.extractTagValue(match, "lien") || "";
+
+        // Extract equip_id1 and equip_id2 from lien field
+        // The lien field contains URL-encoded data in CDATA
+        const equipId1Match = lienContent.match(/equip_id1=(\d+)/);
+        const equipId2Match = lienContent.match(/equip_id2=(\d+)/);
+
+        const tour: MatchData = {
+          equa: this.extractTagValue(match, "equa") || "",
+          equb: this.extractTagValue(match, "equb") || "",
+          scorea: this.extractTagValue(match, "scorea") || "",
+          scoreb: this.extractTagValue(match, "scoreb") || "",
+          resa: this.extractTagValue(match, "resa") || "",
+          resb: this.extractTagValue(match, "resb") || "",
+          dateprevue: this.extractTagValue(match, "dateprevue") || "",
+          datereelle: this.extractTagValue(match, "datereelle") || "",
+          heuredebut: this.extractTagValue(match, "heuredebut") || "",
+          lien: lienContent,
+          nomjour: this.extractTagValue(match, "nomjour") || "",
+          equipId1: equipId1Match ? equipId1Match[1] : "",
+          equipId2: equipId2Match ? equipId2Match[1] : "",
+        };
+        matches.push(tour);
+      });
+    }
+
+    return matches;
+  }
+
+  /**
+   * Get matches for a specific team using xml_result_equ.php
+   * Uses the liendivision parameter from team data to retrieve pool matches
+   */
+  async getTeamMatches(
+    team: TeamData,
+    clubName: string = "LIBERCOURT",
+  ): Promise<SmartPingResult<MatchData[]>> {
+    const url = `${this.baseUrl}xml_result_equ.php`;
+    const authParams = this.getAuthParams();
+
+    // Parse parameters from liendivision
+    const pouleParams = this.parseUrlParams(team.liendivision);
+
+    if (!pouleParams.cx_poule || !pouleParams.D1) {
+      return {
+        success: false,
+        error: "Missing required pool parameters (cx_poule or D1) in team data",
+        source: "team_validation",
+      };
+    }
+
+    const params = new URLSearchParams({
+      serie: authParams.serie,
+      tm: authParams.tm,
+      tmc: authParams.tmc,
+      id: authParams.id,
+      cx_poule: pouleParams.cx_poule,
+      D1: pouleParams.D1,
+      organisme_pere: pouleParams.organisme_pere || "67",
+    });
+
+    try {
+      const response = await fetch(`${url}?${params}`, {
+        method: "GET",
+        headers: {
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
+      });
+
+      const buffer = await response.arrayBuffer();
+      const decoder = new TextDecoder("iso-8859-1");
+      const responseText = decoder.decode(buffer);
+
+      console.log("FFTT Matches Response:", {
+        status: response.status,
+        responseLength: responseText.length,
+        hasMatches: responseText.includes("<tour"),
+        matchCount: (responseText.match(/<tour/g) || []).length,
+      });
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
+      }
+
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
+        const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
+        return { success: false, error: `FFTT Error: ${errorMessage}` };
+      }
+
+      if (responseText.includes("<tour")) {
+        const allMatches = this.parseXMLMatches(responseText);
+
+        // Filter matches for the specific team using precise team ID
+        const teamMatches = allMatches.filter(
+          (match) =>
+            match.equipId1 === team.idequipe ||
+            match.equipId2 === team.idequipe,
+        );
+
+        console.log("Team Matches API SUCCESS:", {
+          totalMatches: allMatches.length,
+          teamSpecificMatches: teamMatches.length,
+          teamName: team.libequipe,
+          teamId: team.idequipe,
+        });
+
+        return { success: true, data: teamMatches };
+      }
+
+      return { success: true, data: [] };
+    } catch (error) {
+      console.error("Team matches API request failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  /**
+   * Get club information from team using FFTT API
+   * Uses xml_result_equ.php to find club number from team data, then xml_club_detail.php for details
+   */
+  async getClubFromTeam(
+    teamData: TeamData,
+  ): Promise<SmartPingResult<ClubDetails | null>> {
+    // Extract pool parameters from team's liendivision
+    const pouleParams = this.parseUrlParams(teamData.liendivision);
+
+    if (!pouleParams.cx_poule || !pouleParams.D1) {
+      return {
+        success: false,
+        error: "Missing required pool parameters (cx_poule or D1) in team data",
+        source: "team_validation",
+      };
+    }
+
+    // Step 1: Get classement to find club number for this team
+    const url = `${this.baseUrl}xml_result_equ.php`;
+    const authParams = this.getAuthParams();
+
+    const params = new URLSearchParams({
+      serie: authParams.serie,
+      tm: authParams.tm,
+      tmc: authParams.tmc,
+      id: authParams.id,
+      action: "classement",
+      cx_poule: pouleParams.cx_poule,
+      D1: pouleParams.D1,
+      organisme_pere: pouleParams.organisme_pere || "67",
+    });
+
+    try {
+      const response = await fetch(`${url}?${params}`, {
+        method: "GET",
+        headers: {
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
+      });
+
+      const buffer = await response.arrayBuffer();
+      const decoder = new TextDecoder("iso-8859-1");
+      const responseText = decoder.decode(buffer);
+
+      console.log("FFTT Team Classement Response:", {
+        status: response.status,
+        responseLength: responseText.length,
+        hasClassement: responseText.includes("<classement"),
+      });
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
+      }
+
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
+        const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
+        return { success: false, error: `FFTT Error: ${errorMessage}` };
+      }
+
+      // Parse classement to find club number for our team
+      let clubNumber: string | null = null;
+      const classementMatches = responseText.match(
+        /<classement>[\s\S]*?<\/classement>/g,
+      );
+
+      if (classementMatches) {
+        for (const match of classementMatches) {
+          const idequipe = this.extractTagValue(match, "idequipe");
+          if (idequipe === teamData.idequipe) {
+            clubNumber = this.extractTagValue(match, "numero");
+            break;
+          }
+        }
+      }
+
+      if (!clubNumber) {
+        return {
+          success: false,
+          error: `Could not find club number for team ${teamData.libequipe} (ID: ${teamData.idequipe})`,
+          source: "team_not_found_in_classement",
+        };
+      }
+
+      console.log("Found club number for team:", {
+        teamName: teamData.libequipe,
+        teamId: teamData.idequipe,
+        clubNumber,
+      });
+
+      // Step 2: Get club details using the found club number
+      const clubDetailsResult = await this.getClubDetails(
+        clubNumber,
+        teamData.idequipe,
+      );
+
+      if (clubDetailsResult.success && clubDetailsResult.data) {
+        return {
+          success: true,
+          data: clubDetailsResult.data,
+          source: "fftt_team_club_lookup",
+        };
+      } else {
+        return {
+          success: false,
+          error: `Found club number ${clubNumber} but failed to get club details: ${clubDetailsResult.error}`,
+          source: "club_details_failed",
+        };
+      }
+    } catch (error) {
+      console.error("Team club lookup API error:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+        source: "api_error",
+      };
+    }
+  }
+
+  /**
+   * Get club details using xml_club_detail.php
+   * Returns club address information for Google Maps integration
+   */
+  async getClubDetails(
+    clubNumber: string,
+    idequipe?: string,
+  ): Promise<SmartPingResult<ClubDetails | null>> {
+    const url = `${this.baseUrl}xml_club_detail.php`;
+    const authParams = this.getAuthParams();
+
+    const params = new URLSearchParams({
+      serie: authParams.serie,
+      tm: authParams.tm,
+      tmc: authParams.tmc,
+      id: authParams.id,
+      club: clubNumber,
+    });
+
+    // Add idequipe parameter if provided (for team-specific hall info)
+    if (idequipe) {
+      params.append("idequipe", idequipe);
+    }
+
+    try {
+      const response = await fetch(`${url}?${params}`, {
+        method: "GET",
+        headers: {
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
+      });
+
+      const buffer = await response.arrayBuffer();
+      const decoder = new TextDecoder("iso-8859-1");
+      const responseText = decoder.decode(buffer);
+
+      console.log("FFTT Club Details Response:", {
+        status: response.status,
+        responseLength: responseText.length,
+        hasClub: responseText.includes("<club"),
+        clubNumber,
+      });
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
+      }
+
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
+        const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
+        return { success: false, error: `FFTT Error: ${errorMessage}` };
+      }
+
+      if (responseText.includes("<club")) {
+        const clubDetails = this.parseXMLClubDetails(responseText);
+        return { success: true, data: clubDetails };
+      }
+
+      return { success: true, data: null };
+    } catch (error) {
+      console.error("Club details API request failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  /**
+   * Parse XML club details response from xml_club_detail.php
+   */
+  private parseXMLClubDetails(xmlResponse: string): ClubDetails | null {
+    const clubMatch = xmlResponse.match(/<club>[\s\S]*?<\/club>/);
+
+    if (!clubMatch) {
+      return null;
+    }
+
+    const match = clubMatch[0];
+
+    // Build address from multiple address fields
+    const adressesalle1 = this.fixEncoding(
+      this.extractTagValue(match, "adressesalle1") || "",
+    );
+    const adressesalle2 = this.fixEncoding(
+      this.extractTagValue(match, "adressesalle2") || "",
+    );
+    const adressesalle3 = this.fixEncoding(
+      this.extractTagValue(match, "adressesalle3") || "",
+    );
+
+    const addressParts = [adressesalle1, adressesalle2, adressesalle3].filter(
+      (part) => part.trim() !== "",
+    );
+    const fullAddress = addressParts.join(", ");
+
+    return {
+      numero: this.extractTagValue(match, "numero") || "",
+      nom: this.fixEncoding(this.extractTagValue(match, "nom") || ""),
+      adresse: fullAddress,
+      codepostal: this.extractTagValue(match, "codepsalle") || "",
+      ville: this.fixEncoding(this.extractTagValue(match, "villesalle") || ""),
+      telephone: this.extractTagValue(match, "telcor") || "",
+      courrielligue: this.extractTagValue(match, "mailcor") || "",
+      web: this.extractTagValue(match, "web") || "",
+      latitude: this.extractTagValue(match, "latitude") || "",
+      longitude: this.extractTagValue(match, "longitude") || "",
+    };
+  }
+
+  /**
+   * Search clubs using xml_club_b.php
+   * This can help find club numbers dynamically
+   */
+  async searchClubs(
+    ville?: string,
+    nom?: string,
+  ): Promise<SmartPingResult<ClubSearchResult[]>> {
+    const url = `${this.baseUrl}xml_club_b.php`;
+    const authParams = this.getAuthParams();
+
+    const params = new URLSearchParams({
+      serie: authParams.serie,
+      tm: authParams.tm,
+      tmc: authParams.tmc,
+      id: authParams.id,
+    });
+
+    // Ajouter les paramètres de recherche
+    if (ville) params.append("ville", ville);
+    if (nom) params.append("nom", nom);
+
+    try {
+      const response = await fetch(`${url}?${params}`, {
+        method: "GET",
+        headers: {
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
+      });
+
+      const buffer = await response.arrayBuffer();
+      const decoder = new TextDecoder("iso-8859-1");
+      const responseText = decoder.decode(buffer);
+
+      console.log("FFTT Club Search Response:", {
+        status: response.status,
+        responseLength: responseText.length,
+        hasClubs: responseText.includes("<club"),
+        clubCount: (responseText.match(/<club/g) || []).length,
+      });
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
+      }
+
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
+        const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
+        return { success: false, error: `FFTT Error: ${errorMessage}` };
+      }
+
+      if (responseText.includes("<club")) {
+        const clubs = this.parseXMLClubSearch(responseText);
+        return { success: true, data: clubs };
+      }
+
+      return { success: true, data: [] };
+    } catch (error) {
+      console.error("Club search API request failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  /**
+   * Parse XML club search response from xml_club_b.php
+   */
+  private parseXMLClubSearch(xmlResponse: string): ClubSearchResult[] {
+    const clubs: ClubSearchResult[] = [];
+    const clubMatches = xmlResponse.match(/<club>[\s\S]*?<\/club>/g);
+
+    if (clubMatches) {
+      clubMatches.forEach((match) => {
+        const club: ClubSearchResult = {
+          numero: this.extractTagValue(match, "numero") || "",
+          nom: this.fixEncoding(this.extractTagValue(match, "nom") || ""),
+          ville: this.fixEncoding(this.extractTagValue(match, "ville") || ""),
+        };
+        clubs.push(club);
+      });
+    }
+
+    return clubs;
   }
 }
 
@@ -726,18 +1307,20 @@ export class SmartPingAPI {
  * Fetch licensees for a club using modern FFTT API with ranking data (xml_licence_b.php)
  * Export function for use in Nuxt API routes
  */
-export async function fetchLicenseesWithSmartPing(clubId: string): Promise<SmartPingResult<LicenseeData[]>> {
+export async function fetchLicenseesWithSmartPing(
+  clubId: string,
+): Promise<SmartPingResult<LicenseeData[]>> {
   const config = useRuntimeConfig();
   const appCode = config.smartpingAppCode;
   const password = config.smartpingPassword;
   const email = config.smartpingEmail;
 
   if (!appCode || !password || !email) {
-    console.error('Missing SmartPing credentials');
+    console.error("Missing SmartPing credentials");
     return {
       success: false,
-      error: 'Missing SmartPing API credentials',
-      source: 'config'
+      error: "Missing SmartPing API credentials",
+      source: "config",
     };
   }
 
@@ -747,15 +1330,14 @@ export async function fetchLicenseesWithSmartPing(clubId: string): Promise<Smart
 
     return {
       ...result,
-      source: 'xml_licence_b'
+      source: "xml_licence_b",
     };
-
   } catch (error) {
-    console.error('SmartPing API error:', error);
+    console.error("SmartPing API error:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      source: 'xml_licence_b'
+      error: error instanceof Error ? error.message : "Unknown error",
+      source: "xml_licence_b",
     };
   }
 }
@@ -764,18 +1346,20 @@ export async function fetchLicenseesWithSmartPing(clubId: string): Promise<Smart
  * Fetch teams for a club using modern FFTT API
  * Export function for use in Nuxt API routes
  */
-export async function fetchTeamsWithSmartPing(clubId: string): Promise<SmartPingResult<TeamData[]>> {
+export async function fetchTeamsWithSmartPing(
+  clubId: string,
+): Promise<SmartPingResult<TeamData[]>> {
   const config = useRuntimeConfig();
   const appCode = config.smartpingAppCode;
   const password = config.smartpingPassword;
   const email = config.smartpingEmail;
 
   if (!appCode || !password || !email) {
-    console.error('Missing SmartPing credentials');
+    console.error("Missing SmartPing credentials");
     return {
       success: false,
-      error: 'Missing SmartPing API credentials',
-      source: 'config'
+      error: "Missing SmartPing API credentials",
+      source: "config",
     };
   }
 
@@ -785,15 +1369,54 @@ export async function fetchTeamsWithSmartPing(clubId: string): Promise<SmartPing
 
     return {
       ...result,
-      source: 'smartping_api'
+      source: "smartping_api",
     };
-
   } catch (error) {
-    console.error('SmartPing Teams API error:', error);
+    console.error("SmartPing Teams API error:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      source: 'smartping_api'
+      error: error instanceof Error ? error.message : "Unknown error",
+      source: "smartping_api",
+    };
+  }
+}
+
+/**
+ * Fetch matches for a specific team using modern FFTT API
+ * Export function for use in Nuxt API routes
+ */
+export async function fetchTeamMatchesWithSmartPing(
+  team: TeamData,
+  clubName: string = "LIBERCOURT",
+): Promise<SmartPingResult<MatchData[]>> {
+  const config = useRuntimeConfig();
+  const appCode = config.smartpingAppCode;
+  const password = config.smartpingPassword;
+  const email = config.smartpingEmail;
+
+  if (!appCode || !password || !email) {
+    console.error("Missing SmartPing credentials");
+    return {
+      success: false,
+      error: "Missing SmartPing API credentials",
+      source: "config",
+    };
+  }
+
+  try {
+    const smartPingApi = new SmartPingAPI(appCode, password, email);
+    const result = await smartPingApi.getTeamMatches(team, clubName);
+
+    return {
+      ...result,
+      source: "smartping_matches_api",
+    };
+  } catch (error) {
+    console.error("SmartPing Team Matches API error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      source: "smartping_matches_api",
     };
   }
 }

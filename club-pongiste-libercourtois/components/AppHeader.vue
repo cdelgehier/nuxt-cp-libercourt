@@ -16,7 +16,7 @@
             :key="item.href"
             :to="item.href"
             class="nav-link"
-            :class="{ 'nav-link-active': $route.path === item.href }"
+            :class="{ 'nav-link-active': $route?.path === item.href }"
           >
             {{ item.label }}
           </NuxtLink>
@@ -100,6 +100,7 @@ const navigation: NavigationItem[] = [
   { label: "Accueil", href: "/" },
   { label: "Le Club", href: "/club" },
   { label: "Licenciés", href: "/licencies" },
+  { label: "Équipes", href: "/equipes" },
   { label: "Calendrier", href: "/calendrier" },
   { label: "Horaires & Tarifs", href: "/horaires-tarifs" },
   { label: "FAQ", href: "/faq" },

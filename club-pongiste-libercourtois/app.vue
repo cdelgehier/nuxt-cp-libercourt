@@ -29,6 +29,14 @@ useHead({
   bodyAttrs: {
     class: "light",
   },
+  link: [
+    // Preload critical images
+    { rel: "preload", href: "/images/logo-club.png", as: "image" },
+    // Preload key pages for faster navigation
+    { rel: "prefetch", href: "/club" },
+    { rel: "prefetch", href: "/contact" },
+    { rel: "prefetch", href: "/calendrier" },
+  ],
 });
 
 // SEO Configuration

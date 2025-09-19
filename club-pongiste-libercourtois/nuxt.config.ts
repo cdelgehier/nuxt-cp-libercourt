@@ -139,18 +139,8 @@ export default defineNuxtConfig({
 
   // Vite optimizations
   vite: {
-    build: {
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            vendor: ['vue', '@nuxt/kit'],
-            ui: ['@nuxt/ui'],
-          },
-        },
-      },
-    },
     optimizeDeps: {
-      include: ['vue', '@nuxt/ui'],
+      include: ['vue', '@nuxt/ui', '@vueuse/core'],
     },
   },
 

@@ -107,3 +107,15 @@ logs
 .tmp/
 tmp/
 *.tmp
+
+# Smartping documentation
+Sp*cifications*
+*Smartping*
+
+# Test and audit reports
+lighthouse-*.html
+playwright-report/
+test-results/
+
+# Build outputs
+.netlify/

@@ -22,3 +22,14 @@ logs
 .env
 .env.local
 .env.*.local
+
+# Smartping documentation (not to be committed)
+"Spécifications techniques de API Smartping 2.0.md"
+
+# Test and audit reports
+lighthouse-*.html
+playwright-report/
+test-results/
+
+# Build outputs
+.netlify/

@@ -97,7 +97,15 @@ export default defineNuxtConfig({
           href: "https://fonts.gstatic.com",
           crossorigin: "",
         },
-        // Preload critical font faces
+        // Preload critical font files directly
+        {
+          rel: "preload",
+          href: "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2",
+          as: "font",
+          type: "font/woff2",
+          crossorigin: "",
+        },
+        // Preload CSS with high priority
         {
           rel: "preload",
           href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap",
@@ -160,6 +168,23 @@ export default defineNuxtConfig({
       clubAddress: `${clubConfigData.location.salle} - ${clubConfigData.location.complexe}, ${clubConfigData.location.city}`,
       clubId: clubConfigData.club.id, // Safe to expose for client-side queries
     },
+  },
+
+  // Additional resource hints for FCP optimization
+  hooks: {
+    'render:route': (url, result) => {
+      // Add early hints for critical resources
+      if (url === '/') {
+        result.html = result.html.replace(
+          '<head>',
+          `<head>
+          <link rel="dns-prefetch" href="//fonts.googleapis.com">
+          <link rel="dns-prefetch" href="//fonts.gstatic.com">
+          <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>`
+        );
+      }
+    }
   },
 
   // Tailwind CSS configuration will extend our custom theme

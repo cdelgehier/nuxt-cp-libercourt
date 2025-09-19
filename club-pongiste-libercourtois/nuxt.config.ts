@@ -124,6 +124,34 @@ export default defineNuxtConfig({
   // Build configuration
   nitro: {
     preset: "netlify",
+    compressPublicAssets: true,
+    minify: true,
+    experimental: {
+      wasm: true,
+    },
+  },
+
+  // Performance optimizations
+  experimental: {
+    payloadExtraction: false, // Improves hydration performance
+    viewTransition: true,     // Enable View Transitions API
+  },
+
+  // Vite optimizations
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['vue', '@nuxt/kit'],
+            ui: ['@nuxt/ui'],
+          },
+        },
+      },
+    },
+    optimizeDeps: {
+      include: ['vue', '@nuxt/ui'],
+    },
   },
 
   // Runtime config

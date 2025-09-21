@@ -71,6 +71,24 @@ interface ClubSearchResult {
   ville: string;
 }
 
+interface MatchDetail {
+  equa: string;
+  equb: string;
+  resa: string;
+  resb: string;
+  parties: PartieDetail[];
+}
+
+interface PartieDetail {
+  ja: string; // Joueur A
+  jb: string; // Joueur B
+  scorea: string; // Score joueur A
+  scoreb: string; // Score joueur B
+  detail: string; // Détail des manches (ex: "11/3 9/11 11/4 11/4")
+  xca?: string; // Classement joueur A
+  xcb?: string; // Classement joueur B
+}
+
 // Type definitions for SmartPing API responses
 interface SmartPingResult<T> {
   success: boolean;
@@ -1209,6 +1227,80 @@ export class SmartPingAPI {
   }
 
   /**
+   * Get match details using xml_chp_renc.php
+   * According to FFTT documentation: "Renvoie les informations détaillées d'une rencontre"
+   * Takes the 'lien' parameter from a match data
+   */
+  async getMatchDetails(
+    lienParam: string,
+  ): Promise<SmartPingResult<MatchDetail | null>> {
+    const url = `${this.baseUrl}xml_chp_renc.php`;
+    const authParams = this.getAuthParams();
+
+    // Parse lien parameter to extract required params
+    const linkParams = this.parseUrlParams(lienParam);
+
+    const params = new URLSearchParams({
+      serie: authParams.serie,
+      tm: authParams.tm,
+      tmc: authParams.tmc,
+      id: authParams.id,
+      ...linkParams, // Add all parameters from lien
+    });
+
+    try {
+      const response = await fetch(`${url}?${params}`, {
+        method: "GET",
+        headers: {
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
+      });
+
+      const buffer = await response.arrayBuffer();
+      const decoder = new TextDecoder("iso-8859-1");
+      const responseText = decoder.decode(buffer);
+
+      console.log("FFTT Match Details Response:", {
+        status: response.status,
+        responseLength: responseText.length,
+        hasResultat: responseText.includes("<resultat"),
+        hasPartie: responseText.includes("<partie"),
+        partieCount: (responseText.match(/<partie/g) || []).length,
+      });
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
+      }
+
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
+        const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
+        return { success: false, error: `FFTT Error: ${errorMessage}` };
+      }
+
+      if (responseText.includes("<resultat")) {
+        const matchDetail = this.parseXMLMatchDetails(responseText);
+        return { success: true, data: matchDetail };
+      }
+
+      return { success: true, data: null };
+    } catch (error) {
+      console.error("Match details API request failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  /**
    * Search clubs using xml_club_b.php
    * This can help find club numbers dynamically
    */
@@ -1300,6 +1392,94 @@ export class SmartPingAPI {
     }
 
     return clubs;
+  }
+
+  /**
+   * Parse XML match details response from xml_chp_renc.php
+   * According to FFTT spec, returns: <resultat>, then <joueur> pairs, then <partie> details
+   */
+  private parseXMLMatchDetails(xmlResponse: string): MatchDetail | null {
+    // Extract resultat section
+    const resultatMatch = xmlResponse.match(/<resultat>[\s\S]*?<\/resultat>/);
+    if (!resultatMatch) {
+      return null;
+    }
+
+    const resultat = resultatMatch[0];
+    const equa = this.extractTagValue(resultat, "equa") || "";
+    const equb = this.extractTagValue(resultat, "equb") || "";
+    const resa = this.extractTagValue(resultat, "resa") || "";
+    const resb = this.extractTagValue(resultat, "resb") || "";
+
+    // Extract joueur pairs for classement info
+    const joueurPairs: Array<{
+      xja: string;
+      xca: string;
+      xjb: string;
+      xcb: string;
+    }> = [];
+    const joueurMatches = xmlResponse.match(/<joueur>[\s\S]*?<\/joueur>/g);
+
+    if (joueurMatches) {
+      joueurMatches.forEach((match) => {
+        const pair = {
+          xja: this.fixEncoding(this.extractTagValue(match, "xja") || ""),
+          xca: this.extractTagValue(match, "xca") || "",
+          xjb: this.fixEncoding(this.extractTagValue(match, "xjb") || ""),
+          xcb: this.extractTagValue(match, "xcb") || "",
+        };
+        joueurPairs.push(pair);
+      });
+    }
+
+    // Extract partie details
+    const parties: PartieDetail[] = [];
+    const partieMatches = xmlResponse.match(/<partie>[\s\S]*?<\/partie>/g);
+
+    if (partieMatches) {
+      partieMatches.forEach((match, index) => {
+        const ja = this.fixEncoding(this.extractTagValue(match, "ja") || "");
+        const jb = this.fixEncoding(this.extractTagValue(match, "jb") || "");
+        const scorea = this.extractTagValue(match, "scorea") || "";
+        const scoreb = this.extractTagValue(match, "scoreb") || "";
+        const detail = this.extractTagValue(match, "detail") || "";
+
+        // Try to match with joueur pair for classement
+        let xca = "";
+        let xcb = "";
+
+        // Find matching joueur pair based on names
+        const matchingPair = joueurPairs.find(
+          (pair) =>
+            pair.xja.includes(ja.split(" ")[0]) ||
+            pair.xjb.includes(jb.split(" ")[0]),
+        );
+
+        if (matchingPair) {
+          xca = matchingPair.xca;
+          xcb = matchingPair.xcb;
+        }
+
+        const partie: PartieDetail = {
+          ja,
+          jb,
+          scorea,
+          scoreb,
+          detail,
+          xca,
+          xcb,
+        };
+        parties.push(partie);
+      });
+    }
+
+    return {
+      equa,
+      equb,
+      resa,
+      resb,
+      parties,
+    };
   }
 }
 
@@ -1417,6 +1597,45 @@ export async function fetchTeamMatchesWithSmartPing(
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
       source: "smartping_matches_api",
+    };
+  }
+}
+
+/**
+ * Fetch match details using modern FFTT API
+ * Export function for use in Nuxt API routes
+ */
+export async function fetchMatchDetailsWithSmartPing(
+  lienParam: string,
+): Promise<SmartPingResult<MatchDetail | null>> {
+  const config = useRuntimeConfig();
+  const appCode = config.smartpingAppCode;
+  const password = config.smartpingPassword;
+  const email = config.smartpingEmail;
+
+  if (!appCode || !password || !email) {
+    console.error("Missing SmartPing credentials");
+    return {
+      success: false,
+      error: "Missing SmartPing API credentials",
+      source: "config",
+    };
+  }
+
+  try {
+    const smartPingApi = new SmartPingAPI(appCode, password, email);
+    const result = await smartPingApi.getMatchDetails(lienParam);
+
+    return {
+      ...result,
+      source: "smartping_match_details_api",
+    };
+  } catch (error) {
+    console.error("SmartPing Match Details API error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      source: "smartping_match_details_api",
     };
   }
 }

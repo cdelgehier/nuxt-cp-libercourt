@@ -33,7 +33,7 @@
     {
       "id": "3",
       "firstName": "Cédric",
-      "lastName": "DELGEHIER",
+      "lastName": "Delgehier",
       "role": "secretary",
       "fullRole": "Secrétaire adjoint",
       "email": "",
@@ -49,22 +49,9 @@
       "image": ""
     },
     {
-      "id": "4",
-      "firstName": "Patrick",
-      "lastName": "Levray",
-      "role": "treasurer",
-      "fullRole": "Trésorier",
-      "email": "",
-      "phone": "",
-      "bio": "Trésorier, gère les finances et la comptabilité du club.",
-      "responsibilities": ["Gestion financière", "Comptabilité", "Budgets"],
-      "joinedDate": "2019-01-01",
-      "image": ""
-    },
-    {
       "id": "5",
       "firstName": "Vincent",
-      "lastName": "DARUL",
+      "lastName": "Darul",
       "role": "treasurer",
       "fullRole": "Trésorier adjoint",
       "email": "",
@@ -93,6 +80,23 @@
         "Manifestations"
       ],
       "joinedDate": "2018-01-01",
+      "image": ""
+    },
+    {
+      "id": "7",
+      "firstName": "Sandrine",
+      "lastName": "Benoit",
+      "role": "president",
+      "fullRole": "Présidente adjoint",
+      "email": "",
+      "phone": "",
+      "bio": "Présidente adjoint du club, référente projets stratégiques.",
+      "responsibilities": [
+        "Remplacement du président en cas d'absence",
+        "Appui à l’organisation générale et à la coordination des projets du bureau",
+        "Médiation et accompagnement des adhérents"
+      ],
+      "joinedDate": "2025-09-21",
       "image": ""
     }
   ]

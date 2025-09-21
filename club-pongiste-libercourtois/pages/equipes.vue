@@ -305,9 +305,6 @@
                     <div class="font-semibold text-gray-900 dark:text-white">
                       {{ match.scorea }} - {{ match.scoreb }}
                     </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
-                      {{ match.resa }} - {{ match.resb }}
-                    </div>
                   </div>
                   <div v-else class="text-sm text-gray-500 dark:text-gray-500">
                     À venir

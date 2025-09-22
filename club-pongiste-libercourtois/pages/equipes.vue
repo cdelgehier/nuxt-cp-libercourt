@@ -215,299 +215,321 @@
                 <div
                   v-for="(match, index) in teamMatches[team.idequipe]"
                   :key="index"
-                  class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                  class="space-y-3"
                 >
-                  <div class="flex items-center space-x-3">
-                    <div class="text-2xl">
-                      {{ match.equa.includes("LIBERCOURT") ? "🏠" : "🚌" }}
-                    </div>
-                    <div>
-                      <div class="font-medium text-gray-900 dark:text-white">
-                        {{ match.equa }} vs {{ match.equb }}
+                  <!-- Match principal -->
+                  <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <!-- Info du match -->
+                    <div class="flex items-start justify-between mb-2">
+                      <div class="flex items-center space-x-3 flex-1 min-w-0">
+                        <div class="text-2xl">
+                          {{ match.equa.includes("LIBERCOURT") ? "🏠" : "🚌" }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <div
+                            class="font-medium text-gray-900 dark:text-white"
+                          >
+                            {{ match.equa }} vs {{ match.equb }}
+                          </div>
+                          <div class="text-sm text-gray-600 dark:text-gray-400">
+                            {{
+                              formatDate(match.dateprevue || match.datereelle)
+                            }}
+                            <span v-if="match.heuredebut" class="ml-2">
+                              à {{ match.heuredebut }}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">
-                        {{ formatDate(match.dateprevue || match.datereelle) }}
-                        <span v-if="match.heuredebut" class="ml-2">
-                          à {{ match.heuredebut }}
-                        </span>
-                      </div>
-                      <!-- Actions pour tous les matchs -->
-                      <div class="mt-1 flex items-center space-x-2">
-                        <!-- Bouton calendrier pour tous les matchs -->
-                        <UButton
-                          @click="addMatchToCalendar(match, team)"
-                          variant="ghost"
-                          color="green"
-                          size="xs"
-                          :title="`Ajouter le match au calendrier`"
+                      <div class="text-right flex-shrink-0 ml-3">
+                        <div
+                          v-if="match.scorea && match.scoreb"
+                          class="font-bold text-lg text-gray-900 dark:text-white"
                         >
-                          📅 Agenda
-                        </UButton>
-
-                        <!-- Actions spécifiques aux matchs à l'extérieur -->
-                        <template v-if="!match.equa.includes('LIBERCOURT')">
-                          <UButton
-                            @click="openGoogleMaps(match, team)"
-                            variant="ghost"
-                            color="blue"
-                            size="xs"
-                            icon="i-heroicons-map-pin"
-                          >
-                            📍 Itinéraire
-                          </UButton>
-                          <span
-                            v-if="getTravelTime(match, team)"
-                            class="text-xs text-gray-500 dark:text-gray-400"
-                          >
-                            (~{{ getTravelTime(match, team) }}min)
-                          </span>
-                        </template>
+                          {{ match.scorea }} - {{ match.scoreb }}
+                        </div>
+                        <div
+                          v-else
+                          class="text-sm text-gray-500 dark:text-gray-500"
+                        >
+                          À venir
+                        </div>
                       </div>
-                      <!-- Lien Google Maps pour les matchs à l'extérieur (ancien code) -->
-                      <div
-                        v-if="false"
-                        class="mt-1 flex items-center space-x-2"
+                    </div>
+
+                    <!-- Actions pour tous les matchs -->
+                    <div class="flex flex-wrap items-center gap-2">
+                      <!-- Bouton calendrier pour tous les matchs -->
+                      <UButton
+                        @click="addMatchToCalendar(match, team)"
+                        variant="ghost"
+                        color="green"
+                        size="xs"
+                        :title="`Ajouter le match au calendrier`"
+                        class="flex-shrink-0"
                       >
+                        📅 Agenda
+                      </UButton>
+
+                      <!-- Actions spécifiques aux matchs à l'extérieur -->
+                      <template v-if="!match.equa.includes('LIBERCOURT')">
                         <UButton
-                          @click="
-                            openGoogleMaps(
-                              match.equa.includes('LIBERCOURT')
-                                ? match.equb
-                                : match.equa,
-                            )
-                          "
+                          @click="openGoogleMaps(match, team)"
                           variant="ghost"
                           color="blue"
                           size="xs"
                           icon="i-heroicons-map-pin"
+                          class="flex-shrink-0"
                         >
                           📍 Itinéraire
                         </UButton>
-                        <UButton
-                          @click="addMatchToCalendar(match, team)"
-                          variant="ghost"
-                          color="green"
-                          size="xs"
-                          :title="`Ajouter le match au calendrier`"
-                        >
-                          📅 Agenda
-                        </UButton>
                         <span
                           v-if="getTravelTime(match, team)"
-                          class="text-xs text-gray-500 dark:text-gray-400"
+                          class="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0"
                         >
                           (~{{ getTravelTime(match, team) }}min)
                         </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div v-if="match.scorea && match.scoreb" class="text-right">
-                    <div
-                      class="font-semibold text-gray-900 dark:text-white mb-2"
-                    >
-                      {{ match.scorea }} - {{ match.scoreb }}
-                    </div>
-                    <UButton
-                      @click="toggleMatchDetails(match)"
-                      variant="ghost"
-                      color="gray"
-                      size="xs"
-                      :title="`${expandedMatchDetails.includes(`${match.equipId1}-${match.equipId2}-${match.dateprevue}`) ? 'Masquer' : 'Voir'} les détails`"
-                    >
-                      <UIcon
-                        :name="
-                          expandedMatchDetails.includes(
-                            `${match.equipId1}-${match.equipId2}-${match.dateprevue}`,
-                          )
-                            ? 'i-heroicons-chevron-up'
-                            : 'i-heroicons-chevron-down'
-                        "
-                        class="w-3 h-3 mr-1"
-                      />
-                      📊 Détails
-                    </UButton>
-                  </div>
-                  <div v-else class="text-sm text-gray-500 dark:text-gray-500">
-                    À venir
-                  </div>
-                  <!-- Détails du match (expandable) -->
-                  <div
-                    v-if="
-                      match.scorea &&
-                      match.scoreb &&
-                      expandedMatchDetails.includes(
-                        `${match.equipId1}-${match.equipId2}-${match.dateprevue}`,
-                      )
-                    "
-                    class="mt-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-t border-gray-200 dark:border-gray-600"
-                  >
-                    <!-- Loading des détails -->
-                    <div
-                      v-if="
-                        loadingMatchDetails[
-                          `${match.equipId1}-${match.equipId2}-${match.dateprevue}`
-                        ]
-                      "
-                      class="text-center py-4"
-                    >
-                      <UIcon
-                        name="i-heroicons-arrow-path"
-                        class="mx-auto h-6 w-6 text-club-green animate-spin"
-                      />
-                      <p class="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                        Chargement des détails...
-                      </p>
+                      </template>
+
+                      <!-- Bouton pour les détails des parties -->
+                      <UButton
+                        v-if="match.scorea && match.scoreb"
+                        @click="toggleMatchDetails(match)"
+                        variant="ghost"
+                        color="gray"
+                        size="xs"
+                        icon="i-heroicons-eye"
+                        :title="`${expandedMatchDetails.includes(`${match.equipId1}-${match.equipId2}-${match.dateprevue}`) ? 'Masquer' : 'Voir'} les détails`"
+                        class="flex-shrink-0"
+                      >
+                        📊 Détails
+                      </UButton>
                     </div>
 
-                    <!-- Erreur des détails -->
+                    <!-- Détails du match DIRECTEMENT SOUS LES BOUTONS -->
                     <div
-                      v-else-if="
-                        matchDetailsErrors[
-                          `${match.equipId1}-${match.equipId2}-${match.dateprevue}`
-                        ]
+                      v-if="
+                        match.scorea &&
+                        match.scoreb &&
+                        expandedMatchDetails.includes(
+                          `${match.equipId1}-${match.equipId2}-${match.dateprevue}`,
+                        )
                       "
-                      class="text-center py-4"
+                      class="mt-3 p-3 bg-gray-100 dark:bg-gray-600 rounded-md border border-gray-200 dark:border-gray-500"
                     >
-                      <p class="text-xs text-red-600 dark:text-red-400">
-                        Erreur:
-                        {{
+                      <!-- Loading des détails -->
+                      <div
+                        v-if="
+                          loadingMatchDetails[
+                            `${match.equipId1}-${match.equipId2}-${match.dateprevue}`
+                          ]
+                        "
+                        class="text-center py-2"
+                      >
+                        <UIcon
+                          name="i-heroicons-arrow-path"
+                          class="mx-auto h-4 w-4 text-club-green animate-spin"
+                        />
+                        <p
+                          class="mt-1 text-xs text-gray-600 dark:text-gray-400"
+                        >
+                          Chargement des détails...
+                        </p>
+                      </div>
+
+                      <!-- Erreur des détails -->
+                      <div
+                        v-else-if="
                           matchDetailsErrors[
                             `${match.equipId1}-${match.equipId2}-${match.dateprevue}`
                           ]
-                        }}
-                      </p>
-                    </div>
-
-                    <!-- Liste des parties -->
-                    <div
-                      v-else-if="
-                        matchDetails[
-                          `${match.equipId1}-${match.equipId2}-${match.dateprevue}`
-                        ]?.parties?.length > 0
-                      "
-                      class="space-y-2"
-                    >
-                      <h5
-                        class="font-medium text-gray-900 dark:text-white text-sm mb-3"
+                        "
+                        class="text-center py-2"
                       >
-                        Détail des parties ({{
+                        <p class="text-xs text-red-600 dark:text-red-400">
+                          Erreur:
+                          {{
+                            matchDetailsErrors[
+                              `${match.equipId1}-${match.equipId2}-${match.dateprevue}`
+                            ]
+                          }}
+                        </p>
+                      </div>
+
+                      <!-- Liste des parties -->
+                      <div
+                        v-else-if="
                           matchDetails[
                             `${match.equipId1}-${match.equipId2}-${match.dateprevue}`
-                          ].parties.length
-                        }})
-                      </h5>
-                      <div
-                        v-for="(partie, partieIndex) in matchDetails[
-                          `${match.equipId1}-${match.equipId2}-${match.dateprevue}`
-                        ].parties"
-                        :key="partieIndex"
-                        class="grid grid-cols-3 gap-4 p-3 bg-white dark:bg-gray-700 rounded-md text-sm items-center"
+                          ]?.parties?.length > 0
+                        "
                       >
-                        <!-- Joueur A -->
-                        <div class="flex items-center justify-end">
-                          <div class="text-right">
-                            <div
-                              class="flex items-center justify-end space-x-2"
-                            >
-                              <span
-                                :class="
-                                  isPlayerWinner(partie.scorea, partie.scoreb)
-                                    ? 'text-green-600'
-                                    : 'text-red-600'
-                                "
-                                class="text-sm"
-                              >
-                                {{
-                                  isPlayerWinner(partie.scorea, partie.scoreb)
-                                    ? "🟢"
-                                    : "🔴"
-                                }}
-                              </span>
-                              <div
-                                class="font-medium text-gray-900 dark:text-white"
-                              >
-                                <div
-                                  v-for="(joueur, idx) in partie.ja.split(
-                                    ' et ',
-                                  )"
-                                  :key="idx"
-                                >
-                                  {{ joueur.trim() }}
-                                </div>
-                              </div>
-                            </div>
-                            <div
-                              v-if="partie.xca"
-                              class="text-xs text-gray-500 dark:text-gray-400 mt-1"
-                            >
-                              ({{
-                                partie.xca.replace("M ", "").replace("pts", "")
-                              }})
-                            </div>
-                          </div>
-                        </div>
-
-                        <!-- Scores centrés -->
-                        <div class="text-center">
+                        <h5
+                          class="font-medium text-gray-900 dark:text-white text-xs mb-2 flex items-center"
+                        >
+                          <UIcon
+                            name="i-heroicons-list-bullet"
+                            class="w-3 h-3 mr-1 text-club-green"
+                          />
+                          Détail des parties ({{
+                            matchDetails[
+                              `${match.equipId1}-${match.equipId2}-${match.dateprevue}`
+                            ].parties.length
+                          }})
+                        </h5>
+                        <div class="space-y-1">
                           <div
-                            class="text-xs text-gray-500 dark:text-gray-400 font-mono leading-relaxed"
+                            v-for="(partie, partieIndex) in matchDetails[
+                              `${match.equipId1}-${match.equipId2}-${match.dateprevue}`
+                            ].parties"
+                            :key="partieIndex"
+                            class="p-2 border-b border-gray-200 dark:border-gray-600 last:border-b-0"
                           >
-                            {{ partie.detail }}
-                          </div>
-                        </div>
-
-                        <!-- Joueur B -->
-                        <div class="flex items-center justify-start">
-                          <div class="text-left">
-                            <div class="flex items-center space-x-2">
-                              <span
-                                :class="
-                                  !isPlayerWinner(partie.scorea, partie.scoreb)
-                                    ? 'text-green-600'
-                                    : 'text-red-600'
-                                "
-                                class="text-sm"
-                              >
-                                {{
-                                  !isPlayerWinner(partie.scorea, partie.scoreb)
-                                    ? "🟢"
-                                    : "🔴"
-                                }}
-                              </span>
-                              <div
-                                class="font-medium text-gray-900 dark:text-white"
-                              >
+                            <!-- Layout mobile/desktop adaptatif -->
+                            <div
+                              class="flex flex-col sm:grid sm:grid-cols-3 gap-3 sm:gap-4 sm:items-start"
+                            >
+                              <!-- Joueurs (côte à côte sur mobile, colonnes sur desktop) -->
+                              <div class="flex justify-between sm:contents">
+                                <!-- Joueur A -->
                                 <div
-                                  v-for="(joueur, idx) in partie.jb.split(
-                                    ' et ',
-                                  )"
-                                  :key="idx"
+                                  class="flex flex-col items-start sm:items-end min-w-0 flex-1 sm:flex-none"
                                 >
-                                  {{ joueur.trim() }}
+                                  <div
+                                    class="flex items-center space-x-1 sm:justify-end w-full"
+                                  >
+                                    <span
+                                      :class="
+                                        isPlayerWinner(
+                                          partie.scorea,
+                                          partie.scoreb,
+                                        )
+                                          ? 'text-green-600'
+                                          : 'text-red-600'
+                                      "
+                                      class="text-sm flex-shrink-0"
+                                    >
+                                      {{
+                                        isPlayerWinner(
+                                          partie.scorea,
+                                          partie.scoreb,
+                                        )
+                                          ? "🟢"
+                                          : "🔴"
+                                      }}
+                                    </span>
+                                    <div
+                                      class="font-medium text-gray-900 dark:text-white text-sm text-left sm:text-right min-w-0"
+                                    >
+                                      <div
+                                        v-for="(joueur, idx) in partie.ja.split(
+                                          ' et ',
+                                        )"
+                                        :key="idx"
+                                        class="leading-tight truncate"
+                                      >
+                                        {{ joueur.trim() }}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    v-if="partie.xca"
+                                    class="mt-1 sm:self-end"
+                                  >
+                                    <span
+                                      class="px-1.5 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full"
+                                    >
+                                      {{
+                                        partie.xca
+                                          .replace("M ", "")
+                                          .replace("pts", "")
+                                      }}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <!-- Scores (centrés sur mobile et desktop) -->
+                                <div
+                                  class="flex items-center justify-center sm:justify-center"
+                                >
+                                  <div
+                                    class="text-xs text-gray-500 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-600 px-2 py-1 rounded"
+                                  >
+                                    {{ partie.detail }}
+                                  </div>
+                                </div>
+
+                                <!-- Joueur B -->
+                                <div
+                                  class="flex flex-col items-end sm:items-start min-w-0 flex-1 sm:flex-none"
+                                >
+                                  <div
+                                    class="flex items-center space-x-1 sm:justify-start w-full"
+                                  >
+                                    <span
+                                      :class="
+                                        !isPlayerWinner(
+                                          partie.scorea,
+                                          partie.scoreb,
+                                        )
+                                          ? 'text-green-600'
+                                          : 'text-red-600'
+                                      "
+                                      class="text-sm flex-shrink-0 order-2 sm:order-1"
+                                    >
+                                      {{
+                                        !isPlayerWinner(
+                                          partie.scorea,
+                                          partie.scoreb,
+                                        )
+                                          ? "🟢"
+                                          : "🔴"
+                                      }}
+                                    </span>
+                                    <div
+                                      class="font-medium text-gray-900 dark:text-white text-sm text-right sm:text-left min-w-0 order-1 sm:order-2"
+                                    >
+                                      <div
+                                        v-for="(joueur, idx) in partie.jb.split(
+                                          ' et ',
+                                        )"
+                                        :key="idx"
+                                        class="leading-tight truncate"
+                                      >
+                                        {{ joueur.trim() }}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    v-if="partie.xcb"
+                                    class="mt-1 sm:self-start"
+                                  >
+                                    <span
+                                      class="px-1.5 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full"
+                                    >
+                                      {{
+                                        partie.xcb
+                                          .replace("M ", "")
+                                          .replace("pts", "")
+                                      }}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            <div
-                              v-if="partie.xcb"
-                              class="text-xs text-gray-500 dark:text-gray-400 mt-1"
-                            >
-                              ({{
-                                partie.xcb.replace("M ", "").replace("pts", "")
-                              }})
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    <!-- Aucun détail trouvé -->
-                    <div
-                      v-else
-                      class="text-center py-4 text-gray-500 dark:text-gray-400"
-                    >
-                      <p class="text-xs">
-                        Détails non disponibles pour cette rencontre
-                      </p>
+                      <!-- Aucun détail trouvé -->
+                      <div
+                        v-else
+                        class="text-center py-2 text-gray-500 dark:text-gray-400"
+                      >
+                        <p class="text-xs">
+                          Détails non disponibles pour cette rencontre
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>

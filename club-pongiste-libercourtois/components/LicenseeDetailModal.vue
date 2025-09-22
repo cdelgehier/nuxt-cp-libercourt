@@ -1,5 +1,8 @@
 <template>
-  <UModal v-model="isOpen" :ui="{ width: 'w-full max-w-4xl' }">
+  <UModal
+    v-model="isOpen"
+    :ui="{ width: 'w-full max-w-4xl sm:max-w-2xl md:max-w-3xl lg:max-w-4xl' }"
+  >
     <UCard>
       <template #header>
         <div class="flex items-center justify-between">
@@ -52,7 +55,7 @@
 
       <div v-else class="space-y-6">
         <!-- Informations essentielles -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-center">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
           <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
             <span class="text-gray-600 dark:text-gray-400 text-sm">Points</span>
             <p class="font-bold text-lg text-club-navy dark:text-blue-400">
@@ -159,37 +162,40 @@
                 <div
                   v-for="(match, index) in dateGroup"
                   :key="index"
-                  class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md border-l-4"
+                  class="p-3 bg-gray-50 dark:bg-gray-700 rounded-md border-l-4"
                   :class="
                     match.victoire === 'V'
                       ? 'border-green-500'
                       : 'border-red-500'
                   "
                 >
-                  <div class="flex items-center space-x-3">
+                  <!-- Résultat en haut -->
+                  <div class="flex items-center justify-center mb-3">
                     <div
                       :class="[
-                        'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold',
+                        'w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold',
                         match.victoire === 'V' ? 'bg-green-500' : 'bg-red-500',
                       ]"
                     >
                       {{ match.victoire === "V" ? "✓" : "✗" }}
                     </div>
-                    <div class="flex-1">
-                      <div class="flex items-center space-x-2">
-                        <p class="font-medium text-gray-900 dark:text-white">
-                          {{ formatPlayerName(match.nom) }}
-                        </p>
-                        <span
-                          class="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full"
-                        >
-                          {{ match.classement }}
-                        </span>
-                      </div>
-                      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        {{ match.epreuve }}
+                  </div>
+
+                  <!-- Détails de la rencontre en dessous -->
+                  <div class="text-center space-y-2">
+                    <div class="flex items-center justify-center space-x-2">
+                      <p class="font-medium text-gray-900 dark:text-white">
+                        {{ formatPlayerName(match.nom) }}
                       </p>
+                      <span
+                        class="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full"
+                      >
+                        ({{ match.classement }})
+                      </span>
                     </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ match.epreuve }}
+                    </p>
                   </div>
                 </div>
               </div>

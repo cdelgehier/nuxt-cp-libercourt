@@ -68,23 +68,23 @@
           </div>
           <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
             <span class="text-gray-600 dark:text-gray-400 text-sm"
-              >Catégorie</span
+              >Victoires saison</span
             >
-            <p class="font-bold text-lg text-purple-600 dark:text-purple-400">
-              {{ decodeFfttCategory(licensee?.cat || "") || "N/A" }}
+            <p class="font-bold text-lg" :class="winrateColor">
+              {{ seasonWinrate }}%
+            </p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              {{ seasonMatches.length }} match{{
+                seasonMatches.length !== 1 ? "s" : ""
+              }}
             </p>
           </div>
           <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
             <span class="text-gray-600 dark:text-gray-400 text-sm"
-              >Groupe d'âge</span
+              >Catégorie</span
             >
-            <p class="font-bold text-lg">
-              {{ getAgeGroup(licensee?.cat || "") === "junior" ? "🧸" : "🐻" }}
-              {{
-                getAgeGroup(licensee?.cat || "") === "junior"
-                  ? "Junior"
-                  : "Adulte"
-              }}
+            <p class="font-bold text-lg text-purple-600 dark:text-purple-400">
+              {{ decodeFfttCategory(licensee?.cat || "") || "N/A" }}
             </p>
           </div>
         </div>
@@ -346,6 +346,55 @@ async function loadLicenseeData(licence: string) {
     loadingMatches.value = false;
   }
 }
+
+// Calculate season winrate (September to July of next year)
+const seasonMatches = computed(() => {
+  if (!matches.value || matches.value.length === 0) {
+    return [];
+  }
+
+  // Current season: September 2025 to July 2026
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-based
+
+  // Determine season start year (if we're before September, we're in previous season)
+  const seasonStartYear = currentMonth >= 9 ? currentYear : currentYear - 1;
+  const seasonStart = new Date(seasonStartYear, 8, 1); // September 1st (month 8 = September)
+  const seasonEnd = new Date(seasonStartYear + 1, 6, 31); // July 31st of next year (month 6 = July)
+
+  return matches.value.filter((match) => {
+    const matchDate = parseDate(match.date);
+    return matchDate >= seasonStart && matchDate <= seasonEnd;
+  });
+});
+
+const seasonWinrate = computed(() => {
+  if (seasonMatches.value.length === 0) {
+    return "--";
+  }
+
+  const victories = seasonMatches.value.filter(
+    (match) => match.victoire === "V",
+  ).length;
+  const winrate = Math.round((victories / seasonMatches.value.length) * 100);
+  return winrate;
+});
+
+const winrateColor = computed(() => {
+  const rate =
+    typeof seasonWinrate.value === "number" ? seasonWinrate.value : 0;
+
+  if (rate >= 70) {
+    return "text-green-600 dark:text-green-400";
+  } else if (rate >= 50) {
+    return "text-blue-600 dark:text-blue-400";
+  } else if (rate >= 30) {
+    return "text-orange-600 dark:text-orange-400";
+  } else {
+    return "text-red-600 dark:text-red-400";
+  }
+});
 
 // Group matches by date
 const groupedMatches = computed(() => {

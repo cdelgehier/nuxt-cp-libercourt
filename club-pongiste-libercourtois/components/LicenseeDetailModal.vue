@@ -190,7 +190,16 @@
                       <span
                         class="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full"
                       >
-                        ({{ match.classement }})
+                        {{ match.classement }}
+                      </span>
+                      <span
+                        v-if="getMatchPoints(match)"
+                        :class="[
+                          'px-2 py-1 text-xs font-medium rounded-full',
+                          getMatchPoints(match)?.style.color,
+                        ]"
+                      >
+                        {{ getMatchPoints(match)?.style.text }}
                       </span>
                     </div>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -272,7 +281,9 @@ const emit = defineEmits<{
 }>();
 
 // Import utilities
-const { decodeFfttCategory, getAgeGroup } = useFfttCategories();
+const { decodeFfttCategory } = useFfttCategories();
+const { calculateMatchPoints, convertRankingToPoints, getPointsBadgeStyle } =
+  usePointsCalculation();
 
 // Modal state
 const isOpen = computed({
@@ -430,6 +441,23 @@ const groupedMatches = computed(() => {
 
   return grouped;
 });
+
+// Calculate points for individual match
+const getMatchPoints = (match: PlayerMatch) => {
+  if (!props.licensee?.clast) return null;
+
+  const matchResult = {
+    playerRanking: convertRankingToPoints(props.licensee.clast),
+    opponentRanking: convertRankingToPoints(match.classement),
+    victory: match.victoire === "V",
+  };
+
+  const result = calculateMatchPoints(matchResult);
+  return {
+    points: result.points,
+    style: getPointsBadgeStyle(result.points),
+  };
+};
 
 // Chart data
 const chartData = computed(() => {

@@ -89,6 +89,26 @@ interface PartieDetail {
   xcb?: string; // Classement joueur B
 }
 
+interface PlayerMatch {
+  date: string;
+  nom: string; // Nom de l'adversaire
+  classement: string; // Classement de l'adversaire
+  epreuve: string; // Libellé épreuve
+  victoire: string; // V ou D
+  forfait: string; // Indicateur forfait
+  idpartie?: string; // ID de la partie
+  coefchamp?: string; // Coefficient championnat
+  pointsgagnes?: string; // Points gagnés/perdus (calculé)
+}
+
+interface RankingHistory {
+  echelon: string; // N si classé national ou rien
+  place: string; // Numéro du joueur si classé national
+  point: string; // Nombre de points
+  saison: string; // Libellé de la saison
+  phase: string; // Indicateur de phase (1 ou 2)
+}
+
 // Type definitions for SmartPing API responses
 interface SmartPingResult<T> {
   success: boolean;
@@ -1301,6 +1321,153 @@ export class SmartPingAPI {
   }
 
   /**
+   * Get player matches using xml_partie.php
+   * According to FFTT documentation: "Liste des parties d'un joueur de la base SPID"
+   */
+  async getPlayerMatches(
+    licenceNumber: string,
+  ): Promise<SmartPingResult<PlayerMatch[]>> {
+    const url = `${this.baseUrl}xml_partie.php`;
+    const authParams = this.getAuthParams();
+
+    const params = new URLSearchParams({
+      serie: authParams.serie,
+      tm: authParams.tm,
+      tmc: authParams.tmc,
+      id: authParams.id,
+      numlic: licenceNumber,
+    });
+
+    console.log(
+      `Fetching matches for licence ${licenceNumber} with params:`,
+      params.toString(),
+    );
+
+    try {
+      const response = await fetch(`${url}?${params}`, {
+        method: "GET",
+        headers: {
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
+      });
+
+      const buffer = await response.arrayBuffer();
+      const decoder = new TextDecoder("iso-8859-1");
+      const responseText = decoder.decode(buffer);
+
+      console.log("FFTT Player Matches Response:", {
+        status: response.status,
+        responseLength: responseText.length,
+        hasResultat: responseText.includes("<resultat"),
+        hasPartie: responseText.includes("<partie"),
+        resultatCount: (responseText.match(/<resultat/g) || []).length,
+        partieCount: (responseText.match(/<partie/g) || []).length,
+        licenceNumber,
+        responsePreview: responseText.substring(0, 500),
+      });
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
+      }
+
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
+        const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
+        return { success: false, error: `FFTT Error: ${errorMessage}` };
+      }
+
+      if (responseText.includes("<partie")) {
+        const matches = this.parseXMLPlayerMatches(responseText);
+        return { success: true, data: matches };
+      }
+
+      return { success: true, data: [] };
+    } catch (error) {
+      console.error("Player matches API request failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  /**
+   * Get player ranking history using xml_histo_classement.php
+   * According to FFTT documentation: "Historique des classements du joueur"
+   */
+  async getPlayerRankingHistory(
+    licenceNumber: string,
+  ): Promise<SmartPingResult<RankingHistory[]>> {
+    const url = `${this.baseUrl}xml_histo_classement.php`;
+    const authParams = this.getAuthParams();
+
+    const params = new URLSearchParams({
+      serie: authParams.serie,
+      tm: authParams.tm,
+      tmc: authParams.tmc,
+      id: authParams.id,
+      numlic: licenceNumber,
+    });
+
+    try {
+      const response = await fetch(`${url}?${params}`, {
+        method: "GET",
+        headers: {
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
+      });
+
+      const buffer = await response.arrayBuffer();
+      const decoder = new TextDecoder("iso-8859-1");
+      const responseText = decoder.decode(buffer);
+
+      console.log("FFTT Player Ranking History Response:", {
+        status: response.status,
+        responseLength: responseText.length,
+        hasHisto: responseText.includes("<histo"),
+        histoCount: (responseText.match(/<histo/g) || []).length,
+      });
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
+      }
+
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
+        const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
+        return { success: false, error: `FFTT Error: ${errorMessage}` };
+      }
+
+      if (responseText.includes("<histo")) {
+        const history = this.parseXMLRankingHistory(responseText);
+        return { success: true, data: history };
+      }
+
+      return { success: true, data: [] };
+    } catch (error) {
+      console.error("Player ranking history API request failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  /**
    * Search clubs using xml_club_b.php
    * This can help find club numbers dynamically
    */
@@ -1481,6 +1648,60 @@ export class SmartPingAPI {
       parties,
     };
   }
+
+  /**
+   * Parse XML player matches response from xml_partie.php
+   * Updated to parse <partie> elements instead of <resultat>
+   * Format: <partie><date>xxx</date><nom>xxx</nom><classement>xxx</classement><epreuve>xxx</epreuve><victoire>xxx</victoire><forfait>xxx</forfait></partie>
+   */
+  private parseXMLPlayerMatches(xmlResponse: string): PlayerMatch[] {
+    const matches: PlayerMatch[] = [];
+    const partieMatches = xmlResponse.match(/<partie>[\s\S]*?<\/partie>/g);
+
+    if (partieMatches) {
+      partieMatches.forEach((match) => {
+        const playerMatch: PlayerMatch = {
+          date: this.extractTagValue(match, "date") || "",
+          nom: this.fixEncoding(this.extractTagValue(match, "nom") || ""),
+          classement: this.extractTagValue(match, "classement") || "",
+          epreuve: this.fixEncoding(
+            this.extractTagValue(match, "epreuve") || "",
+          ),
+          victoire: this.extractTagValue(match, "victoire") || "",
+          forfait: this.extractTagValue(match, "forfait") || "",
+          idpartie: this.extractTagValue(match, "idpartie") || undefined,
+          coefchamp: this.extractTagValue(match, "coefchamp") || undefined,
+        };
+        matches.push(playerMatch);
+      });
+    }
+
+    return matches;
+  }
+
+  /**
+   * Parse XML ranking history response from xml_histo_classement.php
+   * According to FFTT spec: <histo><echelon>xxx</echelon><place>xxx</place><point>xxx</point><saison>xxx</saison><phase>xxx</phase></histo>
+   */
+  private parseXMLRankingHistory(xmlResponse: string): RankingHistory[] {
+    const history: RankingHistory[] = [];
+    const histoMatches = xmlResponse.match(/<histo>[\s\S]*?<\/histo>/g);
+
+    if (histoMatches) {
+      histoMatches.forEach((match) => {
+        const ranking: RankingHistory = {
+          echelon: this.extractTagValue(match, "echelon") || "",
+          place: this.extractTagValue(match, "place") || "",
+          point: this.extractTagValue(match, "point") || "",
+          saison: this.fixEncoding(this.extractTagValue(match, "saison") || ""),
+          phase: this.extractTagValue(match, "phase") || "",
+        };
+        history.push(ranking);
+      });
+    }
+
+    return history;
+  }
 }
 
 /**
@@ -1636,6 +1857,84 @@ export async function fetchMatchDetailsWithSmartPing(
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
       source: "smartping_match_details_api",
+    };
+  }
+}
+
+/**
+ * Fetch player matches using modern FFTT API
+ * Export function for use in Nuxt API routes
+ */
+export async function fetchPlayerMatchesWithSmartPing(
+  licenceNumber: string,
+): Promise<SmartPingResult<PlayerMatch[]>> {
+  const config = useRuntimeConfig();
+  const appCode = config.smartpingAppCode;
+  const password = config.smartpingPassword;
+  const email = config.smartpingEmail;
+
+  if (!appCode || !password || !email) {
+    console.error("Missing SmartPing credentials");
+    return {
+      success: false,
+      error: "Missing SmartPing API credentials",
+      source: "config",
+    };
+  }
+
+  try {
+    const smartPingApi = new SmartPingAPI(appCode, password, email);
+    const result = await smartPingApi.getPlayerMatches(licenceNumber);
+
+    return {
+      ...result,
+      source: "smartping_player_matches_api",
+    };
+  } catch (error) {
+    console.error("SmartPing Player Matches API error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      source: "smartping_player_matches_api",
+    };
+  }
+}
+
+/**
+ * Fetch player ranking history using modern FFTT API
+ * Export function for use in Nuxt API routes
+ */
+export async function fetchPlayerRankingHistoryWithSmartPing(
+  licenceNumber: string,
+): Promise<SmartPingResult<RankingHistory[]>> {
+  const config = useRuntimeConfig();
+  const appCode = config.smartpingAppCode;
+  const password = config.smartpingPassword;
+  const email = config.smartpingEmail;
+
+  if (!appCode || !password || !email) {
+    console.error("Missing SmartPing credentials");
+    return {
+      success: false,
+      error: "Missing SmartPing API credentials",
+      source: "config",
+    };
+  }
+
+  try {
+    const smartPingApi = new SmartPingAPI(appCode, password, email);
+    const result = await smartPingApi.getPlayerRankingHistory(licenceNumber);
+
+    return {
+      ...result,
+      source: "smartping_player_ranking_history_api",
+    };
+  } catch (error) {
+    console.error("SmartPing Player Ranking History API error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      source: "smartping_player_ranking_history_api",
     };
   }
 }

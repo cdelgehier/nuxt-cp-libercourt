@@ -67,7 +67,7 @@
       "title": "Grand Prix des Jeunes Pongistes - Étape 1",
       "description": "Crédit Agricole",
       "date": "2025-11-08T12:00:00.000Z",
-      "time": "12h00 - 18h00",
+      "time": "13h30 - 18h00",
       "type": "tournament",
       "location": "ATT Carvin, 980 Bd de la Justice, 62220 Carvin, France",
       "registrationOpen": false,
@@ -357,6 +357,66 @@
       "type": "competition",
       "registrationOpen": false,
       "price": 0,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "stage-octobre-j1",
+      "title": "Stage Octobre - Jour 1",
+      "description": "Premier jour du stage de octobre",
+      "date": "2025-10-27T09:00:00.000Z",
+      "time": "9h00 - 16h30",
+      "type": "stage",
+      "location": "ATT Carvin, 980 Bd de la Justice, 62220 Carvin, France",
+      "registrationOpen": false,
+      "price": 9,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "stage-octobre-j2",
+      "title": "Stage Octobre - Jour 2",
+      "description": "Second jour du stage de octobre",
+      "date": "2025-10-28T09:00:00.000Z",
+      "time": "9h00 - 16h30",
+      "type": "stage",
+      "location": "ATT Carvin, 980 Bd de la Justice, 62220 Carvin, France",
+      "registrationOpen": false,
+      "price": 9,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "stage-octobre-j3",
+      "title": "Stage Octobre - Jour 3",
+      "description": "Troisième jour du stage de octobre",
+      "date": "2025-10-29T09:00:00.000Z",
+      "time": "9h00 - 16h30",
+      "type": "stage",
+      "location": "ATT Carvin, 980 Bd de la Justice, 62220 Carvin, France",
+      "registrationOpen": false,
+      "price": 9,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "stage-octobre-j4",
+      "title": "Stage Octobre - Jour 4",
+      "description": "Quatrième jour du stage de octobre",
+      "date": "2025-10-29T09:00:00.000Z",
+      "time": "9h00 - 16h30",
+      "type": "stage",
+      "location": "ATT Carvin, 980 Bd de la Justice, 62220 Carvin, France",
+      "registrationOpen": false,
+      "price": 9,
       "contact": {
         "name": "Club Pongiste Libercourtois",
         "role": "Organisation"

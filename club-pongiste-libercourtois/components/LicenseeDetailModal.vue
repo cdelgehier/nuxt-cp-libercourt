@@ -446,10 +446,14 @@ const groupedMatches = computed(() => {
 const getMatchPoints = (match: PlayerMatch) => {
   if (!props.licensee?.clast) return null;
 
+  // Parse coefficient from string (default to 1 if not available)
+  const coefficient = match.coefchamp ? parseFloat(match.coefchamp) : 1;
+
   const matchResult = {
     playerRanking: convertRankingToPoints(props.licensee.clast),
     opponentRanking: convertRankingToPoints(match.classement),
     victory: match.victoire === "V",
+    coefficient: coefficient,
   };
 
   const result = calculateMatchPoints(matchResult);

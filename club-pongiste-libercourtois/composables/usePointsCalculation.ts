@@ -13,6 +13,7 @@ interface MatchResult {
   playerRanking: number;
   opponentRanking: number;
   victory: boolean;
+  coefficient?: number; // Optional coefficient for the competition (default 1)
 }
 
 /**
@@ -87,6 +88,7 @@ export const usePointsCalculation = () => {
 
   /**
    * Calculate points gained/lost for a single match
+   * Takes into account the competition coefficient (default 1)
    */
   const calculateMatchPoints = (
     match: MatchResult,
@@ -113,15 +115,19 @@ export const usePointsCalculation = () => {
       };
     }
 
-    let points: number;
+    let basePoints: number;
 
     if (match.victory) {
       // Victory: use normal or abnormal victory points
-      points = abnormal ? tableRow[4] : tableRow[2];
+      basePoints = abnormal ? tableRow[4] : tableRow[2];
     } else {
       // Defeat: use normal or abnormal defeat points
-      points = abnormal ? tableRow[5] : tableRow[3];
+      basePoints = abnormal ? tableRow[5] : tableRow[3];
     }
+
+    // Apply competition coefficient (default to 1 if not provided)
+    const coefficient = match.coefficient ?? 1;
+    const points = basePoints * coefficient;
 
     return {
       points,

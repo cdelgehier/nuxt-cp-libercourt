@@ -10,33 +10,6 @@
     "Convivialité",
     "Transmission"
   ],
-  "achievements": [
-    {
-      "year": 2025,
-      "title": "Grand Prix des Jeunes Pongistes & Coupe du Pas-de-Calais",
-      "description": "Félicitations à Lilou Sart et Florine Lavoisier qui montent sur le podium du Crédit Agricole (GPJP) et de la Coupe du Pas-de-Calais lors de ces compétitions à Béthune."
-    },
-    {
-      "year": 2025,
-      "title": "Équipe Junior 1 vice-championne régionale",
-      "description": "Notre équipe Junior 1 termine vice-championne régionale, une performance exceptionnelle qui récompense le travail et l'engagement de nos jeunes joueurs."
-    },
-    {
-      "year": 2025,
-      "title": "Florine Lavoisier 4ème aux Championnats Individuels des Hauts-de-France",
-      "description": "Lors des Championnats Individuels des Hauts-de-France à Divion, Florine Lavoisier a brillé en terminant 4ème de toute la région, une performance remarquable."
-    },
-    {
-      "year": 2025,
-      "title": "Montée en J2 de notre équipe principale",
-      "description": "L'équipe qui a brillamment réussi sa montée en J2 a été récompensée pour son travail, son esprit d'équipe et sa persévérance tout au long de l'année."
-    },
-    {
-      "year": 2025,
-      "title": "Prix de la meilleure progression d'effectif dans le Pas-de-Calais",
-      "description": "Le club a reçu le prix de la meilleure progression d'effectif dans le Pas-de-Calais avec 78 licenciés cette saison, témoignant de notre développement."
-    }
-  ],
   "facilities": {
     "tables": 24,
     "location": "Salle Deladerriere - Complexe Sportif Leo Lagrange",

@@ -111,56 +111,6 @@
       </div>
     </section>
 
-    <!-- Our achievements -->
-    <section class="py-16 adaptive-bg-secondary">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold adaptive-title mb-4">
-            Nos Réalisations
-          </h2>
-          <p class="text-lg adaptive-text">
-            Quelques moments forts de notre histoire récente
-          </p>
-        </div>
-
-        <div class="space-y-8">
-          <div
-            v-for="achievement in clubInfo.achievements"
-            :key="achievement.year"
-            class="adaptive-card rounded-xl p-8 shadow-md hover:shadow-lg transition-shadow"
-          >
-            <div
-              class="flex flex-col md:flex-row items-start md:items-center gap-6"
-            >
-              <div class="flex-shrink-0">
-                <div
-                  class="w-16 h-16 bg-club-yellow rounded-full flex items-center justify-center"
-                >
-                  <span class="text-club-navy font-bold text-lg">{{
-                    achievement.year
-                  }}</span>
-                </div>
-              </div>
-              <div class="flex-grow">
-                <h3 class="text-xl font-bold adaptive-title mb-2">
-                  {{ achievement.title }}
-                </h3>
-                <p class="adaptive-text">
-                  {{ achievement.description }}
-                </p>
-              </div>
-              <div class="flex-shrink-0">
-                <UIcon
-                  name="i-heroicons-trophy"
-                  class="text-3xl text-club-yellow"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- Installations -->
     <section class="py-16 page-section">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

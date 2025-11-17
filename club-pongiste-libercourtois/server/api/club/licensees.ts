@@ -35,11 +35,11 @@ export default defineEventHandler(async (_event) => {
     if (!appCode || !password || !email) {
       return {
         success: false,
-        error: 'SmartPing credentials not configured',
+        error: "SmartPing credentials not configured",
         licensees: [],
         count: 0,
         source: "error",
-        clubId
+        clubId,
       };
     }
 
@@ -50,11 +50,16 @@ export default defineEventHandler(async (_event) => {
     const result = await smartPing.getClubLicenseesWithCategories(clubId);
 
     if (result.success && result.data) {
-      // Filter licensees who belong to our club only
+      // Filter licensees who belong to our club only AND have a valid license
       const validLicensees = result.data.filter((licensee: any) => {
         // Check if licensee belongs to our club (handle with/without leading zeros)
-        const belongsToOurClub = licensee.nclub === clubId || licensee.nclub === clubId.replace(/^0+/, '');
-        return belongsToOurClub;
+        const belongsToOurClub =
+          licensee.nclub === clubId ||
+          licensee.nclub === clubId.replace(/^0+/, "");
+        // Check if license is validated (has a validation date)
+        const hasValidLicense =
+          licensee.valide && licensee.valide.trim() !== "";
+        return belongsToOurClub && hasValidLicense;
       });
 
       // Convert FFTT format to our format
@@ -64,37 +69,37 @@ export default defineEventHandler(async (_event) => {
         firstName: licensee.prenom,
         lastName: licensee.nom,
         club: licensee.nclub,
-        clubName: '',
+        clubName: "",
         points: parseInt(licensee.points) || 0,
-        ranking: licensee.classement || '',
-        level: licensee.type || '',
+        ranking: licensee.classement || "",
+        level: licensee.type || "",
         position: parseInt(licensee.place) || 0,
-        nationality: '',
-        gender: licensee.sexe || '',
-        type: licensee.type || '',
-        certificate: '',
+        nationality: "",
+        gender: licensee.sexe || "",
+        type: licensee.type || "",
+        certificate: "",
         active: true,
-        mixedLevel: licensee.echelon_mixte || '',
+        mixedLevel: licensee.echelon_mixte || "",
         // Raw FFTT fields for backward compatibility
         nom: licensee.nom,
         prenom: licensee.prenom,
         sexe: licensee.sexe,
         nclub: licensee.nclub,
         nlic: licensee.club,
-        cat: licensee.cat || '', // FFTT category
-        clast: licensee.clast || licensee.classement || '', // Map 'clast' field to 'clast' for frontend
+        cat: licensee.cat || "", // FFTT category
+        clast: licensee.clast || licensee.classement || "", // Map 'clast' field to 'clast' for frontend
         point: licensee.pointm || licensee.points || 0,
-        avert: '', // Not available in current API
+        avert: "", // Not available in current API
         valide: licensee.valide,
         echelon: licensee.echelon,
         place: licensee.place,
-        pointm: licensee.pointm || '', // Monthly points
-        apointm: licensee.apointm || '', // Previous monthly points
-        initm: licensee.initm || '', // Initial value
-        defim: '', // Not available in current API
-        apoints: '', // Not available in current API
-        inits: '', // Not available in current API
-        defis: '', // Not available in current API
+        pointm: licensee.pointm || "", // Monthly points
+        apointm: licensee.apointm || "", // Previous monthly points
+        initm: licensee.initm || "", // Initial value
+        defim: "", // Not available in current API
+        apoints: "", // Not available in current API
+        inits: "", // Not available in current API
+        defis: "", // Not available in current API
       }));
 
       // Sort licensees by last name, then first name
@@ -110,27 +115,27 @@ export default defineEventHandler(async (_event) => {
         licensees: mappedLicensees,
         count: mappedLicensees.length,
         source: "smartping",
-        clubId
+        clubId,
       };
     } else {
       return {
         success: false,
-        error: result.error || 'Unknown error from SmartPing API',
+        error: result.error || "Unknown error from SmartPing API",
         licensees: [],
         count: 0,
         source: result.source || "error",
-        clubId
+        clubId,
       };
     }
   } catch (error) {
     console.error("Error fetching licensees:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
       licensees: [],
       count: 0,
       source: "exception",
-      clubId: getClubId()
+      clubId: getClubId(),
     };
   }
 });

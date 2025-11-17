@@ -272,7 +272,7 @@ export interface Licensee {
   gender?: "M" | "F"; // Gender retrieved from xml_licence_c.php API only
   ranking?: string; // Points or ranking (e.g., "1200", "NC")
   category?: // Category calculated from real age when available
-    | "poussin"
+  | "poussin"
     | "benjamin"
     | "minime"
     | "cadet"
@@ -308,4 +308,25 @@ export interface SEOData {
   keywords?: string;
   image?: string;
   url?: string;
+}
+
+// News article types for external RSS feeds
+export interface NewsArticle {
+  id: string;
+  title: string;
+  description: string;
+  content?: string;
+  link: string;
+  publishedAt: Date;
+  author?: string;
+  categories: string[];
+  image?: string;
+  source: "comite" | "ligue" | "facebook";
+}
+
+export interface NewsResponse {
+  articles: NewsArticle[];
+  total: number;
+  source?: string;
+  lastUpdated: string;
 }

@@ -98,6 +98,7 @@ const mobileMenuOpen = ref(false);
 // Navigation principale
 const navigation: NavigationItem[] = [
   { label: "Accueil", href: "/" },
+  { label: "Actualités", href: "/actualites" },
   { label: "Le Club", href: "/club" },
   { label: "Licenciés", href: "/licencies" },
   { label: "Équipes", href: "/equipes" },

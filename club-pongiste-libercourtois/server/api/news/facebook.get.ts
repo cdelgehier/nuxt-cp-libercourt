@@ -1,70 +1,100 @@
 import type { NewsArticle, NewsResponse } from "~/types";
 
-// JSON Feed 1.1 structure from RSS.app
-interface JSONFeed {
-  version: string;
-  title: string;
-  home_page_url: string;
-  feed_url: string;
-  items: JSONFeedItem[];
-}
-
-interface JSONFeedItem {
+// Facebook Graph API response structure
+interface FacebookPost {
   id: string;
-  url: string;
-  title: string;
-  content_text: string;
-  content_html: string;
-  date_published: string;
-  authors: Array<{ name: string }>;
-  image?: string;
-  attachments?: Array<{
-    url: string;
-    mime_type: string;
-  }>;
+  message?: string;
+  story?: string;
+  created_time: string;
+  permalink_url: string;
+  full_picture?: string;
+  attachments?: {
+    data: Array<{
+      media?: {
+        image?: {
+          src: string;
+        };
+      };
+      type: string;
+      url: string;
+    }>;
+  };
 }
 
-// Extract first image from attachments or content
-function extractImage(item: JSONFeedItem): string | undefined {
-  if (item.image) return item.image;
-  if (item.attachments && item.attachments.length > 0) {
-    return item.attachments[0].url;
-  }
-  const imgMatch = item.content_html.match(/<img[^>]+src="([^">]+)"/);
-  return imgMatch ? imgMatch[1] : undefined;
+interface FacebookFeedResponse {
+  data: FacebookPost[];
+  paging?: {
+    previous?: string;
+    next?: string;
+  };
 }
 
 export default defineEventHandler(async (): Promise<NewsResponse> => {
   try {
-    // Fetch JSON feed from RSS.app (Facebook posts)
-    const feed = await $fetch<JSONFeed>(
-      "https://rss.app/feeds/v1.1/iRBobncaBBXgPC5v.json",
+    const config = useRuntimeConfig();
+    const pageId = config.facebookPageId;
+    const accessToken = config.facebookPageAccessToken;
+
+    if (!pageId || !accessToken) {
+      console.error("Missing Facebook credentials");
+      return {
+        articles: [],
+        total: 0,
+        source: "facebook",
+        lastUpdated: new Date().toISOString(),
+      };
+    }
+
+    // Fetch posts from Facebook Graph API
+    const response = await $fetch<FacebookFeedResponse>(
+      `https://graph.facebook.com/v24.0/${pageId}/posts`,
       {
-        headers: {
-          "User-Agent": "Club-Pongiste-Libercourtois/1.0",
+        params: {
+          access_token: accessToken,
+          fields:
+            "id,message,story,created_time,permalink_url,full_picture,attachments{media,type,url}",
+          limit: 10,
         },
       },
     );
 
-    const items = feed.items || [];
+    const posts = response.data || [];
 
-    // Transform JSON feed items to NewsArticle format
-    const articles: NewsArticle[] = items.map((item) => {
-      const author =
-        item.authors && item.authors.length > 0
-          ? item.authors[0].name
-          : "Club Pongiste Libercourtois";
+    // Transform Facebook posts to NewsArticle format
+    const articles: NewsArticle[] = posts.map((post) => {
+      // Use message if available, otherwise use story
+      const fullContent = post.message || post.story || "";
 
-      const image = extractImage(item);
+      // Extract image from full_picture or attachments
+      let image: string | undefined = post.full_picture;
+      if (
+        !image &&
+        post.attachments?.data &&
+        post.attachments.data.length > 0
+      ) {
+        const firstAttachment = post.attachments.data[0];
+        image = firstAttachment.media?.image?.src || firstAttachment.url;
+      }
+
+      // Generate a title from the first line of content
+      const lines = fullContent.split("\n");
+      const title =
+        lines[0].substring(0, 100) || "Publication Facebook du club";
+
+      // Remove the first line from content to avoid duplication
+      const content = lines.slice(1).join("\n").trim() || fullContent;
+
+      // Description uses the content without the title
+      const description = content.substring(0, 200);
 
       return {
-        id: item.id,
-        title: item.title,
-        description: item.content_text,
-        content: item.content_html,
-        link: item.url,
-        publishedAt: new Date(item.date_published),
-        author,
+        id: post.id,
+        title,
+        description,
+        content,
+        link: post.permalink_url,
+        publishedAt: new Date(post.created_time),
+        author: "Club Pongiste Libercourtois",
         categories: ["Facebook"],
         image,
         source: "facebook" as const,
@@ -78,7 +108,7 @@ export default defineEventHandler(async (): Promise<NewsResponse> => {
       lastUpdated: new Date().toISOString(),
     };
   } catch (error) {
-    console.error("Error fetching Facebook RSS feed:", error);
+    console.error("Error fetching Facebook posts:", error);
 
     // Return empty response on error instead of throwing
     return {

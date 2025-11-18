@@ -1,4 +1,4 @@
-import clubConfigData from './content/club/config.json';
+import clubConfigData from "./content/club/config.json";
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -116,6 +116,8 @@ export default defineNuxtConfig({
     smartpingAppCode: process.env.SMARTPING_APP_CODE,
     smartpingPassword: process.env.SMARTPING_PASSWORD,
     smartpingEmail: process.env.SMARTPING_EMAIL,
+    facebookPageId: process.env.FACEBOOK_PAGE_ID,
+    facebookPageAccessToken: process.env.FACEBOOK_PAGE_ACCESS_TOKEN,
 
     // Public keys (exposed to client-side)
     public: {

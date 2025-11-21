@@ -1,6 +1,21 @@
 {
   "events": [
     {
+      "id": "repas-fin-phase-dec-2025",
+      "title": "Repas fin de phase",
+      "description": "Repas de fin de première phase au restaurant Timgad",
+      "date": "2025-12-13T18:30:00.000Z",
+      "time": "19h30",
+      "type": "other",
+      "location": "Timgad - 3 Rue Kleber, 62300 Lens, France",
+      "registrationOpen": false,
+      "price": 45,
+      "contact": {
+        "name": "Thierry",
+        "role": "Organisation"
+      }
+    },
+    {
       "id": "arbre-noel-2025",
       "title": "Arbre de Noël 2025",
       "description": "Le père noêl viendra rendre visite aux enfants du club pour leur offrir un cadeau",

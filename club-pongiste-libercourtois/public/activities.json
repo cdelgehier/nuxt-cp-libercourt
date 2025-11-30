@@ -1,0 +1,34 @@
+{
+  "activities": [
+    {
+      "title": "École de Tennis de Table",
+      "description": "Pour les tout petits. Coordination main-œil, service, règles, coup droit. Initiation ludique et pédagogique.",
+      "icon": "i-heroicons-academic-cap",
+      "ageGroup": "Tout petits"
+    },
+    {
+      "title": "Entraînement Jeunes",
+      "description": "Suite logique de l'école de tennis de table jusqu'à Cadet 2. Perfectionnement technique et tactique.",
+      "icon": "i-heroicons-trophy",
+      "ageGroup": "Jusqu'à Cadet 2"
+    },
+    {
+      "title": "Tennis de Table Loisir",
+      "description": "Pratique conviviale pour tous. Ambiance détendue, plaisir de jouer, tous niveaux confondus.",
+      "icon": "i-heroicons-heart",
+      "ageGroup": "Tous âges"
+    },
+    {
+      "title": "Compétition",
+      "description": "Équipes engagées en championnat départemental et régional. Pour les joueurs motivés par la performance.",
+      "icon": "i-heroicons-star",
+      "ageGroup": "Tous niveaux"
+    },
+    {
+      "title": "Ping Santé",
+      "description": "Pour découvrir le sport ou conserver une activité physique. Adapté aux seniors et reprise d'activité.",
+      "icon": "i-heroicons-heart-solid",
+      "ageGroup": "Seniors"
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "sponsors": [
+    {
+      "id": "fftt",
+      "name": "FFTT",
+      "logo": "/images/sponsors/fftt.png",
+      "website": "https://www.fftt.com",
+      "description": "FFTT",
+      "category": "partenaire",
+      "since": 1970
+    },
+    {
+      "id": "ligue-hdf",
+      "name": "Ligue HDF",
+      "logo": "/images/sponsors/ligue-hdf.png",
+      "website": "https://liguehdftt.fr",
+      "description": "Ligue HDF",
+      "category": "partenaire",
+      "since": 1970
+    },
+    {
+      "id": "comite-62",
+      "name": "Comité 62",
+      "logo": "/images/sponsors/cdtt62.jpg",
+      "website": "https://cd62tt.fr",
+      "description": "Comité 62",
+      "category": "partenaire",
+      "since": 1970
+    },
+    {
+      "id": "timgad-lens",
+      "name": "Le Timgad de Lens",
+      "logo": "/images/sponsors/Timgad.png",
+      "website": "https://letimgad-lens.fr/fr",
+      "description": "Restaurant Le Timgad de Lens",
+      "category": "sponsor",
+      "since": 2024
+    },
+    {
+      "id": "jlf",
+      "name": "JLF Transport",
+      "logo": "/images/sponsors/JLF.png",
+      "website": "https://www.astransports-jlf.com",
+      "description": "JLF - Transport express",
+      "category": "sponsor",
+      "since": 2024
+    },
+    {
+      "id": "zeelee",
+      "name": "Zeelee Kebab",
+      "logo": "/images/sponsors/Zeelee.png",
+      "website": "https://www.zeeleelibercourt.fr/",
+      "description": "Zeelee Libercourt - Restaurant",
+      "category": "sponsor",
+      "since": 2024
+    },
+    {
+      "id": "au-coin-de-la-fleur",
+      "name": "Fleuriste",
+      "logo": "/images/sponsors/au_coin_de_la_fleur.png",
+      "website": "https://www.facebook.com/p/Au-Coin-de-la-Fleur-100063773100871/",
+      "description": "Au Coin de la Fleur - Fleuriste",
+      "category": "sponsor",
+      "since": 2024
+    },
+    {
+      "id": "a-croquer",
+      "name": "Artisan Traiteur",
+      "logo": "/images/sponsors/a_croquer.png",
+      "website": "https://www.acroquerartisantraiteur.com/",
+      "description": "À Croquer - Artisan Traiteur",
+      "category": "sponsor",
+      "since": 2024
+    },
+    {
+      "id": "gbs",
+      "name": "GBS",
+      "logo": "/images/sponsors/GBS.png",
+      "website": "https://gbspe.com/",
+      "description": "GBS",
+      "category": "sponsor",
+      "since": 2024
+    },
+    {
+      "id": "instru-mesure",
+      "name": "Instru Mesure",
+      "logo": "/images/sponsors/Instru_mesure.png",
+      "website": "https://www.instrumesure.fr",
+      "description": "Instru Mesure",
+      "category": "sponsor",
+      "since": 2024
+    },
+    {
+      "id": "le-repere-du-centre",
+      "name": "Le Repère du Centre",
+      "logo": "/images/sponsors/Le_repere_du_centre.png",
+      "website": "https://www.facebook.com/LeRepereduCentre/?locale=fr_FR",
+      "description": "Tabac, FDJ, PMU, Presse",
+      "category": "sponsor",
+      "since": 2024
+    },
+    {
+      "id": "le-tabac-du-centre",
+      "name": "Le Tabac du Centre",
+      "logo": "/images/sponsors/Le_tabac_du_centre.png",
+      "website": "https://bureautabac.fr/62/libercourt/tabac-du-centre-wd9",
+      "description": "Le Tabac du Centre",
+      "category": "sponsor",
+      "since": 2024
+    },
+    {
+      "id": "nearfix",
+      "name": "Nearfix",
+      "logo": "/images/sponsors/Nearfix.png",
+      "website": "https://www.nearfix.fr",
+      "description": "Nearfix",
+      "category": "sponsor",
+      "since": 2024
+    },
+    {
+      "id": "o-point-cho",
+      "name": "O Point Cho",
+      "logo": "/images/sponsors/o_point_cho.png",
+      "website": "https://www.facebook.com/opoint.cho/?locale=fr_FR",
+      "description": "O Point Cho",
+      "category": "sponsor",
+      "since": 2024
+    },
+    {
+      "id": "roofup",
+      "name": "Roofup",
+      "logo": "/images/sponsors/roofup.png",
+      "website": "https://roofup.fr/",
+      "description": "Roofup",
+      "category": "sponsor",
+      "since": 2024
+    }
+  ]
+}

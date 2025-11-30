@@ -12,8 +12,13 @@
     <!-- Upcoming events section -->
     <HomeEventsSection :events="upcomingEvents" />
 
-    <!-- Sponsors Banner -->
-    <SponsorsBanner :sponsors="sponsors" />
+    <!-- Sponsors Banner - wrapped in ClientOnly to prevent hydration mismatch from CSS animations -->
+    <ClientOnly>
+      <SponsorsBanner
+        v-if="sponsors && sponsors.length > 0"
+        :sponsors="sponsors"
+      />
+    </ClientOnly>
 
     <!-- Call-to-action section -->
     <HomeCtaSection />
@@ -34,11 +39,16 @@ useSeoMeta({
 });
 
 // Load sponsors data using composable with Zod validation
-const { sponsors } = await useSponsors();
+const { sponsors: sponsorsData } = useSponsors();
 
 // Load activities data using composable with Zod validation
-const { activities } = await useActivities();
+const { activities: activitiesData } = useActivities();
 
 // Load upcoming events using composable with Zod validation
-const { events: upcomingEvents } = await useUpcomingEvents(3);
+const { events: eventsData } = useUpcomingEvents(3);
+
+// Create computed properties for safer access
+const sponsors = computed(() => sponsorsData.value || []);
+const activities = computed(() => activitiesData.value || []);
+const upcomingEvents = computed(() => eventsData.value || []);
 </script>

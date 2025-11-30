@@ -2,30 +2,29 @@
 // Uses Zod schema for data validation and type safety
 import { EventsResponseSchema, type CalendarEvent } from "~/schemas";
 
-export const useUpcomingEvents = async (limit: number = 3) => {
+export const useUpcomingEvents = (limit: number = 3) => {
   // Fetch events from API with server: true to ensure SSR consistency
-  const { data, error } = await useFetch(
-    `/api/events/upcoming?limit=${limit}`,
-    {
-      key: `upcoming-events-${limit}`,
-      // Ensure data is fetched on server-side to prevent hydration mismatch
-      server: true,
+  const { data, error } = useFetch(`/api/events/upcoming?limit=${limit}`, {
+    key: `upcoming-events-${limit}`,
+    // Ensure data is fetched on server-side to prevent hydration mismatch
+    server: true,
+    // Transform the data immediately to ensure consistent SSR/client data
+    transform: (rawData) => {
+      const validationResult = EventsResponseSchema.safeParse(rawData);
+
+      if (!validationResult.success) {
+        console.error("Events data validation failed:", validationResult.error);
+        return [] as CalendarEvent[];
+      }
+
+      return validationResult.data.events;
     },
-  );
-
-  // Validate response with Zod schema
-  const validationResult = EventsResponseSchema.safeParse(data.value);
-
-  if (!validationResult.success) {
-    console.error("Events data validation failed:", validationResult.error);
-    return {
-      events: [] as CalendarEvent[],
-      error: validationResult.error,
-    };
-  }
+    // Provide default value to prevent hydration mismatch
+    default: () => [] as CalendarEvent[],
+  });
 
   return {
-    events: validationResult.data.events,
-    error: error.value,
+    events: data,
+    error,
   };
 };

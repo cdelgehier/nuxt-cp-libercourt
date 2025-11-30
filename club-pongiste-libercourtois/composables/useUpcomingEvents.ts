@@ -3,8 +3,15 @@
 import { EventsResponseSchema, type CalendarEvent } from "~/schemas";
 
 export const useUpcomingEvents = async (limit: number = 3) => {
-  // Fetch events from API
-  const { data, error } = await useFetch(`/api/events/upcoming?limit=${limit}`);
+  // Fetch events from API with server: true to ensure SSR consistency
+  const { data, error } = await useFetch(
+    `/api/events/upcoming?limit=${limit}`,
+    {
+      key: `upcoming-events-${limit}`,
+      // Ensure data is fetched on server-side to prevent hydration mismatch
+      server: true,
+    },
+  );
 
   // Validate response with Zod schema
   const validationResult = EventsResponseSchema.safeParse(data.value);

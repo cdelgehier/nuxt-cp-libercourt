@@ -3,8 +3,12 @@
 import { ActivitiesResponseSchema, type Activity } from "~/schemas";
 
 export const useActivities = async () => {
-  // Fetch activities from API endpoint
-  const { data, error } = await useFetch("/api/activities");
+  // Fetch activities from API endpoint with server: true to ensure SSR consistency
+  const { data, error } = await useFetch("/api/activities", {
+    key: "activities",
+    // Ensure data is fetched on server-side to prevent hydration mismatch
+    server: true,
+  });
 
   if (error.value) {
     console.error("Failed to fetch activities:", error.value);

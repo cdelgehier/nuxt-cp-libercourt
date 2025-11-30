@@ -3,8 +3,12 @@
 import { SponsorsResponseSchema, type Partner } from "~/schemas";
 
 export const useSponsors = async () => {
-  // Fetch sponsors from API endpoint
-  const { data, error } = await useFetch("/api/sponsors");
+  // Fetch sponsors from API endpoint with server: true to ensure SSR consistency
+  const { data, error } = await useFetch("/api/sponsors", {
+    key: "sponsors",
+    // Ensure data is fetched on server-side to prevent hydration mismatch
+    server: true,
+  });
 
   if (error.value) {
     console.error("Failed to fetch sponsors:", error.value);

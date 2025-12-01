@@ -423,6 +423,51 @@
       }
     },
     {
+      "id": "stage-decembre-2-j1",
+      "title": "Stage Decembre - Jour 4",
+      "description": "Premier jour du second stage de decembre",
+      "date": "2025-12-29T09:00:00.000Z",
+      "time": "9h00 - 16h30",
+      "type": "stage",
+      "location": "ATT Carvin, 980 Bd de la Justice, 62220 Carvin, France",
+      "registrationOpen": false,
+      "price": 9,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "stage-decembre-2-j2",
+      "title": "Stage Decembre - Jour 5",
+      "description": "Second jour du second stage de decembre",
+      "date": "2025-12-30T09:00:00.000Z",
+      "time": "9h00 - 16h30",
+      "type": "stage",
+      "location": "ATT Carvin, 980 Bd de la Justice, 62220 Carvin, France",
+      "registrationOpen": false,
+      "price": 9,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
+      "id": "stage-decembre-2-j3",
+      "title": "Stage Decembre - Jour 6",
+      "description": "Troisième jour du second stage de decembre",
+      "date": "2025-12-31T09:00:00.000Z",
+      "time": "9h00 - 16h30",
+      "type": "stage",
+      "location": "ATT Carvin, 980 Bd de la Justice, 62220 Carvin, France",
+      "registrationOpen": false,
+      "price": 9,
+      "contact": {
+        "name": "Club Pongiste Libercourtois",
+        "role": "Organisation"
+      }
+    },
+    {
       "id": "grand-prix-jeunes-etape4-coupe-pas-de-calais",
       "title": "Grand Prix des Jeunes Pongistes - Étape 4 et Coupe du Pas-de-Calais",
       "description": "Crédit Agricole",

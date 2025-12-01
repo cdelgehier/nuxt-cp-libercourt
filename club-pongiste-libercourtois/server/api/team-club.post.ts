@@ -82,15 +82,6 @@ export default defineEventHandler(async (event) => {
         );
       }
 
-      console.log("Club details found for team:", {
-        teamName: body.team.libequipe,
-        clubNumber: result.data.numero,
-        clubName: result.data.nom,
-        ville: result.data.ville,
-        travelTime: travelTimeMinutes,
-        source: result.source,
-      });
-
       return {
         success: true,
         data: {

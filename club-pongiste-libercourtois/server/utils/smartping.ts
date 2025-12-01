@@ -109,6 +109,20 @@ interface RankingHistory {
   phase: string; // Indicateur de phase (1 ou 2)
 }
 
+export interface PoolRankingEntry {
+  position: number;
+  teamName: string;
+  clubNumber: string;
+  teamId: string;
+  played: number;
+  points: number;
+  victories: number;
+  defeats: number;
+  draws: number;
+  isClubTeam: boolean;
+  zone?: "promotion" | "barrage" | "relegation" | "neutral";
+}
+
 // Type definitions for SmartPing API responses
 interface SmartPingResult<T> {
   success: boolean;
@@ -361,10 +375,6 @@ export class SmartPingAPI {
 
       if (responseText.includes("<equipe")) {
         const teams = this.parseXMLTeams(responseText);
-        console.log("Teams API SUCCESS:", {
-          teamsCount: teams.length,
-          sampleTeam: teams.length > 0 ? teams[0] : null,
-        });
         return { success: true, data: teams };
       }
 
@@ -1166,13 +1176,6 @@ export class SmartPingAPI {
       const decoder = new TextDecoder("iso-8859-1");
       const responseText = decoder.decode(buffer);
 
-      console.log("FFTT Club Details Response:", {
-        status: response.status,
-        responseLength: responseText.length,
-        hasClub: responseText.includes("<club"),
-        clubNumber,
-      });
-
       if (!response.ok) {
         return {
           success: false,
@@ -1702,6 +1705,140 @@ export class SmartPingAPI {
 
     return history;
   }
+
+  /**
+   * Get pool ranking using xml_result_equ.php with action=classement
+   * According to FFTT documentation: "Récupérer le classement"
+   */
+  async getPoolRanking(
+    team: TeamData,
+    clubNumber: string,
+  ): Promise<SmartPingResult<PoolRankingEntry[]>> {
+    const url = `${this.baseUrl}xml_result_equ.php`;
+    const authParams = this.getAuthParams();
+
+    // Parse parameters from liendivision
+    const pouleParams = this.parseUrlParams(team.liendivision);
+
+    if (!pouleParams.cx_poule || !pouleParams.D1) {
+      return {
+        success: false,
+        error: "Missing required pool parameters (cx_poule or D1) in team data",
+      };
+    }
+
+    const params = new URLSearchParams({
+      serie: authParams.serie,
+      tm: authParams.tm,
+      tmc: authParams.tmc,
+      id: authParams.id,
+      action: "classement",
+      cx_poule: pouleParams.cx_poule,
+      D1: pouleParams.D1,
+      organisme_pere: pouleParams.organisme_pere || "67",
+    });
+
+    try {
+      const response = await fetch(`${url}?${params}`, {
+        method: "GET",
+        headers: {
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
+      });
+
+      const buffer = await response.arrayBuffer();
+      const decoder = new TextDecoder("iso-8859-1");
+      const responseText = decoder.decode(buffer);
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
+      }
+
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
+        const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
+        return { success: false, error: `FFTT Error: ${errorMessage}` };
+      }
+
+      // Parse classement data
+      const classementMatches = responseText.match(
+        /<classement>[\s\S]*?<\/classement>/g,
+      );
+
+      if (!classementMatches || classementMatches.length === 0) {
+        return {
+          success: false,
+          error: "No ranking data found",
+        };
+      }
+
+      // Extract ranking data
+      const rankings: PoolRankingEntry[] = [];
+      const totalTeams = classementMatches.length;
+
+      for (const match of classementMatches) {
+        const position = parseInt(
+          this.extractTagValue(match, "clt") || "0",
+          10,
+        );
+        const teamName = this.fixEncoding(
+          this.extractTagValue(match, "equipe") || "",
+        );
+        const numero = this.extractTagValue(match, "numero") || "";
+        const idequipe = this.extractTagValue(match, "idequipe") || "";
+        const joue = parseInt(this.extractTagValue(match, "joue") || "0", 10);
+        const pts = parseInt(this.extractTagValue(match, "pts") || "0", 10);
+        const vic = parseInt(this.extractTagValue(match, "vic") || "0", 10);
+        const def = parseInt(this.extractTagValue(match, "def") || "0", 10);
+        const nul = parseInt(this.extractTagValue(match, "nul") || "0", 10);
+
+        // Determine zone based on position
+        // Only first place is promotion, last 2 are relegation, no barrage
+        let zone: "promotion" | "barrage" | "relegation" | "neutral" =
+          "neutral";
+        if (position === 1) {
+          zone = "promotion";
+        } else if (position >= totalTeams - 1) {
+          zone = "relegation";
+        }
+
+        rankings.push({
+          position,
+          teamName,
+          clubNumber: numero,
+          teamId: idequipe,
+          played: joue,
+          points: pts,
+          victories: vic,
+          defeats: def,
+          draws: nul,
+          isClubTeam: numero === clubNumber,
+          zone,
+        });
+      }
+
+      // Sort by position
+      rankings.sort((a, b) => a.position - b.position);
+
+      return {
+        success: true,
+        data: rankings,
+      };
+    } catch (error) {
+      console.error("Error fetching pool ranking:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
 }
 
 /**
@@ -1935,6 +2072,46 @@ export async function fetchPlayerRankingHistoryWithSmartPing(
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
       source: "smartping_player_ranking_history_api",
+    };
+  }
+}
+
+/**
+ * Fetch pool ranking using modern FFTT API
+ * Export function for use in Nuxt API routes
+ */
+export async function fetchPoolRankingWithSmartPing(
+  team: TeamData,
+  clubNumber: string,
+): Promise<SmartPingResult<PoolRankingEntry[]>> {
+  const config = useRuntimeConfig();
+  const appCode = config.smartpingAppCode;
+  const password = config.smartpingPassword;
+  const email = config.smartpingEmail;
+
+  if (!appCode || !password || !email) {
+    console.error("Missing SmartPing credentials");
+    return {
+      success: false,
+      error: "Missing SmartPing API credentials",
+      source: "config",
+    };
+  }
+
+  try {
+    const smartPingApi = new SmartPingAPI(appCode, password, email);
+    const result = await smartPingApi.getPoolRanking(team, clubNumber);
+
+    return {
+      ...result,
+      source: "smartping_pool_ranking_api",
+    };
+  } catch (error) {
+    console.error("SmartPing Pool Ranking API error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      source: "smartping_pool_ranking_api",
     };
   }
 }

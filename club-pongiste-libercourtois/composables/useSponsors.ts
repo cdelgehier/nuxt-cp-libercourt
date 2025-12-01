@@ -2,46 +2,32 @@
 // Uses Zod schema for data validation and type safety
 import { SponsorsResponseSchema, type Partner } from "~/schemas";
 
-export const useSponsors = async () => {
+export const useSponsors = () => {
   // Fetch sponsors from API endpoint with server: true to ensure SSR consistency
-  const { data, error } = await useFetch("/api/sponsors", {
+  const { data, error } = useFetch("/api/sponsors", {
     key: "sponsors",
     // Ensure data is fetched on server-side to prevent hydration mismatch
     server: true,
+    // Transform the data immediately to ensure consistent SSR/client data
+    transform: (rawData) => {
+      const validationResult = SponsorsResponseSchema.safeParse(rawData);
+
+      if (!validationResult.success) {
+        console.error(
+          "Sponsors data validation failed:",
+          validationResult.error.format(),
+        );
+        return [] as Partner[];
+      }
+
+      return validationResult.data.sponsors;
+    },
+    // Provide default value to prevent hydration mismatch
+    default: () => [] as Partner[],
   });
 
-  if (error.value) {
-    console.error("Failed to fetch sponsors:", error.value);
-    return {
-      sponsors: [] as Partner[],
-      error: error.value,
-    };
-  }
-
-  if (!data.value) {
-    console.error("No sponsors data received");
-    return {
-      sponsors: [] as Partner[],
-      error: new Error("No data received"),
-    };
-  }
-
-  // Validate response with Zod schema
-  const validationResult = SponsorsResponseSchema.safeParse(data.value);
-
-  if (!validationResult.success) {
-    console.error(
-      "Sponsors data validation failed:",
-      validationResult.error.format(),
-    );
-    return {
-      sponsors: [] as Partner[],
-      error: validationResult.error,
-    };
-  }
-
   return {
-    sponsors: validationResult.data.sponsors,
-    error: null,
+    sponsors: data,
+    error,
   };
 };

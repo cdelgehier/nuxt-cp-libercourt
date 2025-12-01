@@ -178,6 +178,15 @@
 
             <!-- Matchs de l'équipe (expandable) -->
             <div v-if="expandedTeams.includes(team.idequipe)" class="p-6">
+              <!-- Pool ranking section -->
+              <div class="mb-8">
+                <PoolRankingTable
+                  :rankings="poolRankings[team.idequipe] || []"
+                  :loading="loadingRankings[team.idequipe]"
+                  :error="rankingErrors[team.idequipe]"
+                />
+              </div>
+
               <!-- Loading des matchs -->
               <div
                 v-if="loadingMatches[team.idequipe]"
@@ -625,6 +634,11 @@ const matchDetails = ref<Record<string, MatchDetail | null>>({});
 const loadingMatchDetails = ref<Record<string, boolean>>({});
 const matchDetailsErrors = ref<Record<string, string>>({});
 
+// State management for pool rankings
+const poolRankings = ref<Record<string, any[]>>({});
+const loadingRankings = ref<Record<string, boolean>>({});
+const rankingErrors = ref<Record<string, string>>({});
+
 // Fetch teams data
 const {
   data: teams,
@@ -837,15 +851,48 @@ async function loadTeamMatches(team: TeamData) {
   }
 }
 
+async function loadPoolRanking(team: TeamData) {
+  // Set loading state
+  loadingRankings.value[team.idequipe] = true;
+  rankingErrors.value[team.idequipe] = "";
+
+  try {
+    const response = await $fetch<{
+      success: boolean;
+      data?: any[];
+      error?: string;
+    }>("/api/pool-ranking", {
+      method: "POST",
+      body: {
+        team,
+        clubNumber: clubConfig.club.id,
+      },
+    });
+
+    if (response.success && response.data) {
+      poolRankings.value[team.idequipe] = response.data;
+    } else {
+      rankingErrors.value[team.idequipe] =
+        response.error || "Erreur lors du chargement du classement";
+    }
+  } catch (error) {
+    console.error("Error loading pool ranking:", error);
+    rankingErrors.value[team.idequipe] = "Impossible de charger le classement";
+  } finally {
+    loadingRankings.value[team.idequipe] = false;
+  }
+}
+
 function toggleTeamExpansion(teamId: string) {
   const index = expandedTeams.value.indexOf(teamId);
 
   if (index === -1) {
     expandedTeams.value.push(teamId);
-    // Load matches when expanding
+    // Load matches and ranking when expanding
     const team = teams.value?.data?.find((t) => t.idequipe === teamId);
     if (team) {
       loadTeamMatches(team);
+      loadPoolRanking(team);
     }
   } else {
     expandedTeams.value.splice(index, 1);

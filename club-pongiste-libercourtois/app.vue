@@ -34,7 +34,7 @@ useHead({
 // SEO Configuration
 useSeoMeta({
   titleTemplate: "%s | Club Pongiste Libercourtois",
-  ogImage: "/images/logo-club.png",
+  ogImage: "/images/logo-club.webp",
   twitterCard: "summary_large_image",
 });
 

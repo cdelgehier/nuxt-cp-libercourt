@@ -12,14 +12,12 @@
     >
       <!-- Logo image -->
       <div class="flex items-center justify-center h-16 mb-2">
-        <NuxtImg
-          :src="sponsor.logo"
+        <img
+          :src="sponsor.logo.replace(/\.(png|jpg|jpeg)$/i, '.webp')"
           :alt="`${sponsor.name} logo`"
           loading="lazy"
           width="180"
           height="64"
-          format="webp"
-          quality="75"
           class="max-h-full max-w-full object-contain"
         />
       </div>

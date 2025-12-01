@@ -32,7 +32,7 @@ const { $colorMode } = useNuxtApp();
 // Compute the logo source based on color mode
 const logoSrc = computed(() => {
   return $colorMode.preference === "dark"
-    ? "/images/logo-club-white.png"
-    : "/images/logo-club.png";
+    ? "/images/logo-club-white.webp"
+    : "/images/logo-club.webp";
 });
 </script>

@@ -6,7 +6,7 @@
         <div class="space-y-4">
           <div class="flex items-center justify-center">
             <img
-              src="/images/logo-club-white.png"
+              src="/images/logo-club-white.webp"
               alt="Logo Club Pongiste Libercourtois"
               class="h-24 w-auto"
             />
@@ -167,7 +167,7 @@ const formatDayName = (day: string): string => {
     Jeudi: "Jeu",
     Vendredi: "Ven",
     Samedi: "Sam",
-    Dimanche: "Dim"
+    Dimanche: "Dim",
   };
   return dayMap[day] || day;
 };
@@ -185,7 +185,7 @@ const parseTimeToMinutes = (timeStr: string): number => {
 const formatMinutesToTime = (minutes: number): string => {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
-  return `${hours}h${mins.toString().padStart(2, '0')}`;
+  return `${hours}h${mins.toString().padStart(2, "0")}`;
 };
 
 // Compute opening hours from training schedules
@@ -193,17 +193,17 @@ const computedOpenHours = computed(() => {
   if (!schedulesData.value?.schedules?.training) return [];
 
   return schedulesData.value.schedules.training
-    .filter(day => day.sessions && day.sessions.length > 0)
-    .map(day => {
+    .filter((day) => day.sessions && day.sessions.length > 0)
+    .map((day) => {
       const times: number[] = [];
 
       // Extract all start and end times from sessions
-      day.sessions.forEach(session => {
-        if (session.time && session.time.includes(' - ')) {
-          const [start, end] = session.time.split(' - ');
+      day.sessions.forEach((session) => {
+        if (session.time && session.time.includes(" - ")) {
+          const [start, end] = session.time.split(" - ");
           times.push(parseTimeToMinutes(start.trim()));
           times.push(parseTimeToMinutes(end.trim()));
-        } else if (session.time && session.time.includes('h')) {
+        } else if (session.time && session.time.includes("h")) {
           // Single time (like "18h00")
           times.push(parseTimeToMinutes(session.time.trim()));
         }
@@ -216,11 +216,12 @@ const computedOpenHours = computed(() => {
 
       return {
         day: day.day,
-        hours: `${formatMinutesToTime(minTime)} - ${formatMinutesToTime(maxTime)}`
+        hours: `${formatMinutesToTime(minTime)} - ${formatMinutesToTime(maxTime)}`,
       };
     })
-    .filter((schedule): schedule is NonNullable<typeof schedule> =>
-      schedule !== null && !['Samedi', 'Dimanche'].includes(schedule.day)
+    .filter(
+      (schedule): schedule is NonNullable<typeof schedule> =>
+        schedule !== null && !["Samedi", "Dimanche"].includes(schedule.day),
     ); // Remove null entries and exclude weekend competitions
 });
 </script>

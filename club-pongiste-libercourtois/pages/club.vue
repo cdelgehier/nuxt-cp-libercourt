@@ -69,14 +69,13 @@
           </div>
 
           <div class="relative">
-            <NuxtImg
-              src="/images/club-history.png"
+            <img
+              src="/images/club-history.webp"
               :alt="`Histoire du ${clubConfig.club?.name}`"
               class="rounded-xl shadow-xl w-full h-auto"
               loading="lazy"
-              format="webp"
-              quality="80"
-              sizes="sm:100vw md:50vw lg:600px"
+              width="1024"
+              height="1024"
             />
           </div>
         </div>
@@ -191,14 +190,13 @@
                     'opacity-0': currentImageIndex !== index,
                   }"
                 >
-                  <NuxtImg
-                    :src="image.src"
+                  <img
+                    :src="image.src.replace(/\.(png|jpg|jpeg)$/i, '.webp')"
                     :alt="image.alt"
                     class="w-full h-96 object-cover"
-                    format="webp"
-                    quality="80"
                     :loading="index === 0 ? 'eager' : 'lazy'"
-                    sizes="sm:100vw md:50vw lg:600px"
+                    width="4624"
+                    height="2080"
                   />
                 </div>
 

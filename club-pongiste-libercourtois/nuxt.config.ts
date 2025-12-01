@@ -43,10 +43,11 @@ export default defineNuxtConfig({
     },
   },
 
-  // Image optimization
+  // Image optimization - configured for Netlify static hosting
   image: {
     quality: 80,
     format: ["webp"],
+    provider: "ipx",
     screens: {
       xs: 320,
       sm: 640,
@@ -55,6 +56,8 @@ export default defineNuxtConfig({
       xl: 1280,
       xxl: 1536,
     },
+    // Optimize images at build time for better performance
+    densities: [1, 2],
   },
 
   // SEO and Meta
@@ -81,7 +84,7 @@ export default defineNuxtConfig({
           content: "Club de tennis de table à Libercourt depuis 1970",
         },
         { property: "og:type", content: "website" },
-        { property: "og:image", content: "/images/logo-club.png" },
+        { property: "og:image", content: "/images/logo-club.webp" },
       ],
       link: [
         { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },

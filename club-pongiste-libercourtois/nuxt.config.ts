@@ -92,8 +92,15 @@ export default defineNuxtConfig({
           crossorigin: "",
         },
         {
+          rel: "preload",
+          as: "style",
+          href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap",
+        },
+        {
           rel: "stylesheet",
           href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap",
+          media: "print",
+          onload: "this.media='all'",
         },
       ],
     },
@@ -108,6 +115,13 @@ export default defineNuxtConfig({
   // Build configuration
   nitro: {
     preset: "netlify",
+    compressPublicAssets: true,
+  },
+
+  // Experimental features for better performance
+  experimental: {
+    payloadExtraction: false,
+    renderJsonPayloads: true,
   },
 
   // Runtime config

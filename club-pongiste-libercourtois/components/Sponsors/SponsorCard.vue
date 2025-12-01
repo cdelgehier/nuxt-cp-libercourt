@@ -12,12 +12,14 @@
     >
       <!-- Logo image -->
       <div class="flex items-center justify-center h-16 mb-2">
-        <img
+        <NuxtImg
           :src="sponsor.logo"
           :alt="`${sponsor.name} logo`"
-          loading="eager"
+          loading="lazy"
           width="180"
           height="64"
+          format="webp"
+          quality="75"
           class="max-h-full max-w-full object-contain"
         />
       </div>

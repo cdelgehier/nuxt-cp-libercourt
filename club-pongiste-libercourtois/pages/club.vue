@@ -69,10 +69,14 @@
           </div>
 
           <div class="relative">
-            <img
+            <NuxtImg
               src="/images/club-history.png"
               :alt="`Histoire du ${clubConfig.club?.name}`"
               class="rounded-xl shadow-xl w-full h-auto"
+              loading="lazy"
+              format="webp"
+              quality="80"
+              sizes="sm:100vw md:50vw lg:600px"
             />
           </div>
         </div>
@@ -187,10 +191,14 @@
                     'opacity-0': currentImageIndex !== index,
                   }"
                 >
-                  <img
+                  <NuxtImg
                     :src="image.src"
                     :alt="image.alt"
                     class="w-full h-96 object-cover"
+                    format="webp"
+                    quality="80"
+                    :loading="index === 0 ? 'eager' : 'lazy'"
+                    sizes="sm:100vw md:50vw lg:600px"
                   />
                 </div>
 

@@ -7,16 +7,16 @@
     <HomeActivitiesSection :activities="activities" />
 
     <!-- News section -->
-    <HomeNewsSection />
+    <LazyHomeNewsSection />
 
     <!-- Upcoming events section -->
-    <HomeEventsSection :events="upcomingEvents" />
+    <LazyHomeEventsSection :events="upcomingEvents" />
 
     <!-- Sponsors Banner -->
-    <SponsorsBanner :sponsors="sponsors" />
+    <LazySponsorsBanner :sponsors="sponsors" />
 
     <!-- Call-to-action section -->
-    <HomeCtaSection />
+    <LazyHomeCtaSection />
   </div>
 </template>
 

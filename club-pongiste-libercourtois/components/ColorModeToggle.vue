@@ -23,11 +23,11 @@
 </template>
 
 <script setup lang="ts">
-const { $colorMode } = useNuxtApp();
+const { $colorMode } = useNuxtApp()
 
 const toggleColorMode = () => {
-  $colorMode.preference = $colorMode.preference === "dark" ? "light" : "dark";
-};
+  $colorMode.preference = $colorMode.preference === 'dark' ? 'light' : 'dark'
+}
 </script>
 
 <style scoped>

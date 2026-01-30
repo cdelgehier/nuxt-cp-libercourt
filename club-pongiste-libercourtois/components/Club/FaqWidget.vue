@@ -5,14 +5,20 @@
         <h2 class="text-3xl font-bold text-club-navy mb-4">
           {{ title }}
         </h2>
-        <p v-if="subtitle" class="text-lg text-gray-600">
+        <p
+          v-if="subtitle"
+          class="text-lg text-gray-600"
+        >
           {{ subtitle }}
         </p>
       </div>
 
       <!-- Popular questions or specific category -->
       <div class="space-y-4 mb-8">
-        <UAccordion :items="displayedFaqItems" :ui="{ wrapper: 'space-y-3' }" />
+        <UAccordion
+          :items="displayedFaqItems"
+          :ui="{ wrapper: 'space-y-3' }"
+        />
       </div>
 
       <!-- Link to complete FAQ page -->
@@ -21,7 +27,10 @@
           to="/faq"
           class="inline-flex items-center px-6 py-3 bg-club-blue text-white rounded-lg font-semibold hover:bg-club-navy transition-colors"
         >
-          <Icon name="i-heroicons-question-mark-circle" class="w-5 h-5 mr-2" />
+          <Icon
+            name="i-heroicons-question-mark-circle"
+            class="w-5 h-5 mr-2"
+          />
           Voir toutes les questions
         </NuxtLink>
       </div>
@@ -31,18 +40,18 @@
 
 <script setup lang="ts">
 interface Props {
-  title?: string;
-  subtitle?: string;
-  category?: string; // Specific category ou 'popular' pour les questions populaires
-  limit?: number; // Maximum number of questions to display
+  title?: string
+  subtitle?: string
+  category?: string // Specific category ou 'popular' pour les questions populaires
+  limit?: number // Maximum number of questions to display
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: "Questions Fréquentes",
-  subtitle: "Retrouvez les réponses aux questions les plus courantes",
-  category: "popular",
+  title: 'Questions Fréquentes',
+  subtitle: 'Retrouvez les réponses aux questions les plus courantes',
+  category: 'popular',
   limit: 5,
-});
+})
 
 // Utilisation du composable FAQ
 const {
@@ -51,31 +60,32 @@ const {
   getPopularQuestions,
   getQuestionsByCategory,
   formatForAccordion,
-} = useClubFaq();
+} = useClubFaq()
 
 // Load data if not already done
 if (!faqData.value) {
-  await fetchFaqData();
+  await fetchFaqData()
 }
 
 // Questions to display based on props
 const questionsToShow = computed(() => {
-  if (!faqData.value) return [];
+  if (!faqData.value) return []
 
-  let questions;
+  let questions
 
-  if (props.category === "popular") {
-    questions = getPopularQuestions.value;
-  } else {
-    questions = getQuestionsByCategory(props.category);
+  if (props.category === 'popular') {
+    questions = getPopularQuestions.value
+  }
+  else {
+    questions = getQuestionsByCategory(props.category)
   }
 
   // Limiter le nombre de questions
-  return questions.slice(0, props.limit);
-});
+  return questions.slice(0, props.limit)
+})
 
 // Items formatted for accordion
 const displayedFaqItems = computed(() => {
-  return formatForAccordion(questionsToShow.value);
-});
+  return formatForAccordion(questionsToShow.value)
+})
 </script>

@@ -4,7 +4,10 @@
       <div class="flex items-center justify-between h-20">
         <!-- Logo du club -->
         <div class="flex items-center">
-          <NuxtLink to="/" class="flex items-center">
+          <NuxtLink
+            to="/"
+            class="flex items-center"
+          >
             <AdaptiveLogo />
           </NuxtLink>
         </div>
@@ -25,7 +28,12 @@
         <!-- Boutons d'action -->
         <div class="hidden md:flex items-center space-x-4">
           <ColorModeToggle />
-          <UButton to="/contact" color="primary" variant="solid" size="sm">
+          <UButton
+            to="/contact"
+            color="primary"
+            variant="solid"
+            size="sm"
+          >
             Nous rejoindre
           </UButton>
         </div>
@@ -73,7 +81,10 @@
         >
           {{ item.label }}
         </NuxtLink>
-        <div class="pt-4" style="border-top: 1px solid var(--border-color)">
+        <div
+          class="pt-4"
+          style="border-top: 1px solid var(--border-color)"
+        >
           <UButton
             to="/contact"
             color="primary"
@@ -90,38 +101,39 @@
 </template>
 
 <script setup lang="ts">
-import type { NavigationItem } from "~/types";
+import type { NavigationItem } from '~/types'
 
 // Mobile menu state
-const mobileMenuOpen = ref(false);
+const mobileMenuOpen = ref(false)
 
 // Navigation principale
 const navigation: NavigationItem[] = [
-  { label: "Accueil", href: "/" },
-  { label: "Actualités", href: "/actualites" },
-  { label: "Le Club", href: "/club" },
-  { label: "Licenciés", href: "/licencies" },
-  { label: "Équipes", href: "/equipes" },
-  { label: "Calendrier", href: "/calendrier" },
-  { label: "Horaires & Tarifs", href: "/horaires-tarifs" },
-  { label: "FAQ", href: "/faq" },
-  { label: "Contact", href: "/contact" },
-];
+  { label: 'Accueil', href: '/' },
+  { label: 'Actualités', href: '/actualites' },
+  { label: 'Le Club', href: '/club' },
+  { label: 'Licenciés', href: '/licencies' },
+  { label: 'Équipes', href: '/equipes' },
+  { label: 'Calendrier', href: '/calendrier' },
+  { label: 'Horaires & Tarifs', href: '/horaires-tarifs' },
+  { label: 'FAQ', href: '/faq' },
+  { label: 'Contact', href: '/contact' },
+]
 
 // Fermer le menu mobile lors du changement de route
 watch(
   () => mobileMenuOpen.value,
   (isOpen) => {
     if (isOpen) {
-      document.body.classList.add("overflow-hidden");
-    } else {
-      document.body.classList.remove("overflow-hidden");
+      document.body.classList.add('overflow-hidden')
+    }
+    else {
+      document.body.classList.remove('overflow-hidden')
     }
   },
-);
+)
 
 // Clean up on unmount
 onUnmounted(() => {
-  document.body.classList.remove("overflow-hidden");
-});
+  document.body.classList.remove('overflow-hidden')
+})
 </script>

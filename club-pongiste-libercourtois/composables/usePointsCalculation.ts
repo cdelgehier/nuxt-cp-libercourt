@@ -4,16 +4,16 @@
  */
 
 interface PointsCalculationResult {
-  points: number;
-  isVictory: boolean;
-  isAbnormal: boolean;
+  points: number
+  isVictory: boolean
+  isAbnormal: boolean
 }
 
 interface MatchResult {
-  playerRanking: number;
-  opponentRanking: number;
-  victory: boolean;
-  coefficient?: number; // Optional coefficient for the competition (default 1)
+  playerRanking: number
+  opponentRanking: number
+  victory: boolean
+  coefficient?: number // Optional coefficient for the competition (default 1)
 }
 
 /**
@@ -35,7 +35,7 @@ export const usePointsCalculation = () => {
     [300, 399, 1, -0.5, 22, -16],
     [400, 499, 0.5, 0, 28, -20],
     [500, Infinity, 0, 0, 40, -29],
-  ];
+  ]
 
   /**
    * Convert FFTT ranking to points value
@@ -43,19 +43,19 @@ export const usePointsCalculation = () => {
    * Numbered rankings are actual points
    */
   const convertRankingToPoints = (ranking: string | number): number => {
-    if (!ranking) return 500;
+    if (!ranking) return 500
 
-    if (typeof ranking === "string") {
+    if (typeof ranking === 'string') {
       // Handle "NC" case
-      if (ranking.toUpperCase() === "NC") return 500;
+      if (ranking.toUpperCase() === 'NC') return 500
 
       // Try to parse as number
-      const parsed = parseInt(ranking);
-      return isNaN(parsed) ? 500 : parsed;
+      const parsed = parseInt(ranking)
+      return isNaN(parsed) ? 500 : parsed
     }
 
-    return ranking;
-  };
+    return ranking
+  }
 
   /**
    * Calculate points difference based on rankings
@@ -64,8 +64,8 @@ export const usePointsCalculation = () => {
     playerRanking: number,
     opponentRanking: number,
   ): number => {
-    return Math.abs(playerRanking - opponentRanking);
-  };
+    return Math.abs(playerRanking - opponentRanking)
+  }
 
   /**
    * Determine if victory/defeat is abnormal based on rankings
@@ -79,12 +79,13 @@ export const usePointsCalculation = () => {
   ): boolean => {
     if (victory) {
       // Abnormal victory: player has fewer points (worse ranking) than opponent
-      return playerRanking < opponentRanking;
-    } else {
-      // Abnormal defeat: player has more points (better ranking) than opponent
-      return playerRanking > opponentRanking;
+      return playerRanking < opponentRanking
     }
-  };
+    else {
+      // Abnormal defeat: player has more points (better ranking) than opponent
+      return playerRanking > opponentRanking
+    }
+  }
 
   /**
    * Calculate points gained/lost for a single match
@@ -93,18 +94,18 @@ export const usePointsCalculation = () => {
   const calculateMatchPoints = (
     match: MatchResult,
   ): PointsCalculationResult => {
-    const playerPoints = convertRankingToPoints(match.playerRanking);
-    const opponentPoints = convertRankingToPoints(match.opponentRanking);
+    const playerPoints = convertRankingToPoints(match.playerRanking)
+    const opponentPoints = convertRankingToPoints(match.opponentRanking)
 
-    const gap = calculateRankingGap(playerPoints, opponentPoints);
+    const gap = calculateRankingGap(playerPoints, opponentPoints)
     const abnormal = isAbnormalResult(
       playerPoints,
       opponentPoints,
       match.victory,
-    );
+    )
 
     // Find the appropriate row in the points table
-    const tableRow = POINTS_TABLE.find((row) => gap >= row[0] && gap <= row[1]);
+    const tableRow = POINTS_TABLE.find(row => gap >= row[0] && gap <= row[1])
 
     if (!tableRow) {
       // Fallback for edge cases
@@ -112,64 +113,67 @@ export const usePointsCalculation = () => {
         points: 0,
         isVictory: match.victory,
         isAbnormal: abnormal,
-      };
+      }
     }
 
-    let basePoints: number;
+    let basePoints: number
 
     if (match.victory) {
       // Victory: use normal or abnormal victory points
-      basePoints = abnormal ? tableRow[4] : tableRow[2];
-    } else {
+      basePoints = abnormal ? tableRow[4] : tableRow[2]
+    }
+    else {
       // Defeat: use normal or abnormal defeat points
-      basePoints = abnormal ? tableRow[5] : tableRow[3];
+      basePoints = abnormal ? tableRow[5] : tableRow[3]
     }
 
     // Apply competition coefficient (default to 1 if not provided)
-    const coefficient = match.coefficient ?? 1;
-    const points = basePoints * coefficient;
+    const coefficient = match.coefficient ?? 1
+    const points = basePoints * coefficient
 
     return {
       points,
       isVictory: match.victory,
       isAbnormal: abnormal,
-    };
-  };
+    }
+  }
 
   /**
    * Calculate total points from a list of matches
    */
   const calculateTotalPoints = (matches: MatchResult[]): number => {
     return matches.reduce((total, match) => {
-      const result = calculateMatchPoints(match);
-      return total + result.points;
-    }, 0);
-  };
+      const result = calculateMatchPoints(match)
+      return total + result.points
+    }, 0)
+  }
 
   /**
    * Get points badge style based on total points
    */
   const getPointsBadgeStyle = (
     totalPoints: number,
-  ): { color: string; text: string } => {
+  ): { color: string, text: string } => {
     if (totalPoints > 0) {
       return {
         color:
-          "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100",
+          'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100',
         text: `+${totalPoints} pts`,
-      };
-    } else if (totalPoints < 0) {
-      return {
-        color: "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100",
-        text: `${totalPoints} pts`,
-      };
-    } else {
-      return {
-        color: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100",
-        text: "±0 pts",
-      };
+      }
     }
-  };
+    else if (totalPoints < 0) {
+      return {
+        color: 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100',
+        text: `${totalPoints} pts`,
+      }
+    }
+    else {
+      return {
+        color: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100',
+        text: '±0 pts',
+      }
+    }
+  }
 
   return {
     convertRankingToPoints,
@@ -177,5 +181,5 @@ export const usePointsCalculation = () => {
     calculateTotalPoints,
     getPointsBadgeStyle,
     isAbnormalResult,
-  };
-};
+  }
+}

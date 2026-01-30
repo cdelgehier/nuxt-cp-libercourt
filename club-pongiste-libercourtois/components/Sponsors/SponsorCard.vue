@@ -19,7 +19,7 @@
           width="180"
           height="64"
           class="max-h-full max-w-full object-contain"
-        />
+        >
       </div>
       <!-- Sponsor name -->
       <p
@@ -32,23 +32,23 @@
 </template>
 
 <script setup lang="ts">
-import type { Partner } from "~/schemas";
+import type { Partner } from '~/schemas'
 
 // Component props
 interface Props {
-  sponsor: Partner;
-  isDuplicate?: boolean;
+  sponsor: Partner
+  isDuplicate?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isDuplicate: false,
-});
+})
 
 // Accessibility attributes
 const ariaLabel = computed(() =>
   props.isDuplicate ? undefined : `Visit ${props.sponsor.name} website`,
-);
-const tabindex = computed(() => (props.isDuplicate ? -1 : 0));
+)
+const tabindex = computed(() => (props.isDuplicate ? -1 : 0))
 </script>
 
 <style scoped>

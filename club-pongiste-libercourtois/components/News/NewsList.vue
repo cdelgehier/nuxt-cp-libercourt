@@ -5,22 +5,33 @@
       v-if="pending"
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
     >
-      <div v-for="i in limit" :key="i" class="animate-pulse">
-        <div class="bg-gray-200 dark:bg-gray-700 h-64 rounded-lg"></div>
+      <div
+        v-for="i in limit"
+        :key="i"
+        class="animate-pulse"
+      >
+        <div class="bg-gray-200 dark:bg-gray-700 h-64 rounded-lg" />
       </div>
     </div>
 
     <!-- Error state -->
-    <div v-else-if="error" class="text-center py-12">
+    <div
+      v-else-if="error"
+      class="text-center py-12"
+    >
       <UIcon
         name="i-heroicons-exclamation-triangle"
         class="w-12 h-12 mx-auto mb-4 text-red-500"
       />
-      <p class="text-lg font-semibold mb-2">Erreur de chargement</p>
+      <p class="text-lg font-semibold mb-2">
+        Erreur de chargement
+      </p>
       <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
         Impossible de charger les actualités pour le moment.
       </p>
-      <UButton @click="refresh">Réessayer</UButton>
+      <UButton @click="refresh">
+        Réessayer
+      </UButton>
     </div>
 
     <!-- No articles state -->
@@ -32,14 +43,19 @@
         name="i-heroicons-newspaper"
         class="w-12 h-12 mx-auto mb-4 text-gray-400"
       />
-      <p class="text-lg font-semibold mb-2">Aucune actualité</p>
+      <p class="text-lg font-semibold mb-2">
+        Aucune actualité
+      </p>
       <p class="text-sm text-gray-600 dark:text-gray-400">
         Aucune actualité disponible pour le moment.
       </p>
     </div>
 
     <!-- Articles list - compact feed -->
-    <div v-else class="max-w-4xl mx-auto space-y-4">
+    <div
+      v-else
+      class="max-w-4xl mx-auto space-y-4"
+    >
       <article
         v-for="article in data.articles"
         :key="article.id"
@@ -64,14 +80,17 @@
           </div>
 
           <!-- Content layout differs for Facebook posts -->
-          <div v-if="article.source === 'facebook'" class="space-y-3">
+          <div
+            v-if="article.source === 'facebook'"
+            class="space-y-3"
+          >
             <!-- Image full width for Facebook -->
             <div v-if="article.image">
               <img
                 :src="article.image"
                 :alt="article.title"
                 class="w-full max-h-96 object-cover rounded"
-              />
+              >
             </div>
 
             <!-- Title -->
@@ -116,14 +135,20 @@
           </div>
 
           <!-- Compact layout for other sources -->
-          <div v-else class="flex gap-4">
+          <div
+            v-else
+            class="flex gap-4"
+          >
             <!-- Image (if available) - smaller, on the side -->
-            <div v-if="article.image" class="flex-shrink-0">
+            <div
+              v-if="article.image"
+              class="flex-shrink-0"
+            >
               <img
                 :src="article.image"
                 :alt="article.title"
                 class="w-32 h-32 object-cover rounded"
-              />
+              >
             </div>
 
             <!-- Text content -->
@@ -179,37 +204,37 @@
 </template>
 
 <script setup lang="ts">
-import type { NewsResponse } from "~/types";
+import type { NewsResponse } from '~/types'
 
 // Props
 const props = withDefaults(
   defineProps<{
-    limit?: number;
+    limit?: number
   }>(),
   {
     limit: 10,
   },
-);
+)
 
 // Fetch news from API
 const { data, pending, error, refresh } = await useFetch<NewsResponse>(
-  "/api/news",
+  '/api/news',
   {
     query: {
       limit: props.limit,
     },
   },
-);
+)
 
 // Use news composable for helper functions
-const { getSourceBadgeClass, getSourceIcon, getSourceLabel, formatDate } =
-  useNews();
+const { getSourceBadgeClass, getSourceIcon, getSourceLabel, formatDate }
+  = useNews()
 
 // Format last update time
 const formattedLastUpdate = computed(() => {
-  if (!data.value?.lastUpdated) return "";
-  return formatDate(data.value.lastUpdated);
-});
+  if (!data.value?.lastUpdated) return ''
+  return formatDate(data.value.lastUpdated)
+})
 </script>
 
 <style scoped>

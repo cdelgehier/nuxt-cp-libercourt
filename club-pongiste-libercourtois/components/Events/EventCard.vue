@@ -67,7 +67,10 @@
             />
           </svg>
           <span>{{ formatDate(event.date) }}</span>
-          <span v-if="event.time" class="ml-2">à {{ event.time }}</span>
+          <span
+            v-if="event.time"
+            class="ml-2"
+          >à {{ event.time }}</span>
         </div>
 
         <!-- Location -->
@@ -142,7 +145,10 @@
       </div>
 
       <!-- Status and Actions -->
-      <div v-if="!past" class="space-y-3">
+      <div
+        v-if="!past"
+        class="space-y-3"
+      >
         <!-- Registration Status and Button Row -->
         <div class="flex items-center justify-between">
           <!-- Registration Status -->
@@ -176,7 +182,10 @@
             class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
             @click="$emit('register', event)"
           >
-            <UIcon name="i-heroicons-plus" class="w-4 h-4 mr-1.5" />
+            <UIcon
+              name="i-heroicons-plus"
+              class="w-4 h-4 mr-1.5"
+            />
             S'inscrire
           </button>
 
@@ -218,7 +227,10 @@
       </div>
 
       <!-- Contact Info -->
-      <div v-if="event.contact" class="mt-3 pt-3 border-t border-gray-100">
+      <div
+        v-if="event.contact"
+        class="mt-3 pt-3 border-t border-gray-100"
+      >
         <div class="flex items-center text-xs text-gray-500">
           <svg
             class="w-3 h-3 mr-1.5"
@@ -241,145 +253,146 @@
 </template>
 
 <script setup lang="ts">
-import type { CalendarEvent } from "~/types";
+import type { CalendarEvent } from '~/types'
 
 interface Props {
-  event: CalendarEvent;
-  past?: boolean;
+  event: CalendarEvent
+  past?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   past: false,
-});
+})
 
 defineEmits<{
-  register: [event: CalendarEvent];
-}>();
+  register: [event: CalendarEvent]
+}>()
 
 // Event type configurations using club colors
 const eventTypeConfig = {
   tournament: {
-    label: "Tournoi",
-    class: "bg-accent-50 text-accent-600",
+    label: 'Tournoi',
+    class: 'bg-accent-50 text-accent-600',
   },
   stage: {
-    label: "Stage",
+    label: 'Stage',
     class:
-      "bg-secondary-50 text-secondary-600 dark:bg-secondary-900/20 dark:text-secondary-300",
+      'bg-secondary-50 text-secondary-600 dark:bg-secondary-900/20 dark:text-secondary-300',
   },
   competition: {
-    label: "Compétition",
+    label: 'Compétition',
     class:
-      "bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300",
+      'bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300',
   },
   meeting: {
-    label: "Réunion",
+    label: 'Réunion',
     class:
-      "bg-club-navy/10 text-club-navy dark:bg-club-navy/20 dark:text-club-yellow",
+      'bg-club-navy/10 text-club-navy dark:bg-club-navy/20 dark:text-club-yellow',
   },
   training: {
-    label: "Entraînement",
+    label: 'Entraînement',
     class:
-      "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
+      'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300',
   },
   other: {
-    label: "Autre",
-    class: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+    label: 'Autre',
+    class: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300',
   },
-};
+}
 
 // Computed properties
 const eventTypeLabel = computed(
-  () => eventTypeConfig[props.event.type]?.label || "Événement",
-);
+  () => eventTypeConfig[props.event.type]?.label || 'Événement',
+)
 const eventTypeBadgeClass = computed(
-  () => eventTypeConfig[props.event.type]?.class || "bg-gray-100 text-gray-800",
-);
+  () => eventTypeConfig[props.event.type]?.class || 'bg-gray-100 text-gray-800',
+)
 
 const canRegister = computed(() => {
-  if (!props.event.maxParticipants) return true;
-  return props.event.currentParticipants < props.event.maxParticipants;
-});
+  if (!props.event.maxParticipants) return true
+  return props.event.currentParticipants < props.event.maxParticipants
+})
 
 // Utilities
 const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("fr-FR", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
+  const date = new Date(dateString)
+  return date.toLocaleDateString('fr-FR', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
 
 // Add event to Google Calendar
 const addToGoogleCalendar = () => {
   try {
     // Create event start date-time
-    const eventDate = new Date(props.event.date);
+    const eventDate = new Date(props.event.date)
 
     // If event has a specific time, use it. Otherwise use 9:00 AM as default
-    let startTime = eventDate;
+    let startTime = eventDate
     if (props.event.time) {
       // Handle different time formats (e.g., "14:30", "8h30", "8h30 - 18h00")
-      const timeStr = props.event.time.split(" - ")[0]; // Take start time if range
-      const cleanTime = timeStr.replace("h", ":"); // Convert "8h30" to "8:30"
-      const timeMatch = cleanTime.match(/(\d{1,2}):?(\d{0,2})/);
+      const timeStr = props.event.time.split(' - ')[0] // Take start time if range
+      const cleanTime = timeStr.replace('h', ':') // Convert "8h30" to "8:30"
+      const timeMatch = cleanTime.match(/(\d{1,2}):?(\d{0,2})/)
 
       if (timeMatch) {
-        const hours = parseInt(timeMatch[1]);
-        const minutes = parseInt(timeMatch[2] || "0");
-        startTime = new Date(eventDate);
-        startTime.setHours(hours, minutes, 0, 0);
+        const hours = parseInt(timeMatch[1])
+        const minutes = parseInt(timeMatch[2] || '0')
+        startTime = new Date(eventDate)
+        startTime.setHours(hours, minutes, 0, 0)
       }
-    } else {
-      startTime = new Date(eventDate);
-      startTime.setHours(9, 0, 0, 0);
+    }
+    else {
+      startTime = new Date(eventDate)
+      startTime.setHours(9, 0, 0, 0)
     }
 
     // Create end time (2 hours after start by default)
-    const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000);
+    const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000)
 
     // Format dates for Google Calendar (YYYYMMDDTHHMMSSZ)
     const formatGoogleDate = (date: Date) => {
       return date
         .toISOString()
-        .replace(/[-:]/g, "")
-        .replace(/\.\d{3}/, "");
-    };
+        .replace(/[-:]/g, '')
+        .replace(/\.\d{3}/, '')
+    }
 
     // Build description with additional info
-    let description = props.event.description || "";
+    let description = props.event.description || ''
     if (props.event.contact) {
-      description += `\n\nContact: ${props.event.contact.name}`;
+      description += `\n\nContact: ${props.event.contact.name}`
       if (props.event.contact.role) {
-        description += ` (${props.event.contact.role})`;
+        description += ` (${props.event.contact.role})`
       }
     }
     if (props.event.price !== undefined && props.event.price > 0) {
-      description += `\nTarif: ${props.event.price}€`;
+      description += `\nTarif: ${props.event.price}€`
     }
 
     // Build Google Calendar URL parameters
     const params = new URLSearchParams({
-      action: "TEMPLATE",
+      action: 'TEMPLATE',
       text: props.event.title,
       dates: `${formatGoogleDate(startTime)}/${formatGoogleDate(endTime)}`,
       details: description.trim(),
-      location: props.event.location || "",
+      location: props.event.location || '',
       // Add source information
-      sprop: "name:Club Pongiste Libercourtois",
-    });
+      sprop: 'name:Club Pongiste Libercourtois',
+    })
 
     // Create the Google Calendar URL
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?${params.toString()}`;
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?${params.toString()}`
 
     // Try to open Google Calendar in a new window
     const popup = window.open(
       googleCalendarUrl,
-      "_blank",
-      "noopener,noreferrer",
-    );
+      '_blank',
+      'noopener,noreferrer',
+    )
 
     // Fallback: copy URL to clipboard if popup blocked
     if (!popup || popup.closed) {
@@ -387,24 +400,25 @@ const addToGoogleCalendar = () => {
         ?.writeText(googleCalendarUrl)
         .then(() => {
           alert(
-            "Le lien du calendrier a été copié dans le presse-papiers. Collez-le dans votre navigateur pour ajouter l'événement.",
-          );
+            'Le lien du calendrier a été copié dans le presse-papiers. Collez-le dans votre navigateur pour ajouter l\'événement.',
+          )
         })
         .catch(() => {
           // Final fallback: show the URL
           prompt(
-            "Copiez ce lien pour ajouter l'événement à votre calendrier Google:",
+            'Copiez ce lien pour ajouter l\'événement à votre calendrier Google:',
             googleCalendarUrl,
-          );
-        });
+          )
+        })
     }
-  } catch (error) {
-    console.error("Error creating calendar event:", error);
-    alert(
-      "Une erreur est survenue lors de la création de l'événement calendrier. Veuillez réessayer.",
-    );
   }
-};
+  catch (error) {
+    console.error('Error creating calendar event:', error)
+    alert(
+      'Une erreur est survenue lors de la création de l\'événement calendrier. Veuillez réessayer.',
+    )
+  }
+}
 </script>
 
 <style scoped>

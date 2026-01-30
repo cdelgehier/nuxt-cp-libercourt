@@ -1,7 +1,10 @@
 <template>
   <teleport to="body">
     <transition name="modal">
-      <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
+      <div
+        v-if="show"
+        class="fixed inset-0 z-50 overflow-y-auto"
+      >
         <div
           class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
         >
@@ -80,7 +83,9 @@
                 </div>
                 <div v-if="event.price">
                   <span class="font-medium text-gray-700">Tarif:</span>
-                  <p class="text-gray-600">{{ event.price }}€</p>
+                  <p class="text-gray-600">
+                    {{ event.price }}€
+                  </p>
                 </div>
                 <div v-if="event.maxParticipants">
                   <span class="font-medium text-gray-700">Places:</span>
@@ -100,7 +105,10 @@
             </div>
 
             <!-- Registration Form -->
-            <form class="space-y-4" @submit.prevent="handleSubmit">
+            <form
+              class="space-y-4"
+              @submit.prevent="handleSubmit"
+            >
               <!-- Member selection -->
               <div>
                 <label
@@ -117,7 +125,9 @@
                   :class="{ 'border-red-500': errors.licenseeId }"
                   @change="onLicenseeSelect"
                 >
-                  <option value="">Choisir un licencié...</option>
+                  <option value="">
+                    Choisir un licencié...
+                  </option>
                   <option
                     v-for="licensee in licensees"
                     :key="licensee.id"
@@ -128,7 +138,10 @@
                     }})
                   </option>
                 </select>
-                <p v-if="errors.licenseeId" class="mt-1 text-xs text-red-600">
+                <p
+                  v-if="errors.licenseeId"
+                  class="mt-1 text-xs text-red-600"
+                >
                   {{ errors.licenseeId }}
                 </p>
               </div>
@@ -150,16 +163,16 @@
                     </p>
                   </div>
                   <div>
-                    <span class="font-medium text-blue-700"
-                      >Numéro de licence:</span
-                    >
+                    <span class="font-medium text-blue-700">Numéro de licence:</span>
                     <p class="text-blue-600">
                       {{ selectedLicensee.licenseNumber }}
                     </p>
                   </div>
                   <div>
                     <span class="font-medium text-blue-700">Âge:</span>
-                    <p class="text-blue-600">{{ selectedLicensee.age }} ans</p>
+                    <p class="text-blue-600">
+                      {{ selectedLicensee.age }} ans
+                    </p>
                   </div>
                   <div>
                     <span class="font-medium text-blue-700">Catégorie:</span>
@@ -194,12 +207,16 @@
                   type="checkbox"
                   required
                   class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label for="acceptTerms" class="ml-2 text-sm text-gray-600">
+                >
+                <label
+                  for="acceptTerms"
+                  class="ml-2 text-sm text-gray-600"
+                >
                   J'accepte les
-                  <a href="#" class="text-blue-600 hover:underline"
-                    >conditions d'inscription</a
-                  >
+                  <a
+                    href="#"
+                    class="text-blue-600 hover:underline"
+                  >conditions d'inscription</a>
                   et autorise le club à me contacter pour cet événement
                   <span class="text-red-500">*</span>
                 </label>
@@ -242,7 +259,10 @@
                   class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   :disabled="isSubmitting || !form.acceptTerms"
                 >
-                  <span v-if="isSubmitting" class="flex items-center">
+                  <span
+                    v-if="isSubmitting"
+                    class="flex items-center"
+                  >
                     <svg
                       class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                       xmlns="http://www.w3.org/2000/svg"
@@ -277,177 +297,183 @@
 </template>
 
 <script setup lang="ts">
-import type { CalendarEvent, EventRegistration, Licensee } from "~/types";
+import type { CalendarEvent, EventRegistration, Licensee } from '~/types'
 
 interface Props {
-  event: CalendarEvent;
-  show: boolean;
+  event: CalendarEvent
+  show: boolean
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  close: [];
-  success: [registration: any];
-}>();
+  close: []
+  success: [registration: any]
+}>()
 
 // Data
-const licensees = ref<Licensee[]>([]);
-const isLoadingLicensees = ref(false);
+const licensees = ref<Licensee[]>([])
+const isLoadingLicensees = ref(false)
 
 // Form state
 const form = reactive({
-  licenseeId: "",
-  comments: "",
+  licenseeId: '',
+  comments: '',
   acceptTerms: false,
-});
+})
 
 const errors = reactive({
-  licenseeId: "",
-});
+  licenseeId: '',
+})
 
-const isSubmitting = ref(false);
-const submitError = ref("");
-const submitSuccess = ref("");
+const isSubmitting = ref(false)
+const submitError = ref('')
+const submitSuccess = ref('')
 
 // Computed
 const selectedLicensee = computed(() => {
-  return licensees.value.find((l) => l.id === form.licenseeId) || null;
-});
+  return licensees.value.find(l => l.id === form.licenseeId) || null
+})
 
 const spotsRemaining = computed(() => {
-  if (!props.event.maxParticipants) return 999;
-  return props.event.maxParticipants - props.event.currentParticipants;
-});
+  if (!props.event.maxParticipants) return 999
+  return props.event.maxParticipants - props.event.currentParticipants
+})
 
 // Methods
 const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("fr-FR", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
+  const date = new Date(dateString)
+  return date.toLocaleDateString('fr-FR', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
 
 const fetchLicensees = async () => {
-  isLoadingLicensees.value = true;
+  isLoadingLicensees.value = true
   try {
-    const response = await $fetch<{ success: boolean; licensees: Licensee[] }>(
-      "/api/club/licensees",
-    );
+    const response = await $fetch<{ success: boolean, licensees: Licensee[] }>(
+      '/api/club/licensees',
+    )
     if (response.success) {
-      licensees.value = response.licensees;
+      licensees.value = response.licensees
     }
-  } catch (error) {
-    console.error("Error fetching licensees:", error);
-    submitError.value = "Erreur lors du chargement des licenciés";
-  } finally {
-    isLoadingLicensees.value = false;
   }
-};
+  catch (error) {
+    console.error('Error fetching licensees:', error)
+    submitError.value = 'Erreur lors du chargement des licenciés'
+  }
+  finally {
+    isLoadingLicensees.value = false
+  }
+}
 
 const onLicenseeSelect = () => {
   // Clear previous errors when a licensee is selected
-  errors.licenseeId = "";
-};
+  errors.licenseeId = ''
+}
 
 const validateForm = () => {
   // Reset errors
-  errors.licenseeId = "";
+  errors.licenseeId = ''
 
-  let isValid = true;
+  let isValid = true
 
   // Required field validation
   if (!form.licenseeId) {
-    errors.licenseeId = "Veuillez sélectionner un licencié";
-    isValid = false;
+    errors.licenseeId = 'Veuillez sélectionner un licencié'
+    isValid = false
   }
 
-  return isValid;
-};
+  return isValid
+}
 
 const resetForm = () => {
   Object.assign(form, {
-    licenseeId: "",
-    comments: "",
+    licenseeId: '',
+    comments: '',
     acceptTerms: false,
-  });
+  })
 
-  errors.licenseeId = "";
-  submitError.value = "";
-  submitSuccess.value = "";
-};
+  errors.licenseeId = ''
+  submitError.value = ''
+  submitSuccess.value = ''
+}
 
 const handleSubmit = async () => {
-  if (!validateForm()) return;
+  if (!validateForm()) return
 
   if (!selectedLicensee.value) {
-    submitError.value = "Veuillez sélectionner un licencié";
-    return;
+    submitError.value = 'Veuillez sélectionner un licencié'
+    return
   }
 
-  isSubmitting.value = true;
-  submitError.value = "";
-  submitSuccess.value = "";
+  isSubmitting.value = true
+  submitError.value = ''
+  submitSuccess.value = ''
 
   try {
     const registrationData: Omit<
       EventRegistration,
-      "registrationDate" | "status"
+      'registrationDate' | 'status'
     > = {
       eventId: props.event.id,
       participant: {
         firstName: selectedLicensee.value.firstName,
         lastName: selectedLicensee.value.lastName,
-        email: selectedLicensee.value.email || "",
-        phone: selectedLicensee.value.phone || "",
+        email: selectedLicensee.value.email || '',
+        phone: selectedLicensee.value.phone || '',
         age: selectedLicensee.value.age,
         level: undefined, // No level for licensees
         licenseNumber: selectedLicensee.value.licenseNumber,
         comments: form.comments?.trim() || undefined,
       },
-    };
+    }
 
-    const response = await $fetch<any>("/api/events/register", {
-      method: "POST",
+    const response = await $fetch<any>('/api/events/register', {
+      method: 'POST',
       body: registrationData,
-    });
+    })
 
     if (response.success) {
-      submitSuccess.value = response.message;
-      emit("success", response);
+      submitSuccess.value = response.message
+      emit('success', response)
 
       // Close modal after a delay
       setTimeout(() => {
-        resetForm();
-        emit("close");
-      }, 2000);
-    } else {
-      submitError.value = response.message || "Erreur lors de l'inscription";
+        resetForm()
+        emit('close')
+      }, 2000)
     }
-  } catch (error: any) {
-    console.error("Registration error:", error);
-    submitError.value =
-      error?.data?.message ||
-      "Erreur lors de l'inscription. Veuillez réessayer.";
-  } finally {
-    isSubmitting.value = false;
+    else {
+      submitError.value = response.message || 'Erreur lors de l\'inscription'
+    }
   }
-};
+  catch (error: any) {
+    console.error('Registration error:', error)
+    submitError.value
+      = error?.data?.message
+        || 'Erreur lors de l\'inscription. Veuillez réessayer.'
+  }
+  finally {
+    isSubmitting.value = false
+  }
+}
 
 // Watch for modal close to reset form and load licensees
 watch(
   () => props.show,
   (newShow) => {
     if (newShow) {
-      fetchLicensees();
-    } else {
-      resetForm();
+      fetchLicensees()
+    }
+    else {
+      resetForm()
     }
   },
-);
+)
 </script>
 
 <style scoped>

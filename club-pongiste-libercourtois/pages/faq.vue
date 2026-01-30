@@ -31,7 +31,7 @@
             type="text"
             placeholder="Rechercher une question..."
             class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-club-blue focus:border-transparent"
-          />
+          >
         </div>
       </div>
     </section>
@@ -44,15 +44,25 @@
             <div class="text-2xl font-bold text-club-blue mb-2">
               {{ faqData?.stats.totalQuestions || 0 }}
             </div>
-            <div class="adaptive-text">Questions répondues</div>
+            <div class="adaptive-text">
+              Questions répondues
+            </div>
           </div>
           <div class="adaptive-card rounded-lg shadow-sm p-6 text-center">
-            <div class="text-2xl font-bold text-club-blue mb-2">2</div>
-            <div class="adaptive-text">Essais gratuits</div>
+            <div class="text-2xl font-bold text-club-blue mb-2">
+              2
+            </div>
+            <div class="adaptive-text">
+              Essais gratuits
+            </div>
           </div>
           <div class="adaptive-card rounded-lg shadow-sm p-6 text-center">
-            <div class="text-2xl font-bold text-club-blue mb-2">45€</div>
-            <div class="adaptive-text">À partir de</div>
+            <div class="text-2xl font-bold text-club-blue mb-2">
+              45€
+            </div>
+            <div class="adaptive-text">
+              À partir de
+            </div>
           </div>
         </div>
       </div>
@@ -75,7 +85,10 @@
               ]"
               @click="selectedCategory = category.key"
             >
-              <Icon :name="category.icon" class="w-4 h-4 mr-2" />
+              <Icon
+                :name="category.icon"
+                class="w-4 h-4 mr-2"
+              />
               {{ category.label }}
             </button>
           </div>
@@ -110,14 +123,20 @@
               to="/contact"
               class="inline-flex items-center justify-center px-6 py-3 adaptive-card text-club-blue rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
-              <Icon name="i-heroicons-envelope" class="w-5 h-5 mr-2" />
+              <Icon
+                name="i-heroicons-envelope"
+                class="w-5 h-5 mr-2"
+              />
               Nous contacter
             </NuxtLink>
             <a
               :href="`tel:${contactData.club.phone}`"
               class="inline-flex items-center justify-center px-6 py-3 border-2 border-white text-white rounded-lg font-semibold hover:adaptive-card hover:text-club-blue transition-colors"
             >
-              <Icon name="i-heroicons-phone" class="w-5 h-5 mr-2" />
+              <Icon
+                name="i-heroicons-phone"
+                class="w-5 h-5 mr-2"
+              />
               {{ contactData.club.phone }}
             </a>
           </div>
@@ -129,15 +148,15 @@
 
 <script setup lang="ts">
 // Load club configuration for dynamic content
-const { data: clubConfig } = await useFetch("/api/club/config");
+const { data: clubConfig } = await useFetch('/api/club/config')
 
 // Configuration SEO with dynamic club name
 useSeoMeta({
-  title: "FAQ - Questions Fréquentes",
-  description: `Trouvez les réponses aux questions les plus courantes sur le ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"} : inscriptions, tarifs, horaires, matériel et compétitions.`,
+  title: 'FAQ - Questions Fréquentes',
+  description: `Trouvez les réponses aux questions les plus courantes sur le ${clubConfig.value?.club?.name || 'Club Pongiste Libercourtois'} : inscriptions, tarifs, horaires, matériel et compétitions.`,
   keywords:
-    "FAQ tennis de table, questions fréquentes, inscriptions club, tarifs ping pong, horaires entrainement, Libercourt",
-});
+    'FAQ tennis de table, questions fréquentes, inscriptions club, tarifs ping pong, horaires entrainement, Libercourt',
+})
 
 // Use the FAQ composable to load questions
 const {
@@ -147,69 +166,69 @@ const {
   searchQuestions,
   getQuestionsByCategory,
   formatForAccordion,
-} = useClubFaq();
+} = useClubFaq()
 
 // Load FAQ data
-await fetchFaqData();
+await fetchFaqData()
 
 // Load contact data for phone number
-const contactData = await $fetch("/api/club/contact");
+const contactData = await $fetch('/api/club/contact')
 
 // Local state
-const searchTerm = ref("");
-const selectedCategory = ref("all");
+const searchTerm = ref('')
+const selectedCategory = ref('all')
 
 // Categories for filters
 const allCategories = computed(() => {
-  if (!faqData.value) return [];
+  if (!faqData.value) return []
 
   return [
-    { key: "all", label: "Toutes", icon: "i-heroicons-squares-2x2" },
-    ...faqData.value.categories.map((cat) => ({
+    { key: 'all', label: 'Toutes', icon: 'i-heroicons-squares-2x2' },
+    ...faqData.value.categories.map(cat => ({
       key: cat.id,
       label: cat.name,
       icon: cat.icon,
     })),
-  ];
-});
+  ]
+})
 
 // Search results
 const searchResults = computed(() => {
-  if (!searchTerm.value.trim()) return [];
-  return searchQuestions(searchTerm.value);
-});
+  if (!searchTerm.value.trim()) return []
+  return searchQuestions(searchTerm.value)
+})
 
 // Filtered questions by selected category
 const filteredByCategory = computed(() => {
-  if (!faqData.value) return [];
+  if (!faqData.value) return []
 
-  if (selectedCategory.value === "all") {
-    return getAllQuestions.value;
+  if (selectedCategory.value === 'all') {
+    return getAllQuestions.value
   }
 
-  return getQuestionsByCategory(selectedCategory.value);
-});
+  return getQuestionsByCategory(selectedCategory.value)
+})
 
 // Questions to display (search or category filter)
 const displayedQuestions = computed(() => {
   if (searchTerm.value.trim()) {
-    return searchResults.value;
+    return searchResults.value
   }
 
-  return filteredByCategory.value;
-});
+  return filteredByCategory.value
+})
 
 // Items formatted for accordion
 const displayedFaqItems = computed(() => {
-  return formatForAccordion(displayedQuestions.value);
-});
+  return formatForAccordion(displayedQuestions.value)
+})
 
 // Watcher to reset category when searching
 watch(searchTerm, (newTerm) => {
-  if (newTerm.trim() && selectedCategory.value !== "all") {
-    selectedCategory.value = "all";
+  if (newTerm.trim() && selectedCategory.value !== 'all') {
+    selectedCategory.value = 'all'
   }
-});
+})
 </script>
 
 <style scoped>

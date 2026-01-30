@@ -1,7 +1,7 @@
 // ESLint configuration for Nuxt 3 project
 // This file configures code quality rules for TypeScript and Vue files
 
-import { createConfigForNuxt } from "@nuxt/eslint-config/flat";
+import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 
 export default createConfigForNuxt({
   // Features to enable
@@ -18,37 +18,37 @@ export default createConfigForNuxt({
   {
     rules: {
       // Allow console.log in development for debugging
-      "no-console": "warn",
+      'no-console': 'warn',
       // Prevent debugger statements
-      "no-debugger": "error",
+      'no-debugger': 'error',
       // Allow alert() usage for quick debugging
-      "no-alert": "warn",
+      'no-alert': 'warn',
       // Check for unused variables but allow underscore prefix
-      "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       // TypeScript specific rules
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        { argsIgnorePattern: "^_" },
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' },
       ],
-      "@typescript-eslint/no-explicit-any": "warn",
+      '@typescript-eslint/no-explicit-any': 'warn',
       // Vue specific rules
-      "vue/html-self-closing": "error",
-      "vue/require-default-prop": "error",
+      'vue/html-self-closing': 'error',
+      'vue/require-default-prop': 'error',
       // Allow single word component names for pages
-      "vue/multi-word-component-names": [
-        "error",
+      'vue/multi-word-component-names': [
+        'error',
         {
           ignores: [
-            "default",
-            "index",
-            "admin",
-            "club",
-            "contact",
-            "faq",
-            "calendrier",
+            'default',
+            'index',
+            'admin',
+            'club',
+            'contact',
+            'faq',
+            'calendrier',
           ],
         },
       ],
     },
   },
-);
+)

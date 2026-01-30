@@ -22,7 +22,10 @@
               rel="noopener noreferrer"
               class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 backdrop-blur-sm bg-opacity-90 hover:bg-blue-200 transition-colors"
             >
-              <UIcon name="i-heroicons-newspaper" class="w-4 h-4 mr-1.5" />
+              <UIcon
+                name="i-heroicons-newspaper"
+                class="w-4 h-4 mr-1.5"
+              />
               Comité CD62TT
             </a>
             <a
@@ -31,7 +34,10 @@
               rel="noopener noreferrer"
               class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800 backdrop-blur-sm bg-opacity-90 hover:bg-purple-200 transition-colors"
             >
-              <UIcon name="i-heroicons-globe-alt" class="w-4 h-4 mr-1.5" />
+              <UIcon
+                name="i-heroicons-globe-alt"
+                class="w-4 h-4 mr-1.5"
+              />
               Ligue HDF
             </a>
             <a
@@ -61,25 +67,25 @@
 </template>
 
 <script setup lang="ts">
-import type { ClubConfig } from "~/types";
+import type { ClubConfig } from '~/types'
 
 // SEO metadata
 useHead({
-  title: "Actualités - Club Pongiste Libercourtois",
+  title: 'Actualités - Club Pongiste Libercourtois',
   meta: [
     {
-      name: "description",
+      name: 'description',
       content:
-        "Suivez toutes les actualités du tennis de table : Comité CD62TT, Ligue HDF et Club Pongiste Libercourtois",
+        'Suivez toutes les actualités du tennis de table : Comité CD62TT, Ligue HDF et Club Pongiste Libercourtois',
     },
     {
-      name: "keywords",
+      name: 'keywords',
       content:
-        "actualités tennis de table, cd62tt, ligue hdf, club libercourtois, news ping pong",
+        'actualités tennis de table, cd62tt, ligue hdf, club libercourtois, news ping pong',
     },
   ],
-});
+})
 
 // Fetch club config for Facebook URL
-const { data: clubConfig } = await useFetch<ClubConfig>("/api/club/config");
+const { data: clubConfig } = await useFetch<ClubConfig>('/api/club/config')
 </script>

@@ -3,14 +3,24 @@
   <section class="py-16 page-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between mb-8">
-        <h2 class="text-3xl font-bold adaptive-title">Prochains Événements</h2>
-        <UButton to="/calendrier" variant="outline" color="primary">
+        <h2 class="text-3xl font-bold adaptive-title">
+          Prochains Événements
+        </h2>
+        <UButton
+          to="/calendrier"
+          variant="outline"
+          color="primary"
+        >
           Voir tout le calendrier
         </UButton>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div v-for="event in events" :key="event.id" class="card-club">
+        <div
+          v-for="event in events"
+          :key="event.id"
+          class="card-club"
+        >
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <span
@@ -35,7 +45,10 @@
               v-if="event.location"
               class="flex items-center text-sm adaptive-text"
             >
-              <UIcon name="i-heroicons-map-pin" class="mr-1" />
+              <UIcon
+                name="i-heroicons-map-pin"
+                class="mr-1"
+              />
               {{ event.location }}
             </div>
 
@@ -73,61 +86,61 @@
 </template>
 
 <script setup lang="ts">
-import type { CalendarEvent } from "~/schemas";
+import type { CalendarEvent } from '~/schemas'
 
 // Accept events as prop from parent component
 defineProps<{
-  events: CalendarEvent[];
-}>();
+  events: CalendarEvent[]
+}>()
 
 // Format date to French locale
 function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(date);
+  const date = new Date(dateString)
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(date)
 }
 
 // Get event type label in French
 function getEventTypeLabel(type: string): string {
   const labels: Record<string, string> = {
-    tournament: "Tournoi",
-    stage: "Stage",
-    competition: "Compétition",
-    meeting: "Réunion",
-    training: "Entraînement",
-    Tournoi: "Tournoi",
-    Stage: "Stage",
-    Compétition: "Compétition",
-  };
-  return labels[type] || type;
+    tournament: 'Tournoi',
+    stage: 'Stage',
+    competition: 'Compétition',
+    meeting: 'Réunion',
+    training: 'Entraînement',
+    Tournoi: 'Tournoi',
+    Stage: 'Stage',
+    Compétition: 'Compétition',
+  }
+  return labels[type] || type
 }
 
 // Get CSS classes for event type badge
 function getEventTypeClass(type: string): string {
   const classes: Record<string, string> = {
     tournament:
-      "bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300",
+      'bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300',
     stage:
-      "bg-secondary-50 text-secondary-600 dark:bg-secondary-900/20 dark:text-secondary-300",
+      'bg-secondary-50 text-secondary-600 dark:bg-secondary-900/20 dark:text-secondary-300',
     competition:
-      "bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300",
+      'bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300',
     meeting:
-      "bg-club-navy/10 text-club-navy dark:bg-club-navy/20 dark:text-club-yellow",
+      'bg-club-navy/10 text-club-navy dark:bg-club-navy/20 dark:text-club-yellow',
     training:
-      "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
+      'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300',
     Tournoi:
-      "bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300",
+      'bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300',
     Stage:
-      "bg-secondary-50 text-secondary-600 dark:bg-secondary-900/20 dark:text-secondary-300",
+      'bg-secondary-50 text-secondary-600 dark:bg-secondary-900/20 dark:text-secondary-300',
     Compétition:
-      "bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300",
-  };
+      'bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300',
+  }
   return (
-    classes[type] ||
-    "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
-  );
+    classes[type]
+    || 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'
+  )
 }
 </script>

@@ -49,7 +49,10 @@
                 </a>
               </div>
               <div class="flex items-center justify-center">
-                <UIcon name="i-heroicons-phone" class="mr-2 text-club-green" />
+                <UIcon
+                  name="i-heroicons-phone"
+                  class="mr-2 text-club-green"
+                />
                 <a
                   :href="`tel:${data.club.phone}`"
                   class="hover:text-club-green transition-colors"
@@ -72,9 +75,14 @@
             <div
               class="w-20 h-20 bg-club-green rounded-full flex items-center justify-center mx-auto mb-6"
             >
-              <UIcon name="i-heroicons-map-pin" class="text-3xl text-white" />
+              <UIcon
+                name="i-heroicons-map-pin"
+                class="text-3xl text-white"
+              />
             </div>
-            <h3 class="text-xl font-bold adaptive-title mb-4">Notre Salle</h3>
+            <h3 class="text-xl font-bold adaptive-title mb-4">
+              Notre Salle
+            </h3>
             <div class="space-y-1 adaptive-text">
               <div class="font-medium">
                 {{ data.address.name }}
@@ -89,7 +97,10 @@
               class="mt-4"
               @click="scrollToSection('map')"
             >
-              <UIcon name="i-heroicons-map" class="mr-2" />
+              <UIcon
+                name="i-heroicons-map"
+                class="mr-2"
+              />
               Voir sur la carte
             </UButton>
           </div>
@@ -99,9 +110,14 @@
             <div
               class="w-20 h-20 bg-club-yellow rounded-full flex items-center justify-center mx-auto mb-6"
             >
-              <UIcon name="i-heroicons-share" class="text-3xl text-club-navy" />
+              <UIcon
+                name="i-heroicons-share"
+                class="text-3xl text-club-navy"
+              />
             </div>
-            <h3 class="text-xl font-bold adaptive-title mb-4">Suivez-nous</h3>
+            <h3 class="text-xl font-bold adaptive-title mb-4">
+              Suivez-nous
+            </h3>
             <div class="space-y-3">
               <a
                 v-for="social in data.socialMedia"
@@ -111,7 +127,10 @@
                 rel="noopener noreferrer"
                 class="flex items-center justify-center adaptive-text hover:text-club-green transition-colors"
               >
-                <UIcon :name="social.icon" class="mr-2" />
+                <UIcon
+                  :name="social.icon"
+                  class="mr-2"
+                />
                 <span>{{ social.name }}</span>
               </a>
             </div>
@@ -121,10 +140,15 @@
     </section>
 
     <!-- Management team and contacts -->
-    <section id="contacts" class="py-16 page-section">
+    <section
+      id="contacts"
+      class="py-16 page-section"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold adaptive-title mb-4">Nos Contacts</h2>
+          <h2 class="text-3xl font-bold adaptive-title mb-4">
+            Nos Contacts
+          </h2>
           <p class="text-lg adaptive-text max-w-3xl mx-auto">
             Une équipe dévouée à votre service pour répondre à toutes vos
             questions
@@ -183,7 +207,9 @@
     <section class="py-16 page-section">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold adaptive-title mb-4">Permanences</h2>
+          <h2 class="text-3xl font-bold adaptive-title mb-4">
+            Permanences
+          </h2>
           <p class="text-lg adaptive-text max-w-3xl mx-auto">
             Venez nous rencontrer directement à la salle durant nos permanences
           </p>
@@ -233,7 +259,10 @@
             class="mt-8 p-4 bg-club-navy/10 dark:bg-club-navy/20 rounded-lg text-center"
           >
             <p class="text-club-navy dark:text-club-yellow">
-              <UIcon name="i-heroicons-information-circle" class="mr-2" />
+              <UIcon
+                name="i-heroicons-information-circle"
+                class="mr-2"
+              />
               {{ data.schedule.training.note }}
             </p>
           </div>
@@ -242,10 +271,15 @@
     </section>
 
     <!-- Map and access -->
-    <section id="map" class="py-16 page-section">
+    <section
+      id="map"
+      class="py-16 page-section"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold adaptive-title mb-4">Plan d'accès</h2>
+          <h2 class="text-3xl font-bold adaptive-title mb-4">
+            Plan d'accès
+          </h2>
           <p class="text-lg adaptive-text">
             Trouvez facilement notre salle de sport à Libercourt
           </p>
@@ -317,7 +351,10 @@
                   class="font-semibold"
                   @click="openGoogleMaps"
                 >
-                  <UIcon name="i-heroicons-globe-alt" class="mr-2" />
+                  <UIcon
+                    name="i-heroicons-globe-alt"
+                    class="mr-2"
+                  />
                   Ouvrir dans Google Maps
                 </UButton>
               </div>
@@ -371,7 +408,10 @@
           </p>
         </div>
 
-        <UAccordion :items="faqItems" :ui="{ wrapper: 'space-y-3' }" />
+        <UAccordion
+          :items="faqItems"
+          :ui="{ wrapper: 'space-y-3' }"
+        />
       </div>
     </section>
   </div>
@@ -379,18 +419,18 @@
 
 <script setup lang="ts">
 // Load contact data
-const data = await $fetch("/api/club/contact");
+const data = await $fetch('/api/club/contact')
 
 // Load club configuration for dynamic content
-const { data: clubConfig } = await useFetch("/api/club/config");
+const { data: clubConfig } = await useFetch('/api/club/config')
 
 // Configuration SEO with dynamic club name
 useSeoMeta({
-  title: "Contact",
-  description: `Contactez le ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"}. Trouvez toutes nos coordonnées, horaires de permanence et plan d'accès à notre salle de sport.`,
+  title: 'Contact',
+  description: `Contactez le ${clubConfig.value?.club?.name || 'Club Pongiste Libercourtois'}. Trouvez toutes nos coordonnées, horaires de permanence et plan d'accès à notre salle de sport.`,
   keywords:
-    "contact club tennis de table, Libercourt, horaires permanence, plan accès, formulaire contact",
-});
+    'contact club tennis de table, Libercourt, horaires permanence, plan accès, formulaire contact',
+})
 
 // Transform FAQ for accordion
 const faqItems = computed(() =>
@@ -399,34 +439,34 @@ const faqItems = computed(() =>
     content: item.answer,
     defaultOpen: false,
   })),
-);
+)
 
 // Function to open Google Maps in a new tab
 function openGoogleMaps() {
   // Use the URL from data or build one with coordinates
-  const url =
-    data.address?.googleMapsUrl ||
-    `https://www.google.com/maps/search/?api=1&query=${data.address?.coordinates?.lat || 50.48185408012125},${data.address?.coordinates?.lng || 3.017099247377654}`;
+  const url
+    = data.address?.googleMapsUrl
+      || `https://www.google.com/maps/search/?api=1&query=${data.address?.coordinates?.lat || 50.48185408012125},${data.address?.coordinates?.lng || 3.017099247377654}`
 
   // Open Google Maps in a new tab
-  window.open(url, "_blank");
+  window.open(url, '_blank')
 }
 
 // Function to open Google Maps directions in a new tab
 function openDirections() {
   // Build directions URL using address data
-  const destination = `${data.address?.name || "Salle Deladerriere"}, ${data.address?.city || "Libercourt"}`;
-  const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
+  const destination = `${data.address?.name || 'Salle Deladerriere'}, ${data.address?.city || 'Libercourt'}`
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`
 
   // Open directions in a new tab
-  window.open(url, "_blank");
+  window.open(url, '_blank')
 }
 
 // Fonction de navigation vers une section
 function scrollToSection(sectionId: string) {
-  const element = document.getElementById(sectionId);
+  const element = document.getElementById(sectionId)
   if (element) {
-    element.scrollIntoView({ behavior: "smooth" });
+    element.scrollIntoView({ behavior: 'smooth' })
   }
 }
 </script>

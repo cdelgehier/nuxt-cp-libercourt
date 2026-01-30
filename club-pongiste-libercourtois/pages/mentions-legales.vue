@@ -30,35 +30,32 @@
               <div>
                 <strong>{{
                   clubConfig?.club?.name || "Club Pongiste Libercourtois"
-                }}</strong
-                ><br />
+                }}</strong><br>
                 Association loi 1901
               </div>
               <div>
-                <strong>Siège social :</strong><br />
+                <strong>Siège social :</strong><br>
                 {{
                   clubConfig?.club?.complexe || "Complexe Sportif Léo Lagrange"
-                }}<br />
+                }}<br>
                 {{ clubConfig?.location?.postalCode || "62820" }}
                 {{ clubConfig?.location?.city || "Libercourt" }}
               </div>
               <div>
-                <strong>Contact :</strong><br />
+                <strong>Contact :</strong><br>
                 Email :
                 <a
                   :href="`mailto:${clubConfig?.club?.email || 'cplibercourt@gmail.com'}`"
                   class="text-club-green hover:underline"
-                  >{{ clubConfig?.club?.email || "cplibercourt@gmail.com" }}</a
-                ><br />
+                >{{ clubConfig?.club?.email || "cplibercourt@gmail.com" }}</a><br>
                 Téléphone :
                 <a
                   :href="`tel:${clubConfig?.club?.phone || '06 60 05 12 41'}`"
                   class="text-club-green hover:underline"
-                  >{{ clubConfig?.club?.phone || "06 60 05 12 41" }}</a
-                >
+                >{{ clubConfig?.club?.phone || "06 60 05 12 41" }}</a>
               </div>
               <div>
-                <strong>Responsable de la publication :</strong><br />
+                <strong>Responsable de la publication :</strong><br>
                 Secrétaires du
                 {{ clubConfig?.club?.name || "Club Pongiste Libercourtois" }}
               </div>
@@ -68,20 +65,21 @@
 
         <!-- Hébergement -->
         <div class="mb-12">
-          <h2 class="text-2xl font-bold adaptive-title mb-6">2. Hébergement</h2>
+          <h2 class="text-2xl font-bold adaptive-title mb-6">
+            2. Hébergement
+          </h2>
           <div class="adaptive-card p-6 rounded-lg">
             <div class="space-y-4 adaptive-text">
               <div>
-                <strong>Hébergeur :</strong> Netlify, Inc.<br />
+                <strong>Hébergeur :</strong> Netlify, Inc.<br>
                 <strong>Adresse :</strong> 44 Montgomery Street, Suite 300, San
-                Francisco, CA 94104, USA<br />
+                Francisco, CA 94104, USA<br>
                 <strong>Site web :</strong>
                 <a
                   href="https://netlify.com"
                   target="_blank"
                   class="text-club-green hover:underline"
-                  >netlify.com</a
-                >
+                >netlify.com</a>
               </div>
             </div>
           </div>
@@ -124,7 +122,9 @@
           <div class="adaptive-card p-6 rounded-lg">
             <div class="space-y-4 adaptive-text">
               <div>
-                <h3 class="text-lg font-semibold mb-3">Collecte des données</h3>
+                <h3 class="text-lg font-semibold mb-3">
+                  Collecte des données
+                </h3>
                 <p>
                   Le site
                   {{ clubConfig?.club?.name || "Club Pongiste Libercourtois" }}
@@ -146,7 +146,9 @@
                 </ul>
               </div>
               <div>
-                <h3 class="text-lg font-semibold mb-3">Vos droits</h3>
+                <h3 class="text-lg font-semibold mb-3">
+                  Vos droits
+                </h3>
                 <p>
                   Conformément au RGPD, vous disposez d'un droit d'accès, de
                   rectification, de suppression et de portabilité de vos données
@@ -155,10 +157,9 @@
                   <a
                     :href="`mailto:${clubConfig?.club?.email || 'cplibercourt@gmail.com'}`"
                     class="text-club-green hover:underline"
-                    >{{
-                      clubConfig?.club?.email || "cplibercourt@gmail.com"
-                    }}</a
-                  >
+                  >{{
+                    clubConfig?.club?.email || "cplibercourt@gmail.com"
+                  }}</a>
                 </p>
               </div>
             </div>
@@ -167,7 +168,9 @@
 
         <!-- Cookies -->
         <div class="mb-12">
-          <h2 class="text-2xl font-bold adaptive-title mb-6">5. Cookies</h2>
+          <h2 class="text-2xl font-bold adaptive-title mb-6">
+            5. Cookies
+          </h2>
           <div class="adaptive-card p-6 rounded-lg">
             <div class="space-y-4 adaptive-text">
               <p>
@@ -251,7 +254,9 @@
 
         <!-- Contact -->
         <div class="mb-12">
-          <h2 class="text-2xl font-bold adaptive-title mb-6">9. Contact</h2>
+          <h2 class="text-2xl font-bold adaptive-title mb-6">
+            9. Contact
+          </h2>
           <div class="adaptive-card p-6 rounded-lg">
             <div class="space-y-4 adaptive-text">
               <p>
@@ -264,14 +269,20 @@
                   :href="`mailto:${clubConfig?.club?.email || 'cplibercourt@gmail.com'}`"
                   class="inline-flex items-center px-4 py-2 bg-club-green text-white rounded-lg hover:bg-club-green/90 transition-colors"
                 >
-                  <UIcon name="i-heroicons-envelope" class="mr-2" />
+                  <UIcon
+                    name="i-heroicons-envelope"
+                    class="mr-2"
+                  />
                   Nous contacter par email
                 </a>
                 <a
                   :href="`tel:${clubConfig?.club?.phone || '06 60 05 12 41'}`"
                   class="inline-flex items-center px-4 py-2 bg-club-navy text-white rounded-lg hover:bg-club-navy/90 transition-colors"
                 >
-                  <UIcon name="i-heroicons-phone" class="mr-2" />
+                  <UIcon
+                    name="i-heroicons-phone"
+                    class="mr-2"
+                  />
                   Nous appeler
                 </a>
               </div>
@@ -293,13 +304,13 @@
 <script setup>
 // Meta tags for SEO optimization
 useSeoMeta({
-  title: "Mentions Légales - Club Pongiste Libercourtois",
+  title: 'Mentions Légales - Club Pongiste Libercourtois',
   description:
-    "Mentions légales, conditions d'utilisation et politique de confidentialité du site du Club Pongiste Libercourtois.",
+    'Mentions légales, conditions d\'utilisation et politique de confidentialité du site du Club Pongiste Libercourtois.',
   keywords:
-    "mentions légales, RGPD, données personnelles, club tennis de table, Libercourt",
-});
+    'mentions légales, RGPD, données personnelles, club tennis de table, Libercourt',
+})
 
 // Fetch club configuration from API - uses centralized config
-const { data: clubConfig } = await useFetch("/api/club/config");
+const { data: clubConfig } = await useFetch('/api/club/config')
 </script>

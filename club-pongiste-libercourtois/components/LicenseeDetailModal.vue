@@ -23,11 +23,11 @@
                 <span
                   v-if="licensee?.sexe === 'F'"
                   class="ml-2 text-pink-600 dark:text-pink-400"
-                  >♀</span
-                >
-                <span v-else class="ml-2 text-blue-600 dark:text-blue-400"
-                  >♂</span
-                >
+                >♀</span>
+                <span
+                  v-else
+                  class="ml-2 text-blue-600 dark:text-blue-400"
+                >♂</span>
               </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400">
                 Licence {{ licensee?.licence }}
@@ -43,7 +43,10 @@
         </div>
       </template>
 
-      <div v-if="loading" class="text-center py-8">
+      <div
+        v-if="loading"
+        class="text-center py-8"
+      >
         <UIcon
           name="i-heroicons-arrow-path"
           class="animate-spin text-4xl text-club-green mb-4"
@@ -53,7 +56,10 @@
         </p>
       </div>
 
-      <div v-else class="space-y-6">
+      <div
+        v-else
+        class="space-y-6"
+      >
         <!-- Informations essentielles -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
           <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
@@ -70,10 +76,11 @@
             </p>
           </div>
           <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-            <span class="text-gray-600 dark:text-gray-400 text-sm"
-              >Victoires saison</span
+            <span class="text-gray-600 dark:text-gray-400 text-sm">Victoires saison</span>
+            <p
+              class="font-bold text-lg"
+              :class="winrateColor"
             >
-            <p class="font-bold text-lg" :class="winrateColor">
               {{ seasonWinrate }}%
             </p>
             <p class="text-xs text-gray-500 dark:text-gray-400">
@@ -83,9 +90,7 @@
             </p>
           </div>
           <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-            <span class="text-gray-600 dark:text-gray-400 text-sm"
-              >Catégorie</span
-            >
+            <span class="text-gray-600 dark:text-gray-400 text-sm">Catégorie</span>
             <p class="font-bold text-lg text-purple-600 dark:text-purple-400">
               {{ decodeFfttCategory(licensee?.cat || "") || "N/A" }}
             </p>
@@ -101,7 +106,10 @@
             Évolution des points
           </h4>
           <div class="h-64">
-            <Line :data="chartData" :options="chartOptions" />
+            <Line
+              :data="chartData"
+              :options="chartOptions"
+            />
           </div>
         </div>
 
@@ -111,7 +119,10 @@
             10 derniers matchs
           </h4>
 
-          <div v-if="loadingMatches" class="text-center py-4">
+          <div
+            v-if="loadingMatches"
+            class="text-center py-4"
+          >
             <UIcon
               name="i-heroicons-arrow-path"
               class="animate-spin text-2xl text-club-green mb-2"
@@ -134,7 +145,10 @@
             </p>
           </div>
 
-          <div v-else class="space-y-4">
+          <div
+            v-else
+            class="space-y-4"
+          >
             <div
               v-for="(dateGroup, date) in groupedMatches"
               :key="date"
@@ -144,7 +158,7 @@
               <div class="flex items-center">
                 <div
                   class="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full"
-                ></div>
+                />
                 <h5
                   class="ml-3 text-sm font-semibold text-gray-900 dark:text-white"
                 >
@@ -217,7 +231,7 @@
 </template>
 
 <script setup lang="ts">
-import { Line } from "vue-chartjs";
+import { Line } from 'vue-chartjs'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -228,7 +242,7 @@ import {
   Tooltip,
   Legend,
   Filler,
-} from "chart.js";
+} from 'chart.js'
 
 // Register Chart.js components
 ChartJS.register(
@@ -240,228 +254,235 @@ ChartJS.register(
   Tooltip,
   Legend,
   Filler,
-);
+)
 
 interface PlayerMatch {
-  date: string;
-  nom: string;
-  classement: string;
-  epreuve: string;
-  victoire: string;
-  forfait: string;
+  date: string
+  nom: string
+  classement: string
+  epreuve: string
+  victoire: string
+  forfait: string
 }
 
 interface RankingHistory {
-  echelon: string;
-  place: string;
-  point: string;
-  saison: string;
-  phase: string;
+  echelon: string
+  place: string
+  point: string
+  saison: string
+  phase: string
 }
 
 interface Licensee {
-  licence: string;
-  firstName: string;
-  lastName: string;
-  sexe: string;
-  cat: string;
-  clast: string;
-  points?: number;
-  pointm?: string;
+  licence: string
+  firstName: string
+  lastName: string
+  sexe: string
+  cat: string
+  clast: string
+  points?: number
+  pointm?: string
 }
 
 interface Props {
-  modelValue: boolean;
-  licensee: Licensee | null;
+  modelValue: boolean
+  licensee: Licensee | null
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 const emit = defineEmits<{
-  "update:modelValue": [value: boolean];
-}>();
+  'update:modelValue': [value: boolean]
+}>()
 
 // Import utilities
-const { decodeFfttCategory } = useFfttCategories();
-const { calculateMatchPoints, convertRankingToPoints, getPointsBadgeStyle } =
-  usePointsCalculation();
+const { decodeFfttCategory } = useFfttCategories()
+const { calculateMatchPoints, convertRankingToPoints, getPointsBadgeStyle }
+  = usePointsCalculation()
 
 // Modal state
 const isOpen = computed({
   get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value),
-});
+  set: value => emit('update:modelValue', value),
+})
 
 // Data state
-const loading = ref(false);
-const loadingMatches = ref(false);
-const matches = ref<PlayerMatch[]>([]);
-const rankingHistory = ref<RankingHistory[]>([]);
+const loading = ref(false)
+const loadingMatches = ref(false)
+const matches = ref<PlayerMatch[]>([])
+const rankingHistory = ref<RankingHistory[]>([])
 
 // Watch for licensee changes to load data
 watch(
   () => props.licensee,
   async (newLicensee) => {
     if (newLicensee && isOpen.value) {
-      await loadLicenseeData(newLicensee.licence);
+      await loadLicenseeData(newLicensee.licence)
     }
   },
-);
+)
 
 // Watch for modal open to load data
 watch(isOpen, async (newOpen) => {
   if (newOpen && props.licensee) {
-    await loadLicenseeData(props.licensee.licence);
+    await loadLicenseeData(props.licensee.licence)
   }
-});
+})
 
 // Load licensee data
 async function loadLicenseeData(licence: string) {
-  loading.value = true;
-  loadingMatches.value = true;
+  loading.value = true
+  loadingMatches.value = true
 
   try {
     // Load matches and ranking history in parallel
     const [matchesResponse, historyResponse] = await Promise.all([
       $fetch(`/api/licensee/${licence}/matches`),
       $fetch(`/api/licensee/${licence}/ranking-history`),
-    ]);
+    ])
 
-    console.log("Matches response for licence", licence, ":", matchesResponse);
-    console.log("History response for licence", licence, ":", historyResponse);
+    console.log('Matches response for licence', licence, ':', matchesResponse)
+    console.log('History response for licence', licence, ':', historyResponse)
 
-    if (matchesResponse.success && "data" in matchesResponse) {
-      matches.value = matchesResponse.data || [];
-      console.log("Loaded matches:", matches.value.length, "matches found");
-    } else {
+    if (matchesResponse.success && 'data' in matchesResponse) {
+      matches.value = matchesResponse.data || []
+      console.log('Loaded matches:', matches.value.length, 'matches found')
+    }
+    else {
       console.error(
-        "Failed to load matches:",
-        "error" in matchesResponse ? matchesResponse.error : "Unknown error",
-      );
-      matches.value = [];
+        'Failed to load matches:',
+        'error' in matchesResponse ? matchesResponse.error : 'Unknown error',
+      )
+      matches.value = []
     }
 
-    if (historyResponse.success && "data" in historyResponse) {
-      rankingHistory.value = historyResponse.data || [];
+    if (historyResponse.success && 'data' in historyResponse) {
+      rankingHistory.value = historyResponse.data || []
       console.log(
-        "Loaded ranking history:",
+        'Loaded ranking history:',
         rankingHistory.value.length,
-        "entries found",
-      );
-    } else {
-      console.error(
-        "Failed to load ranking history:",
-        "error" in historyResponse ? historyResponse.error : "Unknown error",
-      );
-      rankingHistory.value = [];
+        'entries found',
+      )
     }
-  } catch (error) {
-    console.error("Error loading licensee data:", error);
-    matches.value = [];
-    rankingHistory.value = [];
-  } finally {
-    loading.value = false;
-    loadingMatches.value = false;
+    else {
+      console.error(
+        'Failed to load ranking history:',
+        'error' in historyResponse ? historyResponse.error : 'Unknown error',
+      )
+      rankingHistory.value = []
+    }
+  }
+  catch (error) {
+    console.error('Error loading licensee data:', error)
+    matches.value = []
+    rankingHistory.value = []
+  }
+  finally {
+    loading.value = false
+    loadingMatches.value = false
   }
 }
 
 // Calculate season winrate (September to July of next year)
 const seasonMatches = computed(() => {
   if (!matches.value || matches.value.length === 0) {
-    return [];
+    return []
   }
 
   // Current season: September 2025 to July 2026
-  const currentDate = new Date();
-  const currentYear = currentDate.getFullYear();
-  const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-based
+  const currentDate = new Date()
+  const currentYear = currentDate.getFullYear()
+  const currentMonth = currentDate.getMonth() + 1 // JavaScript months are 0-based
 
   // Determine season start year (if we're before September, we're in previous season)
-  const seasonStartYear = currentMonth >= 9 ? currentYear : currentYear - 1;
-  const seasonStart = new Date(seasonStartYear, 8, 1); // September 1st (month 8 = September)
-  const seasonEnd = new Date(seasonStartYear + 1, 6, 31); // July 31st of next year (month 6 = July)
+  const seasonStartYear = currentMonth >= 9 ? currentYear : currentYear - 1
+  const seasonStart = new Date(seasonStartYear, 8, 1) // September 1st (month 8 = September)
+  const seasonEnd = new Date(seasonStartYear + 1, 6, 31) // July 31st of next year (month 6 = July)
 
   return matches.value.filter((match) => {
-    const matchDate = parseDate(match.date);
-    return matchDate >= seasonStart && matchDate <= seasonEnd;
-  });
-});
+    const matchDate = parseDate(match.date)
+    return matchDate >= seasonStart && matchDate <= seasonEnd
+  })
+})
 
 const seasonWinrate = computed(() => {
   if (seasonMatches.value.length === 0) {
-    return "--";
+    return '--'
   }
 
   const victories = seasonMatches.value.filter(
-    (match) => match.victoire === "V",
-  ).length;
-  const winrate = Math.round((victories / seasonMatches.value.length) * 100);
-  return winrate;
-});
+    match => match.victoire === 'V',
+  ).length
+  const winrate = Math.round((victories / seasonMatches.value.length) * 100)
+  return winrate
+})
 
 const winrateColor = computed(() => {
-  const rate =
-    typeof seasonWinrate.value === "number" ? seasonWinrate.value : 0;
+  const rate
+    = typeof seasonWinrate.value === 'number' ? seasonWinrate.value : 0
 
   if (rate >= 70) {
-    return "text-green-600 dark:text-green-400";
-  } else if (rate >= 50) {
-    return "text-blue-600 dark:text-blue-400";
-  } else if (rate >= 30) {
-    return "text-orange-600 dark:text-orange-400";
-  } else {
-    return "text-red-600 dark:text-red-400";
+    return 'text-green-600 dark:text-green-400'
   }
-});
+  else if (rate >= 50) {
+    return 'text-blue-600 dark:text-blue-400'
+  }
+  else if (rate >= 30) {
+    return 'text-orange-600 dark:text-orange-400'
+  }
+  else {
+    return 'text-red-600 dark:text-red-400'
+  }
+})
 
 // Group matches by date
 const groupedMatches = computed(() => {
   if (!matches.value || matches.value.length === 0) {
-    return {};
+    return {}
   }
 
   // Sort matches by date (most recent first)
   const sortedMatches = [...matches.value].sort((a, b) => {
-    const dateA = parseDate(a.date);
-    const dateB = parseDate(b.date);
-    return dateB.getTime() - dateA.getTime();
-  });
+    const dateA = parseDate(a.date)
+    const dateB = parseDate(b.date)
+    return dateB.getTime() - dateA.getTime()
+  })
 
   // Group by date
   const grouped = sortedMatches.reduce(
     (acc, match) => {
-      const date = match.date;
+      const date = match.date
       if (!acc[date]) {
-        acc[date] = [];
+        acc[date] = []
       }
-      acc[date].push(match);
-      return acc;
+      acc[date].push(match)
+      return acc
     },
     {} as Record<string, PlayerMatch[]>,
-  );
+  )
 
-  return grouped;
-});
+  return grouped
+})
 
 // Calculate points for individual match
 const getMatchPoints = (match: PlayerMatch) => {
-  if (!props.licensee?.clast) return null;
+  if (!props.licensee?.clast) return null
 
   // Parse coefficient from string (default to 1 if not available)
-  const coefficient = match.coefchamp ? parseFloat(match.coefchamp) : 1;
+  const coefficient = match.coefchamp ? parseFloat(match.coefchamp) : 1
 
   const matchResult = {
     playerRanking: convertRankingToPoints(props.licensee.clast),
     opponentRanking: convertRankingToPoints(match.classement),
-    victory: match.victoire === "V",
+    victory: match.victoire === 'V',
     coefficient: coefficient,
-  };
+  }
 
-  const result = calculateMatchPoints(matchResult);
+  const result = calculateMatchPoints(matchResult)
   return {
     points: result.points,
     style: getPointsBadgeStyle(result.points),
-  };
-};
+  }
+}
 
 // Chart data
 const chartData = computed(() => {
@@ -469,38 +490,38 @@ const chartData = computed(() => {
     return {
       labels: [],
       datasets: [],
-    };
+    }
   }
 
   // Sort by season and phase
   const sortedHistory = [...rankingHistory.value].sort((a, b) => {
     if (a.saison !== b.saison) {
-      return a.saison.localeCompare(b.saison);
+      return a.saison.localeCompare(b.saison)
     }
-    return parseInt(a.phase) - parseInt(b.phase);
-  });
+    return parseInt(a.phase) - parseInt(b.phase)
+  })
 
-  const labels = sortedHistory.map((h) => `${h.saison} P${h.phase}`);
-  const points = sortedHistory.map((h) => parseInt(h.point) || 0);
+  const labels = sortedHistory.map(h => `${h.saison} P${h.phase}`)
+  const points = sortedHistory.map(h => parseInt(h.point) || 0)
 
   return {
     labels,
     datasets: [
       {
-        label: "Points",
+        label: 'Points',
         data: points,
-        borderColor: "rgb(59, 130, 246)",
-        backgroundColor: "rgba(59, 130, 246, 0.1)",
+        borderColor: 'rgb(59, 130, 246)',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
         fill: true,
         tension: 0.3,
-        pointBackgroundColor: "rgb(59, 130, 246)",
-        pointBorderColor: "rgb(59, 130, 246)",
+        pointBackgroundColor: 'rgb(59, 130, 246)',
+        pointBorderColor: 'rgb(59, 130, 246)',
         pointRadius: 4,
         pointHoverRadius: 6,
       },
     ],
-  };
-});
+  }
+})
 
 // Chart options
 const chartOptions = computed(() => ({
@@ -510,18 +531,18 @@ const chartOptions = computed(() => ({
     y: {
       beginAtZero: false,
       grid: {
-        color: "rgba(156, 163, 175, 0.1)",
+        color: 'rgba(156, 163, 175, 0.1)',
       },
       ticks: {
-        color: "rgb(156, 163, 175)",
+        color: 'rgb(156, 163, 175)',
       },
     },
     x: {
       grid: {
-        color: "rgba(156, 163, 175, 0.1)",
+        color: 'rgba(156, 163, 175, 0.1)',
       },
       ticks: {
-        color: "rgb(156, 163, 175)",
+        color: 'rgb(156, 163, 175)',
         maxRotation: 45,
       },
     },
@@ -531,12 +552,12 @@ const chartOptions = computed(() => ({
       display: false,
     },
     tooltip: {
-      mode: "index" as const,
+      mode: 'index' as const,
       intersect: false,
-      backgroundColor: "rgba(0, 0, 0, 0.8)",
-      titleColor: "white",
-      bodyColor: "white",
-      borderColor: "rgb(59, 130, 246)",
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      titleColor: 'white',
+      bodyColor: 'white',
+      borderColor: 'rgb(59, 130, 246)',
       borderWidth: 1,
     },
   },
@@ -545,108 +566,122 @@ const chartOptions = computed(() => ({
       borderWidth: 2,
     },
   },
-}));
+}))
 
 // Utility functions
 function getDisplayClassification(
   clast: string | number | null | undefined,
 ): string {
-  if (!clast) return "NC";
+  if (!clast) return 'NC'
 
-  const points = typeof clast === "string" ? parseInt(clast) : clast;
-  if (!points || points === 0) return "NC";
+  const points = typeof clast === 'string' ? parseInt(clast) : clast
+  if (!points || points === 0) return 'NC'
 
   if (points >= 100) {
-    return Math.floor(points / 100).toString();
+    return Math.floor(points / 100).toString()
   }
 
-  return points.toString();
+  return points.toString()
 }
 
 function getClassificationColor(clast: string | number): string {
-  let classification: number;
+  let classification: number
 
-  if (typeof clast === "string") {
-    const points = parseInt(clast) || 500;
-    classification = Math.floor(points / 100);
-  } else {
-    classification = clast >= 100 ? Math.floor(clast / 100) : clast;
+  if (typeof clast === 'string') {
+    const points = parseInt(clast) || 500
+    classification = Math.floor(points / 100)
+  }
+  else {
+    classification = clast >= 100 ? Math.floor(clast / 100) : clast
   }
 
   if (classification <= 5) {
-    return "bg-red-500";
-  } else if (classification === 6) {
-    return "bg-orange-500";
-  } else if (classification === 7) {
-    return "bg-amber-500";
-  } else if (classification === 8) {
-    return "bg-yellow-500";
-  } else if (classification === 9) {
-    return "bg-lime-500";
-  } else if (classification === 10) {
-    return "bg-green-500";
-  } else if (classification === 11) {
-    return "bg-emerald-500";
-  } else if (classification === 12) {
-    return "bg-teal-500";
-  } else if (classification === 13) {
-    return "bg-cyan-500";
-  } else if (classification === 14) {
-    return "bg-sky-500";
-  } else if (classification >= 15) {
-    return "bg-blue-500";
-  } else {
-    return "bg-gray-500";
+    return 'bg-red-500'
+  }
+  else if (classification === 6) {
+    return 'bg-orange-500'
+  }
+  else if (classification === 7) {
+    return 'bg-amber-500'
+  }
+  else if (classification === 8) {
+    return 'bg-yellow-500'
+  }
+  else if (classification === 9) {
+    return 'bg-lime-500'
+  }
+  else if (classification === 10) {
+    return 'bg-green-500'
+  }
+  else if (classification === 11) {
+    return 'bg-emerald-500'
+  }
+  else if (classification === 12) {
+    return 'bg-teal-500'
+  }
+  else if (classification === 13) {
+    return 'bg-cyan-500'
+  }
+  else if (classification === 14) {
+    return 'bg-sky-500'
+  }
+  else if (classification >= 15) {
+    return 'bg-blue-500'
+  }
+  else {
+    return 'bg-gray-500'
   }
 }
 
 function parseDate(dateString: string): Date {
-  if (!dateString) return new Date();
+  if (!dateString) return new Date()
 
   try {
     // Try parsing as DD/MM/YYYY (FFTT format)
-    const parts = dateString.split("/");
+    const parts = dateString.split('/')
     if (parts.length === 3) {
       return new Date(
         parseInt(parts[2]),
         parseInt(parts[1]) - 1,
         parseInt(parts[0]),
-      );
+      )
     }
     // Fallback to standard Date parsing
-    return new Date(dateString);
-  } catch {
-    return new Date();
+    return new Date(dateString)
+  }
+  catch {
+    return new Date()
   }
 }
 
 function formatDate(dateString: string): string {
-  if (!dateString) return "N/A";
+  if (!dateString) return 'N/A'
 
   try {
-    const date = parseDate(dateString);
-    return date.toLocaleDateString("fr-FR", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  } catch {
-    return dateString;
+    const date = parseDate(dateString)
+    return date.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+  }
+  catch {
+    return dateString
   }
 }
 
 function formatPlayerName(fullName: string): string {
-  if (!fullName) return "N/A";
+  if (!fullName) return 'N/A'
 
   // Convert "DUPONT Pierre" to "Pierre DUPONT" format
-  const parts = fullName.trim().split(" ");
+  const parts = fullName.trim().split(' ')
   if (parts.length >= 2) {
-    const lastName = parts[0];
-    const firstName = parts.slice(1).join(" ");
-    return `${firstName} ${lastName}`;
+    const lastName = parts[0]
+    const firstName = parts.slice(1).join(' ')
+    return `${firstName} ${lastName}`
   }
 
-  return fullName;
+  return fullName
 }
 </script>

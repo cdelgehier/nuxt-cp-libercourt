@@ -8,7 +8,10 @@
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="text-center py-6">
+    <div
+      v-if="loading"
+      class="text-center py-6"
+    >
       <UIcon
         name="i-heroicons-arrow-path"
         class="mx-auto h-6 w-6 text-club-green animate-spin"
@@ -64,7 +67,7 @@
               <th
                 scope="col"
                 class="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-8"
-              ></th>
+              />
             </tr>
           </thead>
           <tbody
@@ -127,7 +130,10 @@
     </div>
 
     <!-- Empty state -->
-    <div v-else class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
+    <div
+      v-else
+      class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg"
+    >
       <p class="text-sm text-gray-600 dark:text-gray-400">
         Aucun classement disponible
       </p>
@@ -157,18 +163,18 @@
 </template>
 
 <script setup lang="ts">
-import type { PoolRankingEntry } from "~/composables/usePoolRanking";
+import type { PoolRankingEntry } from '~/composables/usePoolRanking'
 
 interface Props {
-  rankings: PoolRankingEntry[];
-  loading?: boolean;
-  error?: string | null;
+  rankings: PoolRankingEntry[]
+  loading?: boolean
+  error?: string | null
 }
 
 withDefaults(defineProps<Props>(), {
   loading: false,
   error: null,
-});
+})
 
-const { getZoneIcon, getZoneColor, getZoneLabel } = usePoolRanking();
+const { getZoneIcon, getZoneColor, getZoneLabel } = usePoolRanking()
 </script>

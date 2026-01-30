@@ -20,16 +20,24 @@
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <!-- Loading State -->
-      <div v-if="pending" class="text-center py-12">
+      <div
+        v-if="pending"
+        class="text-center py-12"
+      >
         <UIcon
           name="i-heroicons-arrow-path"
           class="mx-auto h-12 w-12 text-club-green animate-spin"
         />
-        <p class="mt-2 adaptive-text">Chargement du calendrier...</p>
+        <p class="mt-2 adaptive-text">
+          Chargement du calendrier...
+        </p>
       </div>
 
       <!-- Error State -->
-      <div v-else-if="error" class="text-center py-12">
+      <div
+        v-else-if="error"
+        class="text-center py-12"
+      >
         <div class="rounded-md bg-red-50 p-4 max-w-md mx-auto">
           <svg
             class="mx-auto h-12 w-12 text-red-500"
@@ -208,7 +216,7 @@
                 type="text"
                 class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-club-green focus:border-club-green adaptive-text"
                 placeholder="Rechercher... (ex: Adulte, cp 1, Septembre)"
-              />
+              >
               <div
                 v-if="searchQuery"
                 class="absolute inset-y-0 right-0 pr-3 flex items-center"
@@ -217,7 +225,10 @@
                   class="text-gray-400 hover:text-gray-600 focus:outline-none"
                   @click="searchQuery = ''"
                 >
-                  <UIcon name="i-heroicons-x-mark" class="h-5 w-5" />
+                  <UIcon
+                    name="i-heroicons-x-mark"
+                    class="h-5 w-5"
+                  />
                 </button>
               </div>
             </div>
@@ -235,7 +246,10 @@
         </div>
 
         <!-- Events with Open Registration -->
-        <div v-if="eventsWithOpenRegistration.length > 0" class="mb-12">
+        <div
+          v-if="eventsWithOpenRegistration.length > 0"
+          class="mb-12"
+        >
           <div class="flex items-center mb-6">
             <svg
               class="h-6 w-6 text-green-600 mr-2"
@@ -265,7 +279,10 @@
         </div>
 
         <!-- Upcoming Events with Closed Registration -->
-        <div v-if="upcomingEventsClosedRegistration.length > 0" class="mb-12">
+        <div
+          v-if="upcomingEventsClosedRegistration.length > 0"
+          class="mb-12"
+        >
           <div class="flex items-center mb-6">
             <svg
               class="h-6 w-6 text-gray-500 mr-2"
@@ -311,9 +328,9 @@
         <!-- Empty State -->
         <div
           v-if="
-            !eventsWithOpenRegistration.length &&
-            !upcomingEventsClosedRegistration.length &&
-            !pastEvents.length
+            !eventsWithOpenRegistration.length
+              && !upcomingEventsClosedRegistration.length
+              && !pastEvents.length
           "
           class="text-center py-12"
         >
@@ -352,39 +369,39 @@
 </template>
 
 <script setup lang="ts">
-import type { CalendarEvent } from "~/types";
-import EventCard from "~/components/Events/EventCard.vue";
-import RegistrationModal from "~/components/Events/RegistrationModal.vue";
+import type { CalendarEvent } from '~/types'
+import EventCard from '~/components/Events/EventCard.vue'
+import RegistrationModal from '~/components/Events/RegistrationModal.vue'
 
 // Data fetching
-const { data, pending, error, refresh } = useLazyFetch("/api/events/calendar");
+const { data, pending, error, refresh } = useLazyFetch('/api/events/calendar')
 
 // Search and filter functionality
-const searchQuery = ref("");
+const searchQuery = ref('')
 
 // Function to check if event matches search query
 const eventMatchesSearch = (event: CalendarEvent, query: string): boolean => {
-  if (!query.trim()) return true;
+  if (!query.trim()) return true
 
-  const searchTerms = query.toLowerCase().trim();
+  const searchTerms = query.toLowerCase().trim()
 
   // Get event date and format it for month name matching
-  const eventDate = new Date(event.date);
+  const eventDate = new Date(event.date)
   const monthNames = [
-    "janvier",
-    "février",
-    "mars",
-    "avril",
-    "mai",
-    "juin",
-    "juillet",
-    "août",
-    "septembre",
-    "octobre",
-    "novembre",
-    "décembre",
-  ];
-  const monthName = monthNames[eventDate.getMonth()];
+    'janvier',
+    'février',
+    'mars',
+    'avril',
+    'mai',
+    'juin',
+    'juillet',
+    'août',
+    'septembre',
+    'octobre',
+    'novembre',
+    'décembre',
+  ]
+  const monthName = monthNames[eventDate.getMonth()]
 
   // Create searchable text from all event properties
   const searchableText = [
@@ -398,144 +415,144 @@ const eventMatchesSearch = (event: CalendarEvent, query: string): boolean => {
     event.contact?.role,
   ]
     .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
+    .join(' ')
+    .toLowerCase()
 
   // Check if search terms match any part of the event data
-  return searchableText.includes(searchTerms);
-};
+  return searchableText.includes(searchTerms)
+}
 
 // Load club configuration for dynamic content
-const { data: clubConfig } = await useFetch("/api/club/config");
+const { data: clubConfig } = await useFetch('/api/club/config')
 
 // SEO with dynamic club name
 useHead({
-  title: `Calendrier des Événements - ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"}`,
+  title: `Calendrier des Événements - ${clubConfig.value?.club?.name || 'Club Pongiste Libercourtois'}`,
   meta: [
     {
-      name: "description",
-      content: `Découvrez le calendrier complet des événements, tournois et compétitions du ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"}.`,
+      name: 'description',
+      content: `Découvrez le calendrier complet des événements, tournois et compétitions du ${clubConfig.value?.club?.name || 'Club Pongiste Libercourtois'}.`,
     },
   ],
-});
+})
 
 // SEO with dynamic club name
 useHead({
-  title: `Calendrier des Événements - ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"}`,
+  title: `Calendrier des Événements - ${clubConfig.value?.club?.name || 'Club Pongiste Libercourtois'}`,
   meta: [
     {
-      name: "description",
-      content: `Découvrez le calendrier complet des événements, tournois et compétitions du ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"}.`,
+      name: 'description',
+      content: `Découvrez le calendrier complet des événements, tournois et compétitions du ${clubConfig.value?.club?.name || 'Club Pongiste Libercourtois'}.`,
     },
   ],
-});
+})
 
 // Registration modal state
-const showRegistrationModal = ref(false);
-const selectedEvent = ref<CalendarEvent | null>(null);
+const showRegistrationModal = ref(false)
+const selectedEvent = ref<CalendarEvent | null>(null)
 
 // Computed properties with smart event logic
-const referenceDate = new Date();
+const referenceDate = new Date()
 
 // Events with open registration (future deadline and registrationOpen)
 const eventsWithOpenRegistration = computed(() => {
-  if (!data.value?.events) return [];
+  if (!data.value?.events) return []
   return data.value.events
     .filter((event: CalendarEvent) => {
-      const eventDate = new Date(event.date);
+      const eventDate = new Date(event.date)
       // If no registration deadline, use event date as deadline
       const deadlineDate = event.registrationDeadline
         ? new Date(event.registrationDeadline)
-        : eventDate;
+        : eventDate
 
-      const meetsDateCriteria =
-        eventDate >= referenceDate &&
-        deadlineDate >= referenceDate &&
-        event.registrationOpen;
+      const meetsDateCriteria
+        = eventDate >= referenceDate
+          && deadlineDate >= referenceDate
+          && event.registrationOpen
 
       // Apply search filter
-      return meetsDateCriteria && eventMatchesSearch(event, searchQuery.value);
+      return meetsDateCriteria && eventMatchesSearch(event, searchQuery.value)
     })
     .sort((a: CalendarEvent, b: CalendarEvent) => {
       // Sort by event date (earliest first)
-      return new Date(a.date).getTime() - new Date(b.date).getTime();
-    });
-});
+      return new Date(a.date).getTime() - new Date(b.date).getTime()
+    })
+})
 
 // Future events with closed registration (deadline passed or registrationOpen false)
 const upcomingEventsClosedRegistration = computed(() => {
-  if (!data.value?.events) return [];
+  if (!data.value?.events) return []
   return data.value.events
     .filter((event: CalendarEvent) => {
-      const eventDate = new Date(event.date);
+      const eventDate = new Date(event.date)
       // If no registration deadline, use event date as deadline
       const deadlineDate = event.registrationDeadline
         ? new Date(event.registrationDeadline)
-        : eventDate;
+        : eventDate
 
-      const meetsDateCriteria =
-        eventDate >= referenceDate &&
-        (deadlineDate < referenceDate || !event.registrationOpen);
+      const meetsDateCriteria
+        = eventDate >= referenceDate
+          && (deadlineDate < referenceDate || !event.registrationOpen)
 
       // Apply search filter
-      return meetsDateCriteria && eventMatchesSearch(event, searchQuery.value);
+      return meetsDateCriteria && eventMatchesSearch(event, searchQuery.value)
     })
     .sort((a: CalendarEvent, b: CalendarEvent) => {
       // Sort by event date (earliest first)
-      return new Date(a.date).getTime() - new Date(b.date).getTime();
-    });
-});
+      return new Date(a.date).getTime() - new Date(b.date).getTime()
+    })
+})
 
 // Past events (event date has passed)
 const pastEvents = computed(() => {
-  if (!data.value?.events) return [];
+  if (!data.value?.events) return []
   return data.value.events
     .filter((event: CalendarEvent) => {
-      const eventDate = new Date(event.date);
-      const meetsDateCriteria = eventDate < referenceDate;
+      const eventDate = new Date(event.date)
+      const meetsDateCriteria = eventDate < referenceDate
 
       // Apply search filter
-      return meetsDateCriteria && eventMatchesSearch(event, searchQuery.value);
+      return meetsDateCriteria && eventMatchesSearch(event, searchQuery.value)
     })
     .sort((a: CalendarEvent, b: CalendarEvent) => {
       // Sort by event date (most recent first for past events)
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
-});
+      return new Date(b.date).getTime() - new Date(a.date).getTime()
+    })
+})
 
 // Events with registration deadline approaching (within 7 days)
 const eventsWithApproachingDeadline = computed(() => {
-  if (!data.value?.events) return [];
+  if (!data.value?.events) return []
   const sevenDaysFromNow = new Date(
     referenceDate.getTime() + 7 * 24 * 60 * 60 * 1000,
-  );
+  )
   return eventsWithOpenRegistration.value.filter((event: CalendarEvent) => {
-    if (!event.registrationDeadline) return false;
-    const registrationDeadline = new Date(event.registrationDeadline);
-    return registrationDeadline <= sevenDaysFromNow;
-  });
-});
+    if (!event.registrationDeadline) return false
+    const registrationDeadline = new Date(event.registrationDeadline)
+    return registrationDeadline <= sevenDaysFromNow
+  })
+})
 
 // Total count of filtered events for search results display
 const filteredEventsCount = computed(() => {
-  if (!searchQuery.value.trim()) return null;
+  if (!searchQuery.value.trim()) return null
 
-  const totalFilteredEvents =
-    eventsWithOpenRegistration.value.length +
-    upcomingEventsClosedRegistration.value.length +
-    pastEvents.value.length;
+  const totalFilteredEvents
+    = eventsWithOpenRegistration.value.length
+      + upcomingEventsClosedRegistration.value.length
+      + pastEvents.value.length
 
-  return totalFilteredEvents;
-});
+  return totalFilteredEvents
+})
 
 // Event handlers
 function handleRegister(event: CalendarEvent) {
-  selectedEvent.value = event;
-  showRegistrationModal.value = true;
+  selectedEvent.value = event
+  showRegistrationModal.value = true
 }
 
 function onRegister(_data: any) {
-  showRegistrationModal.value = false;
-  selectedEvent.value = null;
+  showRegistrationModal.value = false
+  selectedEvent.value = null
 }
 </script>

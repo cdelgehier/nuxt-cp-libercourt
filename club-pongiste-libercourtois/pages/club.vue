@@ -20,7 +20,9 @@
               <div class="text-3xl font-bold text-club-yellow">
                 {{ pending ? "..." : clubStats?.licencies }}
               </div>
-              <div class="text-sm text-gray-300">Licenciés</div>
+              <div class="text-sm text-gray-300">
+                Licenciés
+              </div>
             </div>
             <div
               class="bg-white/10 backdrop-blur-sm rounded-lg p-4 min-w-[120px]"
@@ -28,7 +30,9 @@
               <div class="text-3xl font-bold text-club-yellow">
                 {{ pending ? "..." : clubStats?.equipes }}
               </div>
-              <div class="text-sm text-gray-300">Équipes</div>
+              <div class="text-sm text-gray-300">
+                Équipes
+              </div>
             </div>
             <div
               class="bg-white/10 backdrop-blur-sm rounded-lg p-4 min-w-[120px]"
@@ -36,7 +40,9 @@
               <div class="text-3xl font-bold text-club-yellow">
                 {{ pending ? "..." : clubStats?.annees }}
               </div>
-              <div class="text-sm text-gray-300">Années</div>
+              <div class="text-sm text-gray-300">
+                Années
+              </div>
             </div>
           </div>
         </div>
@@ -76,7 +82,7 @@
               loading="lazy"
               width="1024"
               height="1024"
-            />
+            >
           </div>
         </div>
       </div>
@@ -86,7 +92,9 @@
     <section class="py-16 page-section">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold adaptive-title mb-4">Notre Mission</h2>
+          <h2 class="text-3xl font-bold adaptive-title mb-4">
+            Notre Mission
+          </h2>
           <p class="text-lg adaptive-text max-w-3xl mx-auto">
             {{ clubInfo.mission }}
           </p>
@@ -150,9 +158,7 @@
                   name="i-heroicons-rectangle-group"
                   class="text-club-green text-xl"
                 />
-                <span class="text-lg adaptive-text-primary"
-                  >{{ clubInfo.facilities.tables }} tables de compétition</span
-                >
+                <span class="text-lg adaptive-text-primary">{{ clubInfo.facilities.tables }} tables de compétition</span>
               </div>
             </div>
 
@@ -197,7 +203,7 @@
                     :loading="index === 0 ? 'eager' : 'lazy'"
                     width="4624"
                     height="2080"
-                  />
+                  >
                 </div>
 
                 <!-- Boutons de navigation -->
@@ -256,7 +262,9 @@
     <section class="py-16 page-section">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold adaptive-title mb-4">Lieu et Accès</h2>
+          <h2 class="text-3xl font-bold adaptive-title mb-4">
+            Lieu et Accès
+          </h2>
           <p class="text-xl adaptive-text max-w-2xl mx-auto">
             Retrouvez-nous facilement dans notre salle moderne au cœur de
             Libercourt
@@ -269,13 +277,18 @@
             <h3
               class="text-2xl font-bold adaptive-title mb-6 flex items-center"
             >
-              <UIcon name="i-heroicons-map-pin" class="mr-3 text-club-green" />
+              <UIcon
+                name="i-heroicons-map-pin"
+                class="mr-3 text-club-green"
+              />
               Informations d'accès
             </h3>
 
             <div class="space-y-6">
               <div>
-                <h4 class="adaptive-subtitle mb-2">Adresse</h4>
+                <h4 class="adaptive-subtitle mb-2">
+                  Adresse
+                </h4>
                 <div class="adaptive-text-primary">
                   <div class="font-medium">
                     {{ clubInfo.facilities.location }}
@@ -312,13 +325,18 @@
             <h3
               class="text-2xl font-bold adaptive-title mb-6 flex items-center"
             >
-              <UIcon name="i-heroicons-home" class="mr-3 text-club-green" />
+              <UIcon
+                name="i-heroicons-home"
+                class="mr-3 text-club-green"
+              />
               Équipements & Transport
             </h3>
 
             <div class="space-y-6">
               <div>
-                <h4 class="adaptive-subtitle mb-3">Équipements disponibles</h4>
+                <h4 class="adaptive-subtitle mb-3">
+                  Équipements disponibles
+                </h4>
                 <ul class="space-y-2">
                   <li
                     v-for="item in clubInfo.facilities.equipment"
@@ -342,7 +360,10 @@
                   class="font-semibold"
                   @click="openGoogleMaps"
                 >
-                  <UIcon name="i-heroicons-map" class="mr-2" />
+                  <UIcon
+                    name="i-heroicons-map"
+                    class="mr-2"
+                  />
                   Voir sur Google Maps
                 </UButton>
 
@@ -354,7 +375,10 @@
                   class="font-semibold"
                   @click="openDirections"
                 >
-                  <UIcon name="i-heroicons-map-pin" class="mr-2" />
+                  <UIcon
+                    name="i-heroicons-map-pin"
+                    class="mr-2"
+                  />
                   Calculer l'itinéraire
                 </UButton>
               </div>
@@ -381,7 +405,10 @@
             size="lg"
             class="font-semibold"
           >
-            <UIcon name="i-heroicons-phone" class="mr-2" />
+            <UIcon
+              name="i-heroicons-phone"
+              class="mr-2"
+            />
             Nous contacter
           </UButton>
           <UButton
@@ -391,7 +418,10 @@
             size="lg"
             class="font-semibold bg-white text-club-navy hover:bg-gray-100 border-0 dark:bg-gray-100 dark:text-club-navy dark:hover:bg-gray-200"
           >
-            <UIcon name="i-heroicons-clock" class="mr-2" />
+            <UIcon
+              name="i-heroicons-clock"
+              class="mr-2"
+            />
             Voir les horaires
           </UButton>
         </div>
@@ -403,139 +433,139 @@
 <script setup lang="ts">
 // Interface for club statistics
 interface ClubStats {
-  licencies: number;
-  equipes: number;
-  annees: number;
-  lastUpdated: string;
+  licencies: number
+  equipes: number
+  annees: number
+  lastUpdated: string
 }
 
 // Fetch club statistics from API (real-time data)
 const { data: clubStats, pending } = await useLazyFetch<ClubStats>(
-  "/api/club/stats",
+  '/api/club/stats',
   {
-    key: "club-page-stats",
+    key: 'club-page-stats',
   },
-);
+)
 
 // Chargement des informations du club (static data)
-const clubInfo = await $fetch("/api/club/about");
+const clubInfo = await $fetch('/api/club/about')
 
 // Load club configuration for Google Maps links
-const clubConfig = await $fetch("/api/club/config");
-const locationData = clubConfig.location;
+const clubConfig = await $fetch('/api/club/config')
+const locationData = clubConfig.location
 
 // Configuration SEO using dynamic club name
 useSeoMeta({
-  title: "À propos du Club",
-  description: `Découvrez l'histoire, la mission et l'équipe du ${clubConfig?.club?.name || "Club Pongiste Libercourtois"}. Plus de 50 ans de passion pour le tennis de table à Libercourt.`,
+  title: 'À propos du Club',
+  description: `Découvrez l'histoire, la mission et l'équipe du ${clubConfig?.club?.name || 'Club Pongiste Libercourtois'}. Plus de 50 ans de passion pour le tennis de table à Libercourt.`,
   keywords:
-    "club tennis de table, histoire, équipe dirigeante, Libercourt, installations",
-});
+    'club tennis de table, histoire, équipe dirigeante, Libercourt, installations',
+})
 
 // Images du carousel des installations
 const facilityImages = [
   {
-    src: "/images/salle-deladerriere.jpg",
-    alt: "Vue de la salle depuis le fond",
+    src: '/images/salle-deladerriere.jpg',
+    alt: 'Vue de la salle depuis le fond',
   },
   {
-    src: "/images/salle-deladerriere-1.jpg",
-    alt: "Vue de la salle depuis l'entree",
+    src: '/images/salle-deladerriere-1.jpg',
+    alt: 'Vue de la salle depuis l\'entree',
   },
   {
-    src: "/images/grande-salle.jpg",
-    alt: "Vue d'ensemble de la grande salle",
+    src: '/images/grande-salle.jpg',
+    alt: 'Vue d\'ensemble de la grande salle',
   },
-];
+]
 
 // Gestion du carousel d'images
-const currentImageIndex = ref(0);
+const currentImageIndex = ref(0)
 
 // Fonctions de navigation du carousel
 function nextImage() {
-  currentImageIndex.value =
-    (currentImageIndex.value + 1) % facilityImages.length;
-  pauseAutoPlay();
+  currentImageIndex.value
+    = (currentImageIndex.value + 1) % facilityImages.length
+  pauseAutoPlay()
 }
 
 function previousImage() {
-  currentImageIndex.value =
-    currentImageIndex.value === 0
+  currentImageIndex.value
+    = currentImageIndex.value === 0
       ? facilityImages.length - 1
-      : currentImageIndex.value - 1;
-  pauseAutoPlay();
+      : currentImageIndex.value - 1
+  pauseAutoPlay()
 }
 
 function goToImage(index: number) {
-  currentImageIndex.value = index;
-  pauseAutoPlay();
+  currentImageIndex.value = index
+  pauseAutoPlay()
 }
 
 // Auto-play du carousel avec gestion des interactions
-let intervalId: NodeJS.Timeout | null = null;
+let intervalId: NodeJS.Timeout | null = null
 
 function pauseAutoPlay() {
   if (intervalId) {
-    clearInterval(intervalId);
+    clearInterval(intervalId)
   }
   // Resume auto-play after 10 seconds of inactivity
   setTimeout(() => {
-    startAutoPlay();
-  }, 10000);
+    startAutoPlay()
+  }, 10000)
 }
 
 function startAutoPlay() {
   if (intervalId) {
-    clearInterval(intervalId);
+    clearInterval(intervalId)
   }
   intervalId = setInterval(() => {
-    currentImageIndex.value =
-      (currentImageIndex.value + 1) % facilityImages.length;
-  }, 5000); // Change d'image toutes les 5 secondes
+    currentImageIndex.value
+      = (currentImageIndex.value + 1) % facilityImages.length
+  }, 5000) // Change d'image toutes les 5 secondes
 }
 
 onMounted(() => {
   // Start auto-play after 3 seconds
   setTimeout(() => {
-    startAutoPlay();
-  }, 3000);
-});
+    startAutoPlay()
+  }, 3000)
+})
 
 onUnmounted(() => {
   if (intervalId) {
-    clearInterval(intervalId);
+    clearInterval(intervalId)
   }
-});
+})
 
 // Utilitaires pour l'affichage
 function getValueIcon(index: number): string {
   const icons = [
-    "i-heroicons-users",
-    "i-heroicons-heart",
-    "i-heroicons-arrow-trending-up",
-    "i-heroicons-face-smile",
-    "i-heroicons-academic-cap",
-  ];
-  return icons[index] || "i-heroicons-star";
+    'i-heroicons-users',
+    'i-heroicons-heart',
+    'i-heroicons-arrow-trending-up',
+    'i-heroicons-face-smile',
+    'i-heroicons-academic-cap',
+  ]
+  return icons[index] || 'i-heroicons-star'
 }
 
 // Functions to handle Google Maps links
 function openGoogleMaps() {
   // Use the URL from club configuration or build one with coordinates
-  const url =
-    locationData.googleMapsUrl ||
-    `https://www.google.com/maps/place/@${locationData.coordinates.lat},${locationData.coordinates.lng},17z`;
+  const url
+    = locationData.googleMapsUrl
+      || `https://www.google.com/maps/place/@${locationData.coordinates.lat},${locationData.coordinates.lng},17z`
 
   // Open Google Maps in a new tab
-  window.open(url, "_blank");
+  window.open(url, '_blank')
 }
 
 function openDirections() {
   // Build directions URL using club location data
-  const destination = `${locationData.name}, ${locationData.city}`;
-  const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
+  const destination = `${locationData.name}, ${locationData.city}`
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`
 
   // Open directions in a new tab
-  window.open(url, "_blank");
+  window.open(url, '_blank')
 }
 </script>

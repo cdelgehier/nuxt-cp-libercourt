@@ -3,36 +3,36 @@
 
 export interface ClubConfig {
   club: {
-    name: string;
-    id: string;
-    salle: string;
-    complexe: string;
-    email: string;
-    phone: string;
-    website: string;
-    description: string;
-  };
+    name: string
+    id: string
+    salle: string
+    complexe: string
+    email: string
+    phone: string
+    website: string
+    description: string
+  }
   social: {
     facebook: {
-      name: string;
-      url: string;
-      icon: string;
-      platform: string;
-    };
-  };
+      name: string
+      url: string
+      icon: string
+      platform: string
+    }
+  }
   location: {
-    name: string;
-    salle: string;
-    complexe: string;
-    street: string;
-    postalCode: string;
-    city: string;
-    country: string;
+    name: string
+    salle: string
+    complexe: string
+    street: string
+    postalCode: string
+    city: string
+    country: string
     coordinates: {
-      lat: number;
-      lng: number;
-    };
-  };
+      lat: number
+      lng: number
+    }
+  }
 }
 
 export const useClubConfig = () => {
@@ -41,22 +41,22 @@ export const useClubConfig = () => {
     data: clubConfig,
     pending,
     error,
-  } = useLazyFetch<ClubConfig>("/api/club/config");
+  } = useLazyFetch<ClubConfig>('/api/club/config')
 
   // Computed values for easy access to common club info
   const clubName = computed(
-    () => clubConfig.value?.club?.name || "Club Pongiste Libercourtois",
-  );
+    () => clubConfig.value?.club?.name || 'Club Pongiste Libercourtois',
+  )
   const clubDescription = computed(
-    () => clubConfig.value?.club?.description || "Club de tennis de table",
-  );
+    () => clubConfig.value?.club?.description || 'Club de tennis de table',
+  )
   const clubEmail = computed(
-    () => clubConfig.value?.club?.email || "contact@club.fr",
-  );
-  const clubPhone = computed(() => clubConfig.value?.club?.phone || "");
+    () => clubConfig.value?.club?.email || 'contact@club.fr',
+  )
+  const clubPhone = computed(() => clubConfig.value?.club?.phone || '')
   const clubLocation = computed(
-    () => clubConfig.value?.location?.name || "Salle de sport",
-  );
+    () => clubConfig.value?.location?.name || 'Salle de sport',
+  )
 
   return {
     clubConfig,
@@ -68,5 +68,5 @@ export const useClubConfig = () => {
     clubEmail,
     clubPhone,
     clubLocation,
-  };
-};
+  }
+}

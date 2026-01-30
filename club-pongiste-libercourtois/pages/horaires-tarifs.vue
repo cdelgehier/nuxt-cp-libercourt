@@ -19,7 +19,10 @@
     </section>
 
     <!-- Training schedules -->
-    <section id="schedules" class="py-16 page-section">
+    <section
+      id="schedules"
+      class="py-16 page-section"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
           <h2 class="text-3xl font-bold adaptive-title mb-4">
@@ -106,10 +109,15 @@
     </section>
 
     <!-- Tarifs -->
-    <section id="pricing" class="py-16 adaptive-bg-secondary">
+    <section
+      id="pricing"
+      class="py-16 adaptive-bg-secondary"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold adaptive-title mb-4">Nos Tarifs</h2>
+          <h2 class="text-3xl font-bold adaptive-title mb-4">
+            Nos Tarifs
+          </h2>
           <p class="text-lg adaptive-text max-w-3xl mx-auto">
             Des tarifs accessibles pour une pratique de qualité, avec de
             nombreux avantages inclus
@@ -135,7 +143,9 @@
               <div class="text-4xl font-bold text-club-yellow">
                 {{ pricing.price }}€
               </div>
-              <div class="text-sm text-gray-200">par an</div>
+              <div class="text-sm text-gray-200">
+                par an
+              </div>
             </div>
             <div class="p-6">
               <ul class="space-y-3">
@@ -204,9 +214,7 @@
               <div
                 class="w-16 h-16 bg-club-yellow rounded-full flex items-center justify-center mx-auto mb-4"
               >
-                <span class="text-club-navy font-bold text-xl"
-                  >{{ reduction.amount }}€</span
-                >
+                <span class="text-club-navy font-bold text-xl">{{ reduction.amount }}€</span>
               </div>
               <h4 class="font-bold text-club-yellow mb-2">
                 {{ reduction.type }}
@@ -252,14 +260,18 @@
 
           <div class="space-y-6">
             <div>
-              <h4 class="adaptive-subtitle mb-2">Période d'inscription</h4>
+              <h4 class="adaptive-subtitle mb-2">
+                Période d'inscription
+              </h4>
               <p class="adaptive-text-primary">
                 {{ data.registration.period }}
               </p>
             </div>
 
             <div>
-              <h4 class="adaptive-subtitle mb-3">Documents requis</h4>
+              <h4 class="adaptive-subtitle mb-3">
+                Documents requis
+              </h4>
               <div class="space-y-3">
                 <div
                   v-for="document in data.registration.documents"
@@ -328,15 +340,16 @@
                       target="_blank"
                       class="underline hover:text-blue-600"
                     >
-                      site officiel FFTT </a
-                    >.
+                      site officiel FFTT </a>.
                   </div>
                 </div>
               </div>
             </div>
 
             <div class="highlight-card rounded-lg p-4 border border-club-green">
-              <h4 class="adaptive-subtitle mb-2">Contact Inscriptions</h4>
+              <h4 class="adaptive-subtitle mb-2">
+                Contact Inscriptions
+              </h4>
               <div class="space-y-1 text-sm">
                 <div class="font-medium adaptive-text-primary">
                   {{ data.registration.contact.responsible }}
@@ -345,11 +358,17 @@
                   {{ data.registration.contact.role }}
                 </div>
                 <div class="flex items-center adaptive-text-primary">
-                  <UIcon name="i-heroicons-envelope" class="mr-2" />
+                  <UIcon
+                    name="i-heroicons-envelope"
+                    class="mr-2"
+                  />
                   {{ data.registration.contact.email }}
                 </div>
                 <div class="flex items-center adaptive-text-primary">
-                  <UIcon name="i-heroicons-phone" class="mr-2" />
+                  <UIcon
+                    name="i-heroicons-phone"
+                    class="mr-2"
+                  />
                   {{ data.registration.contact.phone }}
                 </div>
                 <div class="adaptive-text italic">
@@ -379,7 +398,10 @@
             size="lg"
             class="font-semibold"
           >
-            <UIcon name="i-heroicons-phone" class="mr-2" />
+            <UIcon
+              name="i-heroicons-phone"
+              class="mr-2"
+            />
             Nous contacter
           </UButton>
           <UButton
@@ -389,7 +411,10 @@
             size="lg"
             class="font-semibold"
           >
-            <UIcon name="i-heroicons-information-circle" class="mr-2" />
+            <UIcon
+              name="i-heroicons-information-circle"
+              class="mr-2"
+            />
             En savoir plus sur le club
           </UButton>
         </div>
@@ -400,28 +425,28 @@
 
 <script setup lang="ts">
 // Load club configuration for dynamic content
-const { data: clubConfig } = await useFetch("/api/club/config");
+const { data: clubConfig } = await useFetch('/api/club/config')
 
 // Configuration SEO with dynamic club name
 useSeoMeta({
-  title: "Horaires et Tarifs",
-  description: `Découvrez les horaires d'entraînement et les tarifs du ${clubConfig.value?.club?.name || "Club Pongiste Libercourtois"}. Des créneaux adaptés à tous les âges et tous les niveaux.`,
+  title: 'Horaires et Tarifs',
+  description: `Découvrez les horaires d'entraînement et les tarifs du ${clubConfig.value?.club?.name || 'Club Pongiste Libercourtois'}. Des créneaux adaptés à tous les âges et tous les niveaux.`,
   keywords:
-    "horaires tennis de table, tarifs club, entraînement ping-pong, créneaux Libercourt, inscription club",
-});
+    'horaires tennis de table, tarifs club, entraînement ping-pong, créneaux Libercourt, inscription club',
+})
 
 // Load schedule and pricing data
-const data = await $fetch("/api/club/schedules-pricing");
+const data = await $fetch('/api/club/schedules-pricing')
 
 // Function to get icon based on document type
 function getDocumentIcon(type: string): string {
   const icons: Record<string, string> = {
-    form: "i-heroicons-document-text",
-    fftt: "i-heroicons-building-office",
-    medical: "i-heroicons-heart",
-    contact: "i-heroicons-at-symbol",
-    payment: "i-heroicons-credit-card",
-  };
-  return icons[type] || "i-heroicons-document";
+    form: 'i-heroicons-document-text',
+    fftt: 'i-heroicons-building-office',
+    medical: 'i-heroicons-heart',
+    contact: 'i-heroicons-at-symbol',
+    payment: 'i-heroicons-credit-card',
+  }
+  return icons[type] || 'i-heroicons-document'
 }
 </script>

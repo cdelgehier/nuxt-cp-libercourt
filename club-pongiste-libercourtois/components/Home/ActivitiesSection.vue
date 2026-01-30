@@ -3,7 +3,9 @@
   <section class="py-16 page-section">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold adaptive-title mb-4">Nos Activités</h2>
+        <h2 class="text-3xl font-bold adaptive-title mb-4">
+          Nos Activités
+        </h2>
         <p class="text-lg adaptive-text max-w-2xl mx-auto">
           Du loisir à la compétition, découvrez toutes nos activités adaptées à
           chaque âge et niveau.
@@ -20,7 +22,10 @@
             <div
               class="inline-flex items-center justify-center w-16 h-16 bg-club-yellow/10 rounded-full"
             >
-              <UIcon :name="activity.icon" class="text-2xl text-club-green" />
+              <UIcon
+                :name="activity.icon"
+                class="text-2xl text-club-green"
+              />
             </div>
             <h3 class="text-xl font-semibold adaptive-title">
               {{ activity.title }}
@@ -43,10 +48,10 @@
 </template>
 
 <script setup lang="ts">
-import type { Activity } from "~/schemas";
+import type { Activity } from '~/schemas'
 
 // Accept activities as prop from parent component
 defineProps<{
-  activities: Activity[];
-}>();
+  activities: Activity[]
+}>()
 </script>

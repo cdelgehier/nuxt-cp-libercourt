@@ -26,19 +26,19 @@
 
 // SEO configuration for home page
 useSeoMeta({
-  title: "Accueil",
+  title: 'Accueil',
   description:
-    "Club Pongiste Libercourtois - Club de tennis de table convivial à Libercourt depuis 1970. Activités pour tous âges et niveaux.",
+    'Club Pongiste Libercourtois - Club de tennis de table convivial à Libercourt depuis 1970. Activités pour tous âges et niveaux.',
   keywords:
-    "tennis de table, ping-pong, club sportif, Libercourt, activités jeunes adultes",
-});
+    'tennis de table, ping-pong, club sportif, Libercourt, activités jeunes adultes',
+})
 
 // Load sponsors data using composable with Zod validation
-const { sponsors } = await useSponsors();
+const { sponsors } = await useSponsors()
 
 // Load activities data using composable with Zod validation
-const { activities } = await useActivities();
+const { activities } = await useActivities()
 
 // Load upcoming events using composable with Zod validation
-const { events: upcomingEvents } = await useUpcomingEvents(3);
+const { events: upcomingEvents } = await useUpcomingEvents(3)
 </script>

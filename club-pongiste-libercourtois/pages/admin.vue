@@ -22,19 +22,27 @@
       <!-- Statistiques principales -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="card-club text-center">
-          <h3 class="text-lg font-semibold text-club-navy mb-2">Licenciés</h3>
+          <h3 class="text-lg font-semibold text-club-navy mb-2">
+            Licenciés
+          </h3>
           <div class="text-3xl font-bold text-club-green">
             {{ pending ? "Chargement..." : clubStats?.licencies }}
           </div>
-          <p class="text-sm text-gray-600 mt-2">Mis à jour en temps réel</p>
+          <p class="text-sm text-gray-600 mt-2">
+            Mis à jour en temps réel
+          </p>
         </div>
 
         <div class="card-club text-center">
-          <h3 class="text-lg font-semibold text-club-navy mb-2">Équipes</h3>
+          <h3 class="text-lg font-semibold text-club-navy mb-2">
+            Équipes
+          </h3>
           <div class="text-3xl font-bold text-club-green">
             {{ pending ? "Chargement..." : clubStats?.equipes }}
           </div>
-          <p class="text-sm text-gray-600 mt-2">Championnat en cours</p>
+          <p class="text-sm text-gray-600 mt-2">
+            Championnat en cours
+          </p>
         </div>
 
         <div class="card-club text-center">
@@ -44,7 +52,9 @@
           <div class="text-3xl font-bold text-club-green">
             {{ pending ? "Chargement..." : clubStats?.annees }}
           </div>
-          <p class="text-sm text-gray-600 mt-2">Depuis 1970</p>
+          <p class="text-sm text-gray-600 mt-2">
+            Depuis 1970
+          </p>
         </div>
       </div>
 
@@ -87,7 +97,9 @@
 
       <!-- Actions -->
       <div class="card-club">
-        <h3 class="text-lg font-semibold text-club-navy mb-4">Actions</h3>
+        <h3 class="text-lg font-semibold text-club-navy mb-4">
+          Actions
+        </h3>
 
         <div class="space-y-4">
           <UButton
@@ -108,8 +120,7 @@
                 :href="`https://www.pingpocket.fr/app/fftt/clubs/${$config.public.clubId}`"
                 target="_blank"
                 class="text-club-green hover:underline"
-                >PingPocket FFTT</a
-              >
+              >PingPocket FFTT</a>
             </p>
           </div>
         </div>
@@ -117,7 +128,11 @@
 
       <!-- Retour -->
       <div class="mt-8">
-        <UButton to="/" variant="outline" icon="i-heroicons-arrow-left">
+        <UButton
+          to="/"
+          variant="outline"
+          icon="i-heroicons-arrow-left"
+        >
           Retour à l'accueil
         </UButton>
       </div>
@@ -127,21 +142,21 @@
 
 <script setup lang="ts">
 // Load club configuration for dynamic content
-const { data: clubConfig } = await useFetch("/api/club/config");
+const { data: clubConfig } = await useFetch('/api/club/config')
 
 // Configuration SEO
 useSeoMeta({
-  title: "Administration",
-  description: "Tableau de bord administrateur pour les statistiques du club",
-  robots: "noindex,nofollow",
-});
+  title: 'Administration',
+  description: 'Tableau de bord administrateur pour les statistiques du club',
+  robots: 'noindex,nofollow',
+})
 
 // Interface for club statistics
 interface ClubStats {
-  licencies: number;
-  equipes: number;
-  annees: number;
-  lastUpdated: string;
+  licencies: number
+  equipes: number
+  annees: number
+  lastUpdated: string
 }
 
 // Fetch club statistics from API
@@ -149,18 +164,18 @@ const {
   data: clubStats,
   pending,
   refresh,
-} = await useLazyFetch<ClubStats>("/api/club/stats", {
-  key: "admin-club-stats",
-});
+} = await useLazyFetch<ClubStats>('/api/club/stats', {
+  key: 'admin-club-stats',
+})
 
 // Utility to format dates
 function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
 }
 </script>

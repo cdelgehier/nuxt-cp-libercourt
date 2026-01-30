@@ -1,5 +1,5 @@
-import { z } from "zod";
-import type { ClubConfig } from "~/types";
+import { z } from 'zod'
+import type { ClubConfig } from '~/types'
 
 // Validation schema for an event
 const EventSchema = z.object({
@@ -10,14 +10,14 @@ const EventSchema = z.object({
   time: z.string().optional(),
   location: z.string().optional(),
   type: z.enum([
-    "tournament",
-    "stage",
-    "competition",
-    "meeting",
-    "training",
-    "other",
+    'tournament',
+    'stage',
+    'competition',
+    'meeting',
+    'training',
+    'other',
   ]),
-  status: z.enum(["upcoming", "ongoing", "past", "cancelled"]),
+  status: z.enum(['upcoming', 'ongoing', 'past', 'cancelled']),
   maxParticipants: z.number().optional(),
   currentParticipants: z.number().default(0),
   registrationOpen: z.boolean().default(false),
@@ -32,33 +32,33 @@ const EventSchema = z.object({
     .optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
-});
+})
 
 const UpcomingEventsResponseSchema = z.object({
   events: z.array(EventSchema),
   count: z.number(),
   lastUpdated: z.string(),
-});
+})
 
-type Event = z.infer<typeof EventSchema>;
-type UpcomingEventsResponse = z.infer<typeof UpcomingEventsResponseSchema>;
+type Event = z.infer<typeof EventSchema>
+type UpcomingEventsResponse = z.infer<typeof UpcomingEventsResponseSchema>
 
 export default defineEventHandler(async (event) => {
   try {
     // Import centralized configuration data
-    const configData = await import("~/content/club/config.json");
-    const config = (configData.default || configData) as ClubConfig;
+    const configData = await import('~/content/club/config.json')
+    const config = (configData.default || configData) as ClubConfig
 
     // Import events from centralized JSON file
-    const eventsData = await import("~/content/events/events.json");
-    const eventsJson = eventsData.default || eventsData;
+    const eventsData = await import('~/content/events/events.json')
+    const eventsJson = eventsData.default || eventsData
 
-    const now = new Date();
-    const currentISOString = now.toISOString();
+    const now = new Date()
+    const currentISOString = now.toISOString()
 
     // Get limit parameter (default 3)
-    const query = getQuery(event);
-    const limit = parseInt(query.limit as string) || 3;
+    const query = getQuery(event)
+    const limit = parseInt(query.limit as string) || 3
 
     // Transform JSON events to API format with complete information
     const allEvents: Event[] = eventsJson.events.map((evt: any) => ({
@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
       // Use event location if provided, otherwise use club default location
       location: evt.location || config.location.name,
       // Calculate status dynamically based on date
-      status: new Date(evt.date) >= now ? "upcoming" : "past",
+      status: new Date(evt.date) >= now ? 'upcoming' : 'past',
       contact: {
         name: evt.contact.name,
         email: config.club.email,
@@ -74,27 +74,28 @@ export default defineEventHandler(async (event) => {
       },
       createdAt: currentISOString,
       updatedAt: currentISOString,
-    }));
+    }))
 
     // Filter only upcoming events and sort by date
     const filteredEvents = allEvents
-      .filter((evt) => new Date(evt.date) > now)
+      .filter(evt => new Date(evt.date) > now)
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      .slice(0, limit);
+      .slice(0, limit)
 
     const response: UpcomingEventsResponse = {
       events: filteredEvents,
       count: filteredEvents.length,
       lastUpdated: currentISOString,
-    };
+    }
 
-    return UpcomingEventsResponseSchema.parse(response);
-  } catch (error) {
-    console.error("Error fetching upcoming events:", error);
+    return UpcomingEventsResponseSchema.parse(response)
+  }
+  catch (error) {
+    console.error('Error fetching upcoming events:', error)
 
     throw createError({
       statusCode: 500,
-      statusMessage: "Erreur lors de la récupération des prochains événements",
-    });
+      statusMessage: 'Erreur lors de la récupération des prochains événements',
+    })
   }
-});
+})

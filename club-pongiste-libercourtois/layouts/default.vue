@@ -4,7 +4,10 @@
     <AppHeader />
 
     <!-- Main Content -->
-    <main id="main-content" class="min-h-screen">
+    <main
+      id="main-content"
+      class="min-h-screen"
+    >
       <slot />
     </main>
 
@@ -16,6 +19,6 @@
 <script setup lang="ts">
 // This layout will be used by default for all pages
 defineOptions({
-  name: "DefaultLayout",
-});
+  name: 'DefaultLayout',
+})
 </script>

@@ -8,7 +8,9 @@
     <div class="max-w-7xl mx-auto px-4">
       <!-- Section header -->
       <div class="text-center mb-8">
-        <h2 class="text-3xl font-bold text-white mb-2">Nos Partenaires</h2>
+        <h2 class="text-3xl font-bold text-white mb-2">
+          Nos Partenaires
+        </h2>
         <p class="text-gray-300 dark:text-gray-400">
           Ils nous font confiance et nous soutiennent dans notre développement
         </p>
@@ -46,12 +48,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Partner } from "~/schemas";
+import type { Partner } from '~/schemas'
 
 // Component props - receives sponsors list from parent
 interface Props {
-  sponsors: Partner[];
+  sponsors: Partner[]
 }
 
-defineProps<Props>();
+defineProps<Props>()
 </script>

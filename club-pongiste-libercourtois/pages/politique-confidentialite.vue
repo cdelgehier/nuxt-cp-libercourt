@@ -55,24 +55,22 @@
               <div>
                 <strong>Responsable :</strong>
                 {{ clubConfig?.club?.name || "Club Pongiste Libercourtois"
-                }}<br />
+                }}<br>
                 <strong>Adresse :</strong>
                 {{
                   clubConfig?.club?.complexe || "Complexe Sportif Léo Lagrange"
                 }}, {{ clubConfig?.location?.postalCode || "62820" }}
-                {{ clubConfig?.location?.city || "Libercourt" }}<br />
+                {{ clubConfig?.location?.city || "Libercourt" }}<br>
                 <strong>Email :</strong>
                 <a
                   :href="`mailto:${clubConfig?.club?.email || 'cplibercourt@gmail.com'}`"
                   class="text-club-green hover:underline"
-                  >{{ clubConfig?.club?.email || "cplibercourt@gmail.com" }}</a
-                ><br />
+                >{{ clubConfig?.club?.email || "cplibercourt@gmail.com" }}</a><br>
                 <strong>Téléphone :</strong>
                 <a
                   :href="`tel:${clubConfig?.club?.phone || '06 60 05 12 41'}`"
                   class="text-club-green hover:underline"
-                  >{{ clubConfig?.club?.phone || "06 60 05 12 41" }}</a
-                >
+                >{{ clubConfig?.club?.phone || "06 60 05 12 41" }}</a>
               </div>
             </div>
           </div>
@@ -145,7 +143,9 @@
               </div>
 
               <div>
-                <h3 class="text-lg font-semibold mb-3">4.2. Communication</h3>
+                <h3 class="text-lg font-semibold mb-3">
+                  4.2. Communication
+                </h3>
                 <p><strong>Base légale :</strong> Intérêt légitime</p>
                 <ul class="list-disc pl-6 mt-2">
                   <li>Information sur les activités du club</li>
@@ -182,9 +182,7 @@
               </p>
               <ul class="list-disc pl-6 space-y-2">
                 <li>
-                  <strong
-                    >Fédération Française de Tennis de Table (FFTT) :</strong
-                  >
+                  <strong>Fédération Française de Tennis de Table (FFTT) :</strong>
                   pour la gestion des licences et compétitions
                 </li>
                 <li>
@@ -246,48 +244,68 @@
 
         <!-- Droits des personnes -->
         <div class="mb-12">
-          <h2 class="text-2xl font-bold adaptive-title mb-6">7. Vos droits</h2>
+          <h2 class="text-2xl font-bold adaptive-title mb-6">
+            7. Vos droits
+          </h2>
           <div class="adaptive-card p-6 rounded-lg">
             <div class="space-y-6 adaptive-text">
               <p>Conformément au RGPD, vous disposez des droits suivants :</p>
 
               <div class="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 class="font-semibold mb-2">✓ Droit d'accès</h3>
+                  <h3 class="font-semibold mb-2">
+                    ✓ Droit d'accès
+                  </h3>
                   <p class="text-sm">
                     Connaître les données que nous détenons sur vous
                   </p>
                 </div>
                 <div>
-                  <h3 class="font-semibold mb-2">✓ Droit de rectification</h3>
+                  <h3 class="font-semibold mb-2">
+                    ✓ Droit de rectification
+                  </h3>
                   <p class="text-sm">
                     Corriger ou mettre à jour vos informations
                   </p>
                 </div>
                 <div>
-                  <h3 class="font-semibold mb-2">✓ Droit d'effacement</h3>
-                  <p class="text-sm">Demander la suppression de vos données</p>
+                  <h3 class="font-semibold mb-2">
+                    ✓ Droit d'effacement
+                  </h3>
+                  <p class="text-sm">
+                    Demander la suppression de vos données
+                  </p>
                 </div>
                 <div>
-                  <h3 class="font-semibold mb-2">✓ Droit à la portabilité</h3>
+                  <h3 class="font-semibold mb-2">
+                    ✓ Droit à la portabilité
+                  </h3>
                   <p class="text-sm">
                     Récupérer vos données dans un format standard
                   </p>
                 </div>
                 <div>
-                  <h3 class="font-semibold mb-2">✓ Droit d'opposition</h3>
+                  <h3 class="font-semibold mb-2">
+                    ✓ Droit d'opposition
+                  </h3>
                   <p class="text-sm">
                     Vous opposer au traitement de vos données
                   </p>
                 </div>
                 <div>
-                  <h3 class="font-semibold mb-2">✓ Droit de limitation</h3>
-                  <p class="text-sm">Limiter l'utilisation de vos données</p>
+                  <h3 class="font-semibold mb-2">
+                    ✓ Droit de limitation
+                  </h3>
+                  <p class="text-sm">
+                    Limiter l'utilisation de vos données
+                  </p>
                 </div>
               </div>
 
               <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <h3 class="font-semibold mb-2">Comment exercer vos droits ?</h3>
+                <h3 class="font-semibold mb-2">
+                  Comment exercer vos droits ?
+                </h3>
                 <p class="text-sm mb-3">
                   Pour exercer ces droits, contactez-nous en précisant votre
                   demande et en joignant une copie de votre pièce d'identité :
@@ -297,7 +315,10 @@
                     :href="`mailto:${clubConfig?.club?.email || 'cplibercourt@gmail.com'}?subject=Demande RGPD`"
                     class="inline-flex items-center px-4 py-2 bg-club-green text-white rounded-lg hover:bg-club-green/90 transition-colors text-sm"
                   >
-                    <UIcon name="i-heroicons-envelope" class="mr-2" />
+                    <UIcon
+                      name="i-heroicons-envelope"
+                      class="mr-2"
+                    />
                     Demande par email
                   </a>
                 </div>
@@ -378,17 +399,16 @@
               </p>
               <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                 <p>
-                  <strong>CNIL</strong><br />
-                  3 Place de Fontenoy - TSA 80715<br />
-                  75334 PARIS CEDEX 07<br />
-                  Téléphone : 01 53 73 22 22<br />
+                  <strong>CNIL</strong><br>
+                  3 Place de Fontenoy - TSA 80715<br>
+                  75334 PARIS CEDEX 07<br>
+                  Téléphone : 01 53 73 22 22<br>
                   Site web :
                   <a
                     href="https://www.cnil.fr"
                     target="_blank"
                     class="text-club-green hover:underline"
-                    >www.cnil.fr</a
-                  >
+                  >www.cnil.fr</a>
                 </p>
               </div>
             </div>
@@ -419,7 +439,9 @@
 
         <!-- Contact -->
         <div class="mb-12">
-          <h2 class="text-2xl font-bold adaptive-title mb-6">12. Contact</h2>
+          <h2 class="text-2xl font-bold adaptive-title mb-6">
+            12. Contact
+          </h2>
           <div class="adaptive-card p-6 rounded-lg">
             <div class="space-y-4 adaptive-text">
               <p>
@@ -431,14 +453,20 @@
                   :href="`mailto:${clubConfig?.club?.email || 'cplibercourt@gmail.com'}`"
                   class="inline-flex items-center px-4 py-2 bg-club-green text-white rounded-lg hover:bg-club-green/90 transition-colors"
                 >
-                  <UIcon name="i-heroicons-envelope" class="mr-2" />
+                  <UIcon
+                    name="i-heroicons-envelope"
+                    class="mr-2"
+                  />
                   Nous contacter par email
                 </a>
                 <a
                   :href="`tel:${clubConfig?.club?.phone || '06 60 05 12 41'}`"
                   class="inline-flex items-center px-4 py-2 bg-club-navy text-white rounded-lg hover:bg-club-navy/90 transition-colors"
                 >
-                  <UIcon name="i-heroicons-phone" class="mr-2" />
+                  <UIcon
+                    name="i-heroicons-phone"
+                    class="mr-2"
+                  />
                   Nous appeler
                 </a>
               </div>
@@ -460,13 +488,13 @@
 <script setup>
 // Meta tags for SEO optimization
 useSeoMeta({
-  title: "Politique de Confidentialité - Club Pongiste Libercourtois",
+  title: 'Politique de Confidentialité - Club Pongiste Libercourtois',
   description:
-    "Politique de confidentialité et protection des données personnelles du Club Pongiste Libercourtois. Conforme RGPD.",
+    'Politique de confidentialité et protection des données personnelles du Club Pongiste Libercourtois. Conforme RGPD.',
   keywords:
-    "politique confidentialité, RGPD, protection données, vie privée, club tennis de table",
-});
+    'politique confidentialité, RGPD, protection données, vie privée, club tennis de table',
+})
 
 // Fetch club configuration from API - uses centralized config
-const { data: clubConfig } = await useFetch("/api/club/config");
+const { data: clubConfig } = await useFetch('/api/club/config')
 </script>

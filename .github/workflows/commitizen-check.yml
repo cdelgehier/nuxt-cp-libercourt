@@ -1,0 +1,52 @@
+name: Commitizen check
+
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-commit:
+    name: Check commit message
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install commitizen
+        run: pip install commitizen
+
+      - name: Check commit message
+        run: cz check --message "${{ github.event.head_commit.message }}"
+
+  check-pr:
+    name: Check PR commits
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install commitizen
+        run: pip install commitizen
+
+      - name: Check all PR commits
+        run: cz check --rev-range origin/${{ github.base_ref }}..HEAD

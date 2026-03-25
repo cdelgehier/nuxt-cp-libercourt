@@ -1,74 +1,69 @@
-export default defineEventHandler(async (_event) => {
-  try {
-    // Import team data from JSON file
-    const teamData = await import('~/content/club/team.json')
-    // Import centralized club configuration
-    const configData = await import('~/content/club/config.json')
+/**
+ * GET /api/club/contact
+ * Données de la page contact depuis la DB.
+ */
+import { getConfig, getTeamMembers } from "~~/server/domains/club/service";
 
-    const team = teamData.default?.team || teamData.team || []
-    const config = configData.default || configData
+export default defineEventHandler(async () => {
+  const [config, members] = await Promise.all([getConfig(), getTeamMembers()]);
 
-    // Format for contact page - with responsibilities
-    const contacts = team.map(member => ({
-      name: `${member.firstName} ${member.lastName}`,
-      role: member.fullRole,
-      responsibilities: member.responsibilities,
-      email: member.email,
-      phone: member.phone,
-    }))
+  const contacts = members.map((m) => ({
+    name: `${m.firstName} ${m.lastName}`,
+    role: m.fullRole ?? m.role,
+    responsibilities: m.responsibilities,
+    email: m.email,
+    phone: m.phone,
+  }));
 
-    // Complete data for contact page
-    return {
-      contacts,
-      club: config.club,
-      address: config.location,
-      socialMedia: [config.social.facebook],
-      schedule: {
-        availability: {
-          title: 'Disponibilité des Responsables',
-          note: 'Nous sommes disponibles lors des créneaux d\'entraînement et sur rendez-vous',
-          sessions: [
-            {
-              day: 'Contactez-nous',
-              time: 'Par email ou téléphone',
-              location: 'Réponse rapide garantie',
-              contact: 'Équipe dirigeante',
-            },
-          ],
+  const socialMedia = config.facebookUrl
+    ? [
+        {
+          platform: "facebook",
+          name: "Facebook",
+          url: config.facebookUrl,
+          icon: "i-simple-icons-facebook",
         },
-        training: {
-          note: 'Pendant les créneaux d\'entraînement, un responsable est toujours présent pour vous accueillir.',
-        },
+      ]
+    : [];
+
+  return {
+    contacts,
+    club: {
+      name: config.name,
+      email: config.email,
+      phone: config.phone,
+      website: config.website,
+    },
+    address: {
+      name: [config.salle, config.complexe].filter(Boolean).join(" - ") || null,
+      street: config.street,
+      postalCode: config.postalCode,
+      city: config.city,
+      country: config.country,
+      googleMapsUrl: config.googleMapsUrl,
+      coordinates: { lat: config.lat, lng: config.lng },
+    },
+    socialMedia,
+    schedule: {
+      availability: {
+        title: "Disponibilité des Responsables",
+        note: "Nous sommes disponibles lors des créneaux d'entraînement et sur rendez-vous",
+        sessions: [
+          {
+            day: "Contactez-nous",
+            time: "Par email ou téléphone",
+            location: "Réponse rapide garantie",
+            contact: "Équipe dirigeante",
+          },
+        ],
       },
-      faq: [
-        {
-          question: 'Comment puis-je m\'inscrire au club ?',
-          answer:
-            'Vous pouvez vous inscrire directement en venant aux permanences ou en nous contactant par téléphone. Nous vous expliquerons les démarches et les documents nécessaires.',
-        },
-        {
-          question: 'Quels sont les tarifs d\'adhésion ?',
-          answer:
-            'Nos tarifs varient selon l\'âge et le type de licence. Consultez notre page tarifs ou contactez-nous pour plus d\'informations détaillées.',
-        },
-        {
-          question: 'Puis-je venir essayer avant de m\'inscrire ?',
-          answer:
-            'Bien sûr ! Nous proposons des séances d\'essai gratuites. Venez aux créneaux d\'entraînement avec une tenue de sport, nous vous prêterons le matériel.',
-        },
-        {
-          question: 'Le club prête-t-il du matériel ?',
-          answer:
-            'Oui, nous avons des raquettes et balles disponibles pour les débutants et les séances d\'essai. Pour une pratique régulière, nous conseillons l\'achat de son propre matériel.',
-        },
-      ],
-    }
-  }
-  catch (error) {
-    console.error('Erreur lors du chargement des contacts:', error)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erreur lors du chargement des informations de contact',
-    })
-  }
-})
+    },
+    faq: [
+      {
+        question: "Comment puis-je m'inscrire au club ?",
+        answer:
+          "Vous pouvez vous inscrire directement en venant aux permanences ou en nous contactant par téléphone.",
+      },
+    ],
+  };
+});

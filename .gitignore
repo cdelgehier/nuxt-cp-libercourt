@@ -107,3 +107,6 @@ logs
 .tmp/
 tmp/
 *.tmp
+
+# Local Netlify folder
+.netlify

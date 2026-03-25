@@ -1,75 +1,88 @@
-![Nuxt 3](https://img.shields.io/badge/Nuxt-3-00C58E?style=for-the-badge&logo=nuxt.js&logoColor=white)
-![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-20+-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Nuxt](https://img.shields.io/badge/Nuxt-4-00C58E.svg?style=for-the-badge&logo=nuxt.js&logoColor=white)
+![Vue](https://img.shields.io/badge/Vue-3-4FC08D.svg?style=for-the-badge&logo=vue.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4.svg?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![DrizzleORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F.svg?style=for-the-badge&logo=drizzle&logoColor=black)
+![Neon](https://img.shields.io/badge/Neon-PostgreSQL-00E5BF.svg?style=for-the-badge&logo=postgresql&logoColor=black)
+![Netlify](https://img.shields.io/badge/Netlify-00C7B7.svg?style=for-the-badge&logo=netlify&logoColor=white)
+![pnpm](https://img.shields.io/badge/pnpm-F69220.svg?style=for-the-badge&logo=pnpm&logoColor=white)
 
-# 🏓 Club Pongiste Libercourtois
+# Club Pongiste Libercourtois
 
-Official website of Club Pongiste Libercourtois - Table tennis club located in Libercourt, France.
+Site officiel du Club Pongiste Libercourtois — club de tennis de table basé à Libercourt (62).
 
-## 📁 Projects
+## Stack technique
 
-### 🏓 [Club Website](./club-pongiste-libercourtois/)
+- **Nuxt 4** (architecture `app/`, SSR, Netlify)
+- **DDD** — domaines `club`, `events`, `competition`, `news`, `identity`
+- **Neon PostgreSQL + Drizzle ORM** — données dynamiques avec validation Zod
+- **SmartPing FFTT** — données en temps réel (équipes, classements, matchs)
+- **nuxt-oidc-auth + Authentik** — authentification admin
+- **@nuxt/ui v3 + Tailwind CSS** — UI adaptative dark/light
 
-Modern and dynamic website for Club Pongiste Libercourtois built with Nuxt 3, Vue 3, and TypeScript.
-
-**Features:**
-
-- Dynamic event management system
-- Complete dark/light mode support
-- 100% data-driven architecture
-- Smart APIs with TypeScript validation
-- Mobile-first responsive design
-
-[→ View project documentation](./club-pongiste-libercourtois/README.md)
-
-## 🚀 Getting Started
-
-To run the club website locally:
+## Démarrage rapide
 
 ```bash
-# Navigate to the website directory
 cd club-pongiste-libercourtois
 
-# Install dependencies
+# Installer les dépendances
 pnpm install
 
-# Start development server
-pnpm dev:open
+# Copier et configurer les variables d'environnement
+cp .env.example .env
 
-# Build for production
-pnpm build
+# Créer les tables en DB
+pnpm db:push
+
+# Alimenter la DB depuis les JSON source
+pnpm db:seed
+
+# Lancer le serveur de développement
+pnpm dev
 ```
 
-## � Netlify Deployment
+## Scripts disponibles
 
-This project is optimized for Netlify deployment:
+| Commande         | Description                    |
+| ---------------- | ------------------------------ |
+| `pnpm dev`       | Serveur de développement       |
+| `pnpm build`     | Build production (Netlify)     |
+| `pnpm typecheck` | Vérification TypeScript        |
+| `pnpm lint`      | ESLint (fix auto)              |
+| `pnpm test:unit` | Tests unitaires Vitest         |
+| `pnpm test:e2e`  | Tests end-to-end Playwright    |
+| `pnpm db:push`   | Créer/mettre à jour les tables |
+| `pnpm db:seed`   | Alimenter la DB                |
+| `pnpm db:reset`  | Réinitialiser et re-seeder     |
+| `pnpm db:studio` | Interface Drizzle Studio       |
 
-- **Build Command**: `pnpm build`
-- **Development Command**: `pnpm dev -o`
-- **Package Manager**: pnpm (automatic detection)
-- **No preset needed**: Standard Nuxt 3 deployment
-- **No netlify.toml required**: Configuration via Netlify UI
+## Variables d'environnement
 
-The project uses pnpm for faster installations and better dependency management, which is automatically detected by Netlify.
+Voir [`.env.example`](./club-pongiste-libercourtois/.env.example) pour la liste complète.
 
-## �🔧 Repository Configuration
+```env
+DATABASE_URL=postgresql://...
+SMARTPING_APP_CODE=SX020
+SMARTPING_PASSWORD=
+SMARTPING_EMAIL=
+NUXT_OIDC_ISSUER=https://auth.example.com/application/o/libercourt/
+NUXT_OIDC_CLIENT_ID=
+NUXT_OIDC_CLIENT_SECRET=
+```
 
-This repository includes development tools for code quality:
+## Documentation
 
-- **Pre-commit hooks** for automated code checks
-- **ESLint & Prettier** for consistent code formatting
-- **Markdownlint** for documentation quality
-- **TypeScript** support with strict typing
-- **pnpm** as preferred package manager for Netlify deployment
+- [Architecture](./club-pongiste-libercourtois/docs/architecture.md) — stack, DDD, auth, DB
+- [Flux de données](./club-pongiste-libercourtois/docs/data-flow.md) — API par page, Zod, SmartPing
+- [Guide développement](./club-pongiste-libercourtois/docs/development.md) — conventions, ajout de fonctionnalités
 
-## 📄 License
+## Déploiement Netlify
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+- **Build command** : `pnpm build`
+- **Publish directory** : `.output/public`
+- **Node version** : 20+
+- **Package manager** : pnpm (détection automatique)
 
 ---
 
-## Club Pongiste Libercourtois - Since 1970
-
-Personal Projects by Cédric DELGEHIER
+Club Pongiste Libercourtois — depuis 1970 · Par Cédric DELGEHIER

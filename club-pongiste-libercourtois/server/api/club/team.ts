@@ -1,46 +1,35 @@
+/**
+ * GET /api/club/team
+ * Liste des membres du bureau depuis la DB.
+ */
+import { getTeamMembers } from "~~/server/domains/club/service";
+
 export default defineEventHandler(async (event) => {
-  try {
-    // Import team data from JSON file
-    const teamData = await import('~/content/club/team.json')
+  const query = getQuery(event);
+  const members = await getTeamMembers();
 
-    // Get query parameter for format
-    const query = getQuery(event)
-    const format = query.format as string
-
-    const team = teamData.default?.team || teamData.team || []
-
-    if (format === 'contacts') {
-      // Format for contact page - with responsibilities
-      return {
-        contacts: team.map(member => ({
-          name: `${member.firstName} ${member.lastName}`,
-          role: member.fullRole,
-          responsibilities: member.responsibilities,
-          email: member.email,
-          phone: member.phone,
-        })),
-      }
-    }
-
-    // Default format for club page - with complete bio
+  if (query.format === "contacts") {
     return {
-      team: team.map(member => ({
-        id: member.id,
-        firstName: member.firstName,
-        lastName: member.lastName,
-        role: member.role,
-        fullRole: member.fullRole,
-        bio: member.bio,
-        joinedDate: member.joinedDate ? new Date(member.joinedDate) : null,
-        image: member.image,
+      contacts: members.map((m) => ({
+        name: `${m.firstName} ${m.lastName}`,
+        role: m.fullRole ?? m.role,
+        responsibilities: m.responsibilities,
+        email: m.email,
+        phone: m.phone,
       })),
-    }
+    };
   }
-  catch (error) {
-    console.error('Erreur lors du chargement de l\'équipe:', error)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Erreur lors du chargement des informations de l\'équipe',
-    })
-  }
-})
+
+  return {
+    team: members.map((m) => ({
+      id: m.id,
+      firstName: m.firstName,
+      lastName: m.lastName,
+      role: m.role,
+      fullRole: m.fullRole,
+      bio: m.bio,
+      joinedDate: m.joinedDate,
+      image: m.image,
+    })),
+  };
+});

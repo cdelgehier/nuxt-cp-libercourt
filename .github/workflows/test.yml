@@ -1,0 +1,50 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, feat/**]
+    paths:
+      - "club-pongiste-libercourtois/**"
+      - ".github/workflows/test.yml"
+  pull_request:
+    branches: [main]
+  workflow_call:
+
+defaults:
+  run:
+    working-directory: club-pongiste-libercourtois
+
+jobs:
+  test:
+    name: Typecheck, Lint & Unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: club-pongiste-libercourtois/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: TypeScript check
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint:check
+
+      - name: Unit tests
+        run: pnpm test:unit
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}

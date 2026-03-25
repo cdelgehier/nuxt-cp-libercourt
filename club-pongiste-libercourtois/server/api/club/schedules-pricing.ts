@@ -1,171 +1,163 @@
-import type { ClubConfig } from '~/types'
+/**
+ * GET /api/club/schedules-pricing
+ * Données des horaires, tarifs et informations d'inscription depuis la DB.
+ */
+import {
+  getConfig,
+  getPricing,
+  getSchedules,
+} from "~~/server/domains/club/service";
 
-export default defineEventHandler(async (_event) => {
+export default defineEventHandler(async () => {
+  const [config, schedulesData, pricingData] = await Promise.all([
+    getConfig(),
+    getSchedules(),
+    getPricing(),
+  ]);
+
+  // Documents FFTT (non-bloquant)
+  let ffttDocuments: Record<string, unknown> = { success: false };
   try {
-    // Import centralized configuration data
-    const configData = await import('~/content/club/config.json')
-    const config = (configData.default || configData) as ClubConfig
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ffttDocuments = (await $fetch("/api/fftt/documents")) as any;
+  } catch {
+    // fallback silencieux
+  }
 
-    // Import schedules data from JSON file
-    const schedulesData = await import('~/content/club/schedules.json')
-    const schedules = schedulesData.default || schedulesData
+  const fallbackUrl =
+    "https://www.fftt.com/doc/administratif/telechargement.html";
 
-    // Import pricing data from separate JSON file
-    const pricingData = await import('~/content/club/pricing.json')
-    const pricing = pricingData.default || pricingData
+  const allSchedules = schedulesData.schedules;
+  const allPricing = [...pricingData.annual, ...pricingData.reductions];
 
-    // Get document URLs FFTT
-    let ffttDocuments
-    try {
-      ffttDocuments = await $fetch('/api/fftt/documents')
+  // Grouper les créneaux d'entraînement par jour avec structure sessions
+  type TrainingDay = {
+    day: string;
+    sessions: {
+      time: string;
+      category: string;
+      level: string | null;
+      coach: string | null;
+    }[];
+  };
+  const groupByDay = (list: typeof allSchedules): TrainingDay[] => {
+    const map = new Map<string, TrainingDay>();
+    for (const s of list) {
+      if (!map.has(s.day)) map.set(s.day, { day: s.day, sessions: [] });
+      map.get(s.day)!.sessions.push({
+        time: `${s.timeStart} - ${s.timeEnd}`,
+        category: s.category,
+        level: s.level,
+        coach: s.coach,
+      });
     }
-    catch (_error) {
-      console.warn('Could not fetch FFTT documents, using fallback URLs')
-      ffttDocuments = { success: false }
-    }
+    return Array.from(map.values());
+  };
 
-    // Fallback URLs if scraping fails
-    const fallbackUrl
-      = 'https://www.fftt.com/doc/administratif/telechargement.html'
+  // Compétitions sous forme plate (une entrée = un créneau)
+  const competitions = allSchedules
+    .filter((s) => s.type === "competition")
+    .map((s) => ({
+      day: s.day,
+      time: `${s.timeStart} - ${s.timeEnd}`,
+      description: s.category,
+      note: s.level ?? "",
+    }));
 
-    // Structure enriched with config data and FFTT documents
-    const enrichedData = {
-      // Use schedules from schedules.json
-      schedules: schedules.schedules,
-      // Use pricing from pricing.json
-      pricing: pricing.pricing,
-      registration: {
-        period: 'Inscriptions ouvertes de juin à septembre',
-        documents: [
-          {
-            name: 'Bordereau de demande de Licence (Compétition / Loisir)',
-            description:
-              'Fiche d\'inscription officielle FFTT - fait office de formulaire d\'inscription',
-            required: true,
-            type: 'fftt',
-            url:
-              ffttDocuments.success && ffttDocuments.bordereau_licence
-                ? ffttDocuments.bordereau_licence.url
-                : fallbackUrl,
-          },
-          {
-            name: 'Autoquestionnaire Médical (Personnes Majeures)',
-            description:
-              'Document médical obligatoire pour les joueurs majeurs',
-            required: true,
-            type: 'medical',
-            condition: 'Pour les joueurs majeurs',
-            url:
-              ffttDocuments.success && ffttDocuments.questionnaire_majeurs
-                ? ffttDocuments.questionnaire_majeurs.url
-                : fallbackUrl,
-          },
-          {
-            name: 'Autoquestionnaire Médical (Personnes Mineures)',
-            description:
-              'Document médical obligatoire pour les joueurs mineurs',
-            required: true,
-            type: 'medical',
-            condition: 'Pour les joueurs mineurs',
-            url:
-              ffttDocuments.success && ffttDocuments.questionnaire_mineurs
-                ? ffttDocuments.questionnaire_mineurs.url
-                : fallbackUrl,
-          },
-          {
-            name: 'Certificat médical d\'un médecin',
-            description:
-              'Certificat médical de non contre-indication à la pratique du tennis de table',
-            required: true,
-            type: 'medical',
-            condition: 'Pour les nouveaux licenciés uniquement',
-            url:
-              ffttDocuments.success && ffttDocuments.certificat_medical
-                ? ffttDocuments.certificat_medical.url
-                : fallbackUrl,
-          },
-          {
-            name: 'Adresse email',
-            description: 'Adresse email valide pour les communications du club',
-            required: true,
-            type: 'contact',
-          },
-          {
-            name: 'Numéro de téléphone',
-            description:
-              'Numéro de téléphone pour les urgences et communications',
-            required: true,
-            type: 'contact',
-          },
-          {
-            name: 'Règlement',
-            description: 'Paiement de la licence (chèque, espèces ou virement)',
-            required: true,
-            type: 'payment',
-          },
-        ],
-        contact: {
-          responsible: 'Cédric DELGEHIER',
-          role: 'Responsable des inscriptions',
-          email: config.club.email,
-          phone: config.club.phone,
-          availability: 'Mardi et jeudi de 18h à 20h',
+  return {
+    // Tableaux plats pour l'admin
+    schedules: allSchedules,
+    pricing: allPricing,
+    // Structures groupées (compatibilité frontend)
+    schedulesGrouped: {
+      training: groupByDay(
+        allSchedules.filter((s) => s.type !== "competition"),
+      ),
+      competitions,
+    },
+    pricingGrouped: {
+      annual: pricingData.annual,
+      reductions: pricingData.reductions,
+      additional: [] as typeof pricingData.annual,
+    },
+    registration: {
+      period: "Inscriptions ouvertes de juin à septembre",
+      documents: [
+        {
+          name: "Bordereau de demande de Licence (Compétition / Loisir)",
+          description: "Fiche d'inscription officielle FFTT",
+          required: true,
+          type: "fftt",
+          url:
+            (ffttDocuments.success &&
+              (ffttDocuments as Record<string, { url: string }>)
+                .bordereau_licence?.url) ||
+            fallbackUrl,
         },
-      },
-      facilities: {
-        address: {
-          name: `${config.club.salle} - ${config.club.complexe}`,
-          street: config.club.complexe,
-          city: config.location.city,
-          postalCode: config.location.postalCode,
-          country: config.location.country,
-          coordinates: {
-            lat: config.location.coordinates.lat,
-            lng: config.location.coordinates.lng,
-          },
+        {
+          name: "Autoquestionnaire Médical (Personnes Majeures)",
+          description: "Document médical obligatoire pour les joueurs majeurs",
+          required: true,
+          type: "medical",
+          condition: "Pour les joueurs majeurs",
+          url:
+            (ffttDocuments.success &&
+              (ffttDocuments as Record<string, { url: string }>)
+                .questionnaire_majeurs?.url) ||
+            fallbackUrl,
         },
-        description: `Salle moderne équipée de 24 tables de compétition dans un ${(config as any).club.complexe.toLowerCase()} accessible`,
-        equipment: [
-          '24 tables de compétition Cornilleau',
-          'Éclairage professionnel LED',
-          'Sol sportif homologué FFTT',
-          'Vestiaires et sanitaires',
-          'Espace convivialité',
-        ],
-        access: {
-          parking: 'Gratuit sur place',
-          publicTransport: `Ligne de bus 12 - Arrêt ${config.club.complexe}`,
-          accessibility: 'Accès PMR disponible',
+        {
+          name: "Autoquestionnaire Médical (Personnes Mineures)",
+          description: "Document médical obligatoire pour les joueurs mineurs",
+          required: true,
+          type: "medical",
+          condition: "Pour les joueurs mineurs",
+          url:
+            (ffttDocuments.success &&
+              (ffttDocuments as Record<string, { url: string }>)
+                .questionnaire_mineurs?.url) ||
+            fallbackUrl,
         },
-        parking: 'Gratuit sur place',
-        accessibility: 'Accès PMR disponible',
-      },
+        {
+          name: "Adresse email",
+          description: "Adresse email valide pour les communications du club",
+          required: true,
+          type: "contact",
+        },
+        {
+          name: "Règlement",
+          description: "Paiement de la licence (chèque, espèces ou virement)",
+          required: true,
+          type: "payment",
+        },
+      ],
       contact: {
-        generalInfo: config.club,
-        permanences: [
-          {
-            day: 'Mardi',
-            time: '18h00 - 20h00',
-            location: config.club.salle,
-            contact: 'Cédric DELGEHIER',
-          },
-          {
-            day: 'Jeudi',
-            time: '18h00 - 20h00',
-            location: config.club.salle,
-            contact: 'Patrick Levray',
-          },
-        ],
+        responsible: "Cédric DELGEHIER",
+        role: "Responsable des inscriptions",
+        email: config.email,
+        phone: config.phone,
+        availability: "Mardi et jeudi de 18h à 20h",
       },
-    }
-
-    return enrichedData
-  }
-  catch (_error) {
-    throw createError({
-      statusCode: 500,
-      statusMessage:
-        'Erreur lors de la récupération des données horaires et tarifs',
-    })
-  }
-})
+    },
+    facilities: {
+      address: {
+        name: [config.salle, config.complexe].filter(Boolean).join(" - "),
+        street: config.street,
+        city: config.city,
+        postalCode: config.postalCode,
+        country: config.country,
+        coordinates: { lat: config.lat, lng: config.lng },
+      },
+      parking: "Gratuit sur place",
+      accessibility: "Accès PMR disponible",
+    },
+    contact: {
+      generalInfo: {
+        name: config.name,
+        email: config.email,
+        phone: config.phone,
+        salle: config.salle,
+      },
+    },
+  };
+});

@@ -1,14 +1,12 @@
-export default defineEventHandler(async (_event) => {
-  try {
-    // Import data du club depuis le fichier JSON
-    const clubData = await import('~/content/club/about.json')
+import { getAboutSection } from "~~/server/domains/club/repository";
 
-    return clubData.default || clubData
-  }
-  catch (_error) {
+export default defineEventHandler(async () => {
+  const section = await getAboutSection("about");
+  if (!section?.content) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erreur lors du chargement des informations du club',
-    })
+      statusMessage: "Données club introuvables. Lancez le seed.",
+    });
   }
-})
+  return section.content;
+});

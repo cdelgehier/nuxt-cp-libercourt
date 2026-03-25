@@ -8,8 +8,8 @@
  * @returns Phase number (1, 2, etc.)
  */
 export function extractPhaseFromTeamName(libequipe: string): number {
-  const phaseMatch = libequipe.match(/Phase (\d+)/i)
-  return phaseMatch ? parseInt(phaseMatch[1], 10) : 1
+  const phaseMatch = libequipe.match(/Phase (\d+)/i);
+  return phaseMatch ? parseInt(phaseMatch[1]!, 10) : 1;
 }
 
 /**
@@ -18,8 +18,8 @@ export function extractPhaseFromTeamName(libequipe: string): number {
  * @returns Poule ID
  */
 export function extractPouleId(liendivision: string): string {
-  const pouleMatch = liendivision.match(/cx_poule=(\d+)/)
-  return pouleMatch ? pouleMatch[1] : ''
+  const pouleMatch = liendivision.match(/cx_poule=(\d+)/);
+  return pouleMatch ? pouleMatch[1]! : "";
 }
 
 /**
@@ -28,8 +28,8 @@ export function extractPouleId(liendivision: string): string {
  * @returns Division ID
  */
 export function extractDivisionId(liendivision: string): string {
-  const divisionMatch = liendivision.match(/D1=(\d+)/)
-  return divisionMatch ? divisionMatch[1] : ''
+  const divisionMatch = liendivision.match(/D1=(\d+)/);
+  return divisionMatch ? divisionMatch[1]! : "";
 }
 
 /**
@@ -43,8 +43,8 @@ export function getUniqueTeamKey(
   idequipe: string,
   liendivision: string,
 ): string {
-  const pouleId = extractPouleId(liendivision)
-  return `${idequipe}-${pouleId}`
+  const pouleId = extractPouleId(liendivision);
+  return `${idequipe}-${pouleId}`;
 }
 
 /**
@@ -54,8 +54,8 @@ export function getUniqueTeamKey(
  */
 export function extractTeamNumber(libequipe: string): number {
   // Match "CP (1)" or "CP 2" or "CP 3"
-  const match = libequipe.match(/CP \(?(\d+)\)?/)
-  return match ? parseInt(match[1], 10) : 1
+  const match = libequipe.match(/CP \(?(\d+)\)?/);
+  return match ? parseInt(match[1]!, 10) : 1;
 }
 
 /**
@@ -68,15 +68,15 @@ export function groupTeamsByPhase<T extends { phase: number }>(
 ): Record<number, T[]> {
   return teams.reduce(
     (acc, team) => {
-      const phase = team.phase
+      const phase = team.phase;
       if (!acc[phase]) {
-        acc[phase] = []
+        acc[phase] = [];
       }
-      acc[phase].push(team)
-      return acc
+      acc[phase]!.push(team);
+      return acc;
     },
     {} as Record<number, T[]>,
-  )
+  );
 }
 
 /**
@@ -85,7 +85,7 @@ export function groupTeamsByPhase<T extends { phase: number }>(
  * @returns Phase label
  */
 export function getPhaseLabel(phase: number): string {
-  return `Phase ${phase}`
+  return `Phase ${phase}`;
 }
 
 /**
@@ -96,10 +96,10 @@ export function getPhaseLabel(phase: number): string {
 export function getPhaseDescription(phase: number): string {
   switch (phase) {
     case 1:
-      return 'Première partie de saison'
+      return "Première partie de saison";
     case 2:
-      return 'Deuxième partie de saison'
+      return "Deuxième partie de saison";
     default:
-      return `Phase ${phase}`
+      return `Phase ${phase}`;
   }
 }

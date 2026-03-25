@@ -1,0 +1,42 @@
+name: Bump version
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "club-pongiste-libercourtois/**"
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    name: Bump version & update changelog
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.event.head_commit.message, 'bump')"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install commitizen
+        run: pip install commitizen
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version
+        run: cz -nr 21 bump --yes --annotated-tag --changelog
+
+      - name: Push changes
+        run: git push --follow-tags --force

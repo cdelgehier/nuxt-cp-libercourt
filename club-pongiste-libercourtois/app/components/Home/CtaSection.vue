@@ -11,7 +11,7 @@
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <UButton to="/contact" color="primary" size="lg" class="font-semibold">
-          <UIcon name="i-heroicons-phone" class="mr-2" />
+          <UIcon name="i-heroicons-phone" class="mr-2" aria-hidden="true" />
           Nous contacter
         </UButton>
         <UButton
@@ -21,7 +21,7 @@
           size="lg"
           class="font-semibold bg-white text-club-navy hover:bg-gray-100 dark:bg-gray-100 dark:text-club-navy dark:hover:bg-gray-200"
         >
-          <UIcon name="i-heroicons-clock" class="mr-2" />
+          <UIcon name="i-heroicons-clock" class="mr-2" aria-hidden="true" />
           Voir les horaires
         </UButton>
       </div>

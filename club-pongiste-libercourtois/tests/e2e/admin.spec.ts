@@ -1,6 +1,22 @@
 import { expect, test } from "@playwright/test";
 
 // ---------------------------------------------------------------------------
+// Safety guard — CRUD tests must never run against production
+// ---------------------------------------------------------------------------
+
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
+if (
+  process.env.E2E_ADMIN_PASSWORD &&
+  !baseURL.includes("localhost") &&
+  !baseURL.includes("127.0.0.1")
+) {
+  throw new Error(
+    `CRUD tests with E2E_ADMIN_PASSWORD must not run against a remote URL (${baseURL}). ` +
+      "Use PLAYWRIGHT_BASE_URL=http://localhost:... or unset E2E_ADMIN_PASSWORD.",
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -138,6 +154,15 @@ test.describe.serial("Admin — CRUD FAQ via API", () => {
 
   let createdFaqId: number;
 
+  // Cleanup garanti même si les tests échouent
+  test.afterAll(async ({ request }) => {
+    if (createdFaqId) {
+      await request
+        .delete(`/api/admin/faqs/${createdFaqId}`, { headers: authHeaders() })
+        .catch(() => {});
+    }
+  });
+
   test("authentification Basic Auth → 200", async ({ request }) => {
     const response = await request.get("/api/admin/faqs", {
       headers: authHeaders(),
@@ -226,6 +251,17 @@ test.describe.serial("Admin — CRUD Events via API", () => {
   });
 
   let createdEventId: number;
+
+  // Cleanup garanti même si les tests échouent
+  test.afterAll(async ({ request }) => {
+    if (createdEventId) {
+      await request
+        .delete(`/api/admin/events/${createdEventId}`, {
+          headers: authHeaders(),
+        })
+        .catch(() => {});
+    }
+  });
 
   test("lister les événements → 200", async ({ request }) => {
     const response = await request.get("/api/admin/events", {

@@ -1,34 +1,25 @@
 <template>
   <img
     :src="logoSrc"
-    :alt="altText"
+    alt="Club Pongiste Libercourtois"
     :class="classes"
     class="transition-opacity duration-300"
+    fetchpriority="high"
+    loading="eager"
   />
 </template>
 
 <script setup lang="ts">
 interface Props {
-  alt?: string;
   classes?: string;
 }
 
-const _props = withDefaults(defineProps<Props>(), {
-  alt: undefined, // Will use clubName as fallback
+withDefaults(defineProps<Props>(), {
   classes: "h-20 w-auto hover:scale-105 transition-transform duration-200",
 });
 
-// Get club configuration data
-const { data: clubConfig } = await useFetch("/api/club/config");
-
-// Use prop alt if provided, otherwise use club name
-const altText = computed(
-  () => _props.alt || clubConfig.value?.name || "Club Pongiste Libercourtois",
-);
-
 const { $colorMode } = useNuxtApp();
 
-// Compute the logo source based on color mode
 const logoSrc = computed(() => {
   return $colorMode.preference === "dark"
     ? "/images/logo-club-white.webp"

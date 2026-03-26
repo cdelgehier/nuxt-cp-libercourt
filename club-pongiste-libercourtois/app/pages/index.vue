@@ -21,8 +21,7 @@
 </template>
 
 <script setup lang="ts">
-// Home page - displays hero, activities, news, events, sponsors, and CTA sections
-// Uses composables to fetch data with Zod validation
+import type { Activity, CalendarEvent, Partner } from "~~/schemas";
 
 // SEO configuration for home page
 useSeoMeta({
@@ -33,7 +32,18 @@ useSeoMeta({
     "tennis de table, ping-pong, club sportif, Libercourt, activités jeunes adultes",
 });
 
-// Parallel data fetching to avoid sequential SSR blocking
-const [{ sponsors }, { activities }, { events: upcomingEvents }] =
-  await Promise.all([useSponsors(), useActivities(), useUpcomingEvents(3)]);
+// Lazy fetching: hero renders immediately without blocking SSR on DB calls
+const { data: activitiesData } = useLazyFetch<{ activities: Activity[] }>(
+  "/api/activities",
+);
+const { data: eventsData } = useLazyFetch<{ events: CalendarEvent[] }>(
+  "/api/events/upcoming?limit=3",
+);
+const { data: sponsorsData } = useLazyFetch<{ sponsors: Partner[] }>(
+  "/api/sponsors",
+);
+
+const activities = computed(() => activitiesData.value?.activities ?? []);
+const upcomingEvents = computed(() => eventsData.value?.events ?? []);
+const sponsors = computed(() => sponsorsData.value?.sponsors ?? []);
 </script>

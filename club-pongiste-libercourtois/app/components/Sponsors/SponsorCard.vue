@@ -46,7 +46,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 // Accessibility attributes
 const ariaLabel = computed(() =>
-  props.isDuplicate ? undefined : `Visit ${props.sponsor.name} website`,
+  props.isDuplicate ? undefined : `Visiter le site de ${props.sponsor.name}`,
 );
 const tabindex = computed(() => (props.isDuplicate ? -1 : 0));
 </script>

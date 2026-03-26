@@ -35,7 +35,11 @@
               v-if="event.location"
               class="flex items-center text-sm adaptive-text"
             >
-              <UIcon name="i-heroicons-map-pin" class="mr-1" />
+              <UIcon
+                name="i-heroicons-map-pin"
+                class="mr-1"
+                aria-hidden="true"
+              />
               {{ event.location }}
             </div>
 
@@ -52,6 +56,7 @@
                     ? 'text-green-500 mr-1'
                     : 'text-red-500 mr-1'
                 "
+                aria-hidden="true"
               />
               <span
                 :class="

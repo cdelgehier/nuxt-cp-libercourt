@@ -24,7 +24,7 @@
           :key="index"
           class="flex items-center justify-center md:justify-start gap-4 animate-infinite-scroll will-change-transform"
           :class="{ 'ml-4': index === 2 }"
-          :aria-hidden="index === 2"
+          :aria-hidden="index === 2 ? 'true' : undefined"
         >
           <SponsorsSponsorCard
             v-for="sponsor in sponsors"

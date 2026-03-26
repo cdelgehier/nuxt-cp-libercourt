@@ -39,7 +39,9 @@ test.describe("Admin — protection des routes", () => {
     page.on("pageerror", () => {});
     try {
       await page.goto("/admin", { waitUntil: "commit", timeout: 5000 });
-    } catch {}
+    } catch {
+      // navigation error intentionally ignored — redirect to Authentik SSO
+    }
     await expect(page).not.toHaveURL(/^http:\/\/localhost:\d+\/admin$/);
   });
 
@@ -49,7 +51,9 @@ test.describe("Admin — protection des routes", () => {
     page.on("pageerror", () => {});
     try {
       await page.goto("/admin/faq", { waitUntil: "commit", timeout: 5000 });
-    } catch {}
+    } catch {
+      // navigation error intentionally ignored — redirect to Authentik SSO
+    }
     // La page doit être redirigée vers le login (pas rester sur /admin/faq)
     const url = page.url();
     const pathname = new URL(url).pathname;

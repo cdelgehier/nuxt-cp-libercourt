@@ -420,6 +420,27 @@ interface ClubStats {
   lastUpdated: string;
 }
 
+// Shape of /api/club/about (mirrors server/db/fixtures/about.json)
+interface ClubAbout {
+  name: string;
+  foundedYear: number;
+  description: string;
+  mission: string;
+  values: string[];
+  facilities: {
+    tables: number;
+    location: string;
+    address: {
+      street: string;
+      city: string;
+      postalCode: string;
+      country: string;
+    };
+    equipment: string[];
+  };
+  [key: string]: unknown;
+}
+
 // Fetch club statistics from API (real-time data)
 const { data: clubStats, pending } = await useLazyFetch<ClubStats>(
   "/api/club/stats",
@@ -430,7 +451,7 @@ const { data: clubStats, pending } = await useLazyFetch<ClubStats>(
 
 // Parallel data fetching to avoid sequential SSR blocking
 const [clubInfo, clubConfig] = await Promise.all([
-  $fetch("/api/club/about"),
+  $fetch<ClubAbout>("/api/club/about"),
   $fetch("/api/club/config"),
 ]);
 const locationData = clubConfig;

@@ -70,9 +70,6 @@ definePageMeta({ layout: false, middleware: [] });
 useSeoMeta({ title: "Connexion — Admin", robots: "noindex,nofollow" });
 
 const route = useRoute();
-const redirectTarget = computed(() =>
-  encodeURIComponent((route.query.redirect as string) || "/admin"),
-);
 
 function loginWithSSO() {
   // Navigation HTTP complète — /auth/oidc/login est une route serveur nuxt-oidc-auth

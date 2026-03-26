@@ -42,6 +42,7 @@ export default createConfigForNuxt({
             "actualites",
             "equipes",
             "licencies",
+            "login",
           ],
         },
       ],

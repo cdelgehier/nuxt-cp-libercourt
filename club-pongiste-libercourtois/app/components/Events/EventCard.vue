@@ -261,7 +261,7 @@ type EventProp = {
   currentParticipants?: number;
   registrationOpen?: boolean | null;
   registrationDeadline?: string | null;
-  price?: number | null;
+  price?: string | number | null;
   contact?: { name?: string; email?: string; phone?: string } | string | null;
   [key: string]: unknown;
 };
@@ -348,7 +348,7 @@ const addToGoogleCalendar = () => {
           : props.event.contact?.name;
       description += `\n\nContact: ${contactName}`;
     }
-    if (props.event.price != null && props.event.price > 0) {
+    if (props.event.price != null && Number(props.event.price) > 0) {
       description += `\nTarif: ${props.event.price}€`;
     }
 
@@ -382,14 +382,14 @@ const addToGoogleCalendar = () => {
             title: "Lien copié",
             description:
               "Collez-le dans votre navigateur pour ajouter l'événement à Google Agenda.",
-            color: "success",
+            color: "green" as const,
           });
         })
         .catch(() => {
           toast.add({
             title: "Impossible de copier",
             description: googleCalendarUrl,
-            color: "warning",
+            color: "orange" as const,
           });
         });
     }
@@ -399,7 +399,7 @@ const addToGoogleCalendar = () => {
       title: "Erreur",
       description:
         "Une erreur est survenue lors de la création de l'événement calendrier.",
-      color: "error",
+      color: "red" as const,
     });
   }
 };

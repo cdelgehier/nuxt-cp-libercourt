@@ -10,7 +10,11 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       // Only cover pure logic files — repositories and services require a live DB
-      include: ["server/domains/**/teams.ts", "server/domains/**/helpers.ts"],
+      include: [
+        "server/domains/**/teams.ts",
+        "server/domains/**/helpers.ts",
+        "server/domains/identity/basic.ts",
+      ],
       exclude: [],
       thresholds: {
         lines: 80,

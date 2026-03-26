@@ -24,8 +24,9 @@ vi.stubGlobal(
   },
 );
 
-// Import après les mocks
-const { computeStatus, formatPrice } = await import("./helpers");
+// Import depuis la source réelle (server/domains/events/helpers.ts)
+const { computeStatus, formatPrice, enrichEvent } =
+  await import("~/server/domains/events/helpers");
 
 describe("Events — statuts calculés", () => {
   it("événement futur → upcoming", () => {
@@ -49,9 +50,54 @@ describe("Events — statuts calculés", () => {
 
 describe("Events — prix formaté", () => {
   it("null → null", () => expect(formatPrice(null)).toBeNull());
-  it("0 → Gratuit", () => expect(formatPrice(0)).toBe("Gratuit"));
-  it("4500 → 45,00 €", () => expect(formatPrice(4500)).toBe("45,00 €"));
-  it("100 → 1,00 €", () => expect(formatPrice(100)).toBe("1,00 €"));
+  it("'0' → Gratuit", () => expect(formatPrice("0")).toBe("Gratuit"));
+  it("'45' → 45,00 €", () => expect(formatPrice("45")).toBe("45,00\u00A0€"));
+  it("'1' → 1,00 €", () => expect(formatPrice("1")).toBe("1,00\u00A0€"));
+});
+
+describe("Events — enrichEvent", () => {
+  const baseEvent = {
+    id: 1,
+    title: "Tournoi",
+    slug: "tournoi",
+    type: "tournament",
+    startDate: new Date(Date.now() + 86400_000), // demain
+    endDate: null,
+    location: null,
+    description: null,
+    maxParticipants: 10,
+    isRegistrationOpen: true,
+    price: "15",
+    contact: null,
+    imageUrl: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  it("inscriptions ouvertes avec places disponibles → isRegistrationAvailable true", () => {
+    const result = enrichEvent(baseEvent, 3);
+    expect(result.status).toBe("upcoming");
+    expect(result.isRegistrationAvailable).toBe(true);
+    expect(result.spotsLeft).toBe(7);
+    expect(result.formattedPrice).toBe("15,00\u00A0€");
+  });
+
+  it("complet (maxParticipants atteint) → isRegistrationAvailable false", () => {
+    const result = enrichEvent(baseEvent, 10);
+    expect(result.isRegistrationAvailable).toBe(false);
+    expect(result.spotsLeft).toBe(0);
+  });
+
+  it("inscriptions fermées → isRegistrationAvailable false", () => {
+    const result = enrichEvent({ ...baseEvent, isRegistrationOpen: false }, 0);
+    expect(result.isRegistrationAvailable).toBe(false);
+  });
+
+  it("sans limite de participants → spotsLeft null", () => {
+    const result = enrichEvent({ ...baseEvent, maxParticipants: null }, 99);
+    expect(result.spotsLeft).toBeNull();
+    expect(result.isRegistrationAvailable).toBe(true);
+  });
 });
 
 describe("Events — validation Zod", () => {

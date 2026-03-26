@@ -14,13 +14,13 @@ interface RSSItem {
 }
 
 // Extract first image URL from HTML content
-function extractImageFromHtml(html: string): string | undefined {
+export function extractImageFromHtml(html: string): string | undefined {
   const imgMatch = html.match(/<img[^>]+src="([^">]+)"/);
   return imgMatch ? imgMatch[1] : undefined;
 }
 
 // Clean HTML tags from description
-function stripHtml(html: string): string {
+export function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, "").trim();
 }
 

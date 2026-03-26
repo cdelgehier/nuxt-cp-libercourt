@@ -8,7 +8,7 @@
  * 4. Si aucun n'est valide → 401
  */
 
-// @ts-ignore — auto-imported by nuxt-oidc-auth at runtime
+// @ts-expect-error — auto-imported by nuxt-oidc-auth at runtime
 import { getUserSession } from "nuxt-oidc-auth/runtime/server/utils/session.js";
 import { verifyBasicAuth } from "~~/server/domains/identity/basic";
 

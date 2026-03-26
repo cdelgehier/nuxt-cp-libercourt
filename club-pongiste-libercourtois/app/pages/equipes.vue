@@ -1147,14 +1147,14 @@ async function addMatchToCalendar(match: MatchData, team: TeamDataEnriched) {
             title: "Lien copié",
             description:
               "Collez-le dans votre navigateur pour ajouter le match à votre agenda.",
-            color: "success",
+            color: "green" as const,
           });
         })
         .catch(() => {
           toast.add({
             title: "Impossible de copier",
             description: googleCalendarUrl,
-            color: "warning",
+            color: "orange" as const,
           });
         });
     }
@@ -1164,7 +1164,7 @@ async function addMatchToCalendar(match: MatchData, team: TeamDataEnriched) {
       title: "Erreur",
       description:
         "Une erreur est survenue lors de la création de l'événement calendrier.",
-      color: "error",
+      color: "red" as const,
     });
   }
 }

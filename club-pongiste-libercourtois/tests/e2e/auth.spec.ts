@@ -5,7 +5,9 @@ test.describe("Auth — protection admin", () => {
     page.on("pageerror", () => {});
     try {
       await page.goto("/admin", { waitUntil: "commit", timeout: 5000 });
-    } catch {}
+    } catch {
+      // navigation error intentionally ignored — redirect to Authentik SSO
+    }
     await expect(page).not.toHaveURL("http://localhost:3000/admin");
   });
 

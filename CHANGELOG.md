@@ -1,3 +1,9 @@
+## v1.2.1 (2026-03-26)
+
+### Perf
+
+- **home**: add nitro.prerender.routes as explicit prerender config
+
 ## v1.2.0 (2026-03-26)
 
 ### Feat

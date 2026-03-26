@@ -1,3 +1,9 @@
+## v1.2.0 (2026-03-26)
+
+### Feat
+
+- prerender home page to eliminate cold start TTFB
+
 ## v1.1.0 (2026-03-26)
 
 ### Feat

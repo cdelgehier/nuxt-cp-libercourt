@@ -3,7 +3,7 @@
     {
       "id": "fftt",
       "name": "FFTT",
-      "logo": "/images/sponsors/fftt.png",
+      "logo": "/images/sponsors/fftt.webp",
       "website": "https://www.fftt.com",
       "description": "FFTT",
       "category": "partenaire",
@@ -12,7 +12,7 @@
     {
       "id": "ligue-hdf",
       "name": "Ligue HDF",
-      "logo": "/images/sponsors/ligue-hdf.png",
+      "logo": "/images/sponsors/ligue-hdf.webp",
       "website": "https://liguehdftt.fr",
       "description": "Ligue HDF",
       "category": "partenaire",
@@ -21,7 +21,7 @@
     {
       "id": "comite-62",
       "name": "Comité 62",
-      "logo": "/images/sponsors/cdtt62.jpg",
+      "logo": "/images/sponsors/cdtt62.webp",
       "website": "https://cd62tt.fr",
       "description": "Comité 62",
       "category": "partenaire",
@@ -30,7 +30,7 @@
     {
       "id": "timgad-lens",
       "name": "Le Timgad de Lens",
-      "logo": "/images/sponsors/Timgad.png",
+      "logo": "/images/sponsors/Timgad.webp",
       "website": "https://letimgad-lens.fr/fr",
       "description": "Restaurant Le Timgad de Lens",
       "category": "sponsor",
@@ -39,7 +39,7 @@
     {
       "id": "jlf",
       "name": "JLF Transport",
-      "logo": "/images/sponsors/JLF.png",
+      "logo": "/images/sponsors/JLF.webp",
       "website": "https://www.astransports-jlf.com",
       "description": "JLF - Transport express",
       "category": "sponsor",
@@ -48,7 +48,7 @@
     {
       "id": "zeelee",
       "name": "Zeelee Kebab",
-      "logo": "/images/sponsors/Zeelee.png",
+      "logo": "/images/sponsors/Zeelee.webp",
       "website": "https://www.zeeleelibercourt.fr/",
       "description": "Zeelee Libercourt - Restaurant",
       "category": "sponsor",
@@ -57,7 +57,7 @@
     {
       "id": "au-coin-de-la-fleur",
       "name": "Fleuriste",
-      "logo": "/images/sponsors/au_coin_de_la_fleur.png",
+      "logo": "/images/sponsors/au_coin_de_la_fleur.webp",
       "website": "https://www.facebook.com/p/Au-Coin-de-la-Fleur-100063773100871/",
       "description": "Au Coin de la Fleur - Fleuriste",
       "category": "sponsor",
@@ -66,7 +66,7 @@
     {
       "id": "a-croquer",
       "name": "Artisan Traiteur",
-      "logo": "/images/sponsors/a_croquer.png",
+      "logo": "/images/sponsors/a_croquer.webp",
       "website": "https://www.acroquerartisantraiteur.com/",
       "description": "À Croquer - Artisan Traiteur",
       "category": "sponsor",
@@ -75,7 +75,7 @@
     {
       "id": "gbs",
       "name": "GBS",
-      "logo": "/images/sponsors/GBS.png",
+      "logo": "/images/sponsors/GBS.webp",
       "website": "https://gbspe.com/",
       "description": "GBS",
       "category": "sponsor",
@@ -84,7 +84,7 @@
     {
       "id": "instru-mesure",
       "name": "Instru Mesure",
-      "logo": "/images/sponsors/Instru_mesure.png",
+      "logo": "/images/sponsors/Instru_mesure.webp",
       "website": "https://www.instrumesure.fr",
       "description": "Instru Mesure",
       "category": "sponsor",
@@ -93,7 +93,7 @@
     {
       "id": "le-repere-du-centre",
       "name": "Le Repère du Centre",
-      "logo": "/images/sponsors/Le_repere_du_centre.png",
+      "logo": "/images/sponsors/Le_repere_du_centre.webp",
       "website": "https://www.facebook.com/LeRepereduCentre/?locale=fr_FR",
       "description": "Tabac, FDJ, PMU, Presse",
       "category": "sponsor",
@@ -102,7 +102,7 @@
     {
       "id": "le-tabac-du-centre",
       "name": "Le Tabac du Centre",
-      "logo": "/images/sponsors/Le_tabac_du_centre.png",
+      "logo": "/images/sponsors/Le_tabac_du_centre.webp",
       "website": "https://bureautabac.fr/62/libercourt/tabac-du-centre-wd9",
       "description": "Le Tabac du Centre",
       "category": "sponsor",
@@ -111,7 +111,7 @@
     {
       "id": "nearfix",
       "name": "Nearfix",
-      "logo": "/images/sponsors/Nearfix.png",
+      "logo": "/images/sponsors/Nearfix.webp",
       "website": "https://www.nearfix.fr",
       "description": "Nearfix",
       "category": "sponsor",
@@ -120,7 +120,7 @@
     {
       "id": "o-point-cho",
       "name": "O Point Cho",
-      "logo": "/images/sponsors/o_point_cho.png",
+      "logo": "/images/sponsors/o_point_cho.webp",
       "website": "https://www.facebook.com/opoint.cho/?locale=fr_FR",
       "description": "O Point Cho",
       "category": "sponsor",
@@ -129,7 +129,7 @@
     {
       "id": "roofup",
       "name": "Roofup",
-      "logo": "/images/sponsors/roofup.png",
+      "logo": "/images/sponsors/roofup.webp",
       "website": "https://roofup.fr/",
       "description": "Roofup",
       "category": "sponsor",

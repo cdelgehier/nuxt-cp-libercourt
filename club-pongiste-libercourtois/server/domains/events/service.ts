@@ -3,63 +3,13 @@
  */
 
 import * as repo from "./repository";
-import type { EnrichedEvent, Event, InsertEvent } from "./types";
+import { enrichEvent } from "./helpers";
+import type { InsertEvent } from "./types";
 import {
   createEventInputSchema,
   registerForEventSchema,
   updateEventInputSchema,
 } from "./types";
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function computeStatus(event: Event): EnrichedEvent["status"] {
-  const now = new Date();
-  const start = new Date(event.startDate);
-  const end = event.endDate ? new Date(event.endDate) : null;
-
-  if (end && now >= start && now <= end) return "ongoing";
-  if (start > now) return "upcoming";
-  return "past";
-}
-
-function formatPrice(price: string | null): string | null {
-  if (price === null) return null;
-  const n = Number(price);
-  if (n === 0) return "Gratuit";
-  return n.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
-}
-
-function enrichEvent(event: Event, registrationCount: number): EnrichedEvent {
-  const status = computeStatus(event);
-  const spotsLeft =
-    event.maxParticipants != null
-      ? Math.max(0, event.maxParticipants - registrationCount)
-      : null;
-
-  return {
-    ...event,
-    status,
-    isRegistrationAvailable:
-      event.isRegistrationOpen === true &&
-      status !== "past" &&
-      (spotsLeft === null || spotsLeft > 0),
-    formattedPrice: formatPrice(event.price ?? null),
-    spotsLeft,
-    // CalendarEvent compatibility aliases
-    date:
-      event.startDate instanceof Date
-        ? event.startDate.toISOString()
-        : String(event.startDate),
-    registrationOpen: event.isRegistrationOpen ?? false,
-    currentParticipants: registrationCount,
-    registrationDeadline:
-      event.endDate instanceof Date
-        ? event.endDate.toISOString()
-        : (event.endDate ?? undefined),
-  };
-}
 
 // ---------------------------------------------------------------------------
 // Exports

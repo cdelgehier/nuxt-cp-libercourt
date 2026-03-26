@@ -6,6 +6,8 @@
 [build.environment]
   # Exclude certain paths from secrets scanning
   SECRETS_SCAN_OMIT_PATHS = ".env.example,.netlify/functions-internal/**,.nuxt/**"
+  # Increase Node.js heap size for Nuxt/Vite build (Tailwind v4 + large pnpm-lock)
+  NODE_OPTIONS = "--max-old-space-size=4096"
 
 [context.production]
   command = "pnpm build"

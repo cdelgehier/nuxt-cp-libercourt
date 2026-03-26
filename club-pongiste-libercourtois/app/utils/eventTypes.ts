@@ -14,7 +14,7 @@ export const EVENT_TYPE_CONFIG: Record<
   stage: {
     label: "Stage",
     class:
-      "bg-secondary-50 text-secondary-600 dark:bg-secondary-900/20 dark:text-secondary-300",
+      "bg-secondary-50 text-secondary-800 dark:bg-secondary-900/20 dark:text-secondary-200",
   },
   meeting: {
     label: "Réunion",

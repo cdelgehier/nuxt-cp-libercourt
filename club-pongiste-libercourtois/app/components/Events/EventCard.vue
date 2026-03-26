@@ -122,10 +122,10 @@
         <!-- Registration Deadline -->
         <div
           v-if="event.registrationDeadline && event.registrationOpen"
-          class="flex items-center text-sm text-orange-600"
+          class="flex items-center text-sm text-orange-800"
         >
           <svg
-            class="w-4 h-4 mr-2 text-orange-400"
+            class="w-4 h-4 mr-2 text-orange-700"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

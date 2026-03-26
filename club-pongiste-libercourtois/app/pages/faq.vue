@@ -22,11 +22,16 @@
     <section class="py-8 page-section">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="relative">
+          <label for="faq-search" class="sr-only"
+            >Rechercher une question</label
+          >
           <Icon
             name="i-heroicons-magnifying-glass"
             class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+            aria-hidden="true"
           />
           <input
+            id="faq-search"
             v-model="searchTerm"
             type="text"
             placeholder="Rechercher une question..."
@@ -99,9 +104,9 @@
 
         <!-- Contact pour autres questions -->
         <div class="mt-16 bg-club-blue rounded-xl p-8 text-center text-white">
-          <h3 class="text-2xl font-bold mb-4">
+          <h2 class="text-2xl font-bold mb-4">
             Vous ne trouvez pas votre réponse ?
-          </h3>
+          </h2>
           <p class="text-blue-100 mb-6">
             Notre équipe est là pour vous aider ! Contactez-nous directement.
           </p>
@@ -128,17 +133,6 @@
 </template>
 
 <script setup lang="ts">
-// Load club configuration for dynamic content
-const { data: clubConfig } = await useFetch("/api/club/config");
-
-// Configuration SEO with dynamic club name
-useSeoMeta({
-  title: "FAQ - Questions Fréquentes",
-  description: `Trouvez les réponses aux questions les plus courantes sur le ${clubConfig.value?.name || "Club Pongiste Libercourtois"} : inscriptions, tarifs, horaires, matériel et compétitions.`,
-  keywords:
-    "FAQ tennis de table, questions fréquentes, inscriptions club, tarifs ping pong, horaires entrainement, Libercourt",
-});
-
 // Use the FAQ composable to load questions
 const {
   faqData,
@@ -149,11 +143,20 @@ const {
   formatForAccordion,
 } = useClubFaq();
 
-// Load FAQ data
-await fetchFaqData();
+// Parallel data fetching to avoid sequential SSR blocking
+const [{ data: clubConfig }, , contactData] = await Promise.all([
+  useFetch("/api/club/config"),
+  fetchFaqData(),
+  $fetch("/api/club/contact"),
+]);
 
-// Load contact data for phone number
-const contactData = await $fetch("/api/club/contact");
+// Configuration SEO with dynamic club name
+useSeoMeta({
+  title: "FAQ - Questions Fréquentes",
+  description: `Trouvez les réponses aux questions les plus courantes sur le ${clubConfig.value?.name || "Club Pongiste Libercourtois"} : inscriptions, tarifs, horaires, matériel et compétitions.`,
+  keywords:
+    "FAQ tennis de table, questions fréquentes, inscriptions club, tarifs ping pong, horaires entrainement, Libercourt",
+});
 
 // Local state
 const searchTerm = ref("");

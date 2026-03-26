@@ -111,7 +111,7 @@ function getEventTypeClass(type: string): string {
     tournament:
       "bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300",
     stage:
-      "bg-secondary-50 text-secondary-600 dark:bg-secondary-900/20 dark:text-secondary-300",
+      "bg-secondary-50 text-secondary-800 dark:bg-secondary-900/20 dark:text-secondary-200",
     competition:
       "bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300",
     meeting:
@@ -121,7 +121,7 @@ function getEventTypeClass(type: string): string {
     Tournoi:
       "bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300",
     Stage:
-      "bg-secondary-50 text-secondary-600 dark:bg-secondary-900/20 dark:text-secondary-300",
+      "bg-secondary-50 text-secondary-800 dark:bg-secondary-900/20 dark:text-secondary-200",
     Compétition:
       "bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300",
   };

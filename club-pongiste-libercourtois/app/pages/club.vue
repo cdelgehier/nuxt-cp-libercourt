@@ -15,7 +15,7 @@
           </p>
           <div class="flex flex-wrap justify-center gap-8 text-center">
             <div
-              class="bg-white/10 backdrop-blur-sm rounded-lg p-4 min-w-[120px]"
+              class="bg-club-navy/60 backdrop-blur-sm rounded-lg p-4 min-w-[120px]"
             >
               <div class="text-3xl font-bold text-club-yellow">
                 {{ pending ? "..." : clubStats?.licencies }}
@@ -23,7 +23,7 @@
               <div class="text-sm text-gray-300">Licenciés</div>
             </div>
             <div
-              class="bg-white/10 backdrop-blur-sm rounded-lg p-4 min-w-[120px]"
+              class="bg-club-navy/60 backdrop-blur-sm rounded-lg p-4 min-w-[120px]"
             >
               <div class="text-3xl font-bold text-club-yellow">
                 {{ pending ? "..." : clubStats?.equipes }}
@@ -31,7 +31,7 @@
               <div class="text-sm text-gray-300">Équipes</div>
             </div>
             <div
-              class="bg-white/10 backdrop-blur-sm rounded-lg p-4 min-w-[120px]"
+              class="bg-club-navy/60 backdrop-blur-sm rounded-lg p-4 min-w-[120px]"
             >
               <div class="text-3xl font-bold text-club-yellow">
                 {{ pending ? "..." : clubStats?.annees }}
@@ -204,39 +204,50 @@
                 <button
                   class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-colors z-10"
                   :disabled="facilityImages.length <= 1"
+                  aria-label="Image précédente"
                   @click="previousImage"
                 >
                   <UIcon
                     name="i-heroicons-chevron-left-20-solid"
                     class="w-5 h-5 text-club-navy"
+                    aria-hidden="true"
                   />
                 </button>
 
                 <button
                   class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-colors z-10"
                   :disabled="facilityImages.length <= 1"
+                  aria-label="Image suivante"
                   @click="nextImage"
                 >
                   <UIcon
                     name="i-heroicons-chevron-right-20-solid"
                     class="w-5 h-5 text-club-navy"
+                    aria-hidden="true"
                   />
                 </button>
 
                 <!-- Indicateurs -->
                 <div
                   class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10"
+                  aria-label="Navigation images"
                 >
                   <button
                     v-for="(image, index) in facilityImages"
                     :key="index"
-                    class="w-2 h-2 rounded-full transition-colors"
-                    :class="{
-                      'bg-white': currentImageIndex === index,
-                      'bg-white/50': currentImageIndex !== index,
-                    }"
+                    class="w-6 h-6 rounded-full flex items-center justify-center focus:outline-none"
+                    :aria-label="`Voir l'image ${index + 1} : ${image.alt}`"
+                    :aria-pressed="currentImageIndex === index"
                     @click="goToImage(index)"
-                  />
+                  >
+                    <span
+                      class="w-2 h-2 rounded-full transition-colors"
+                      :class="{
+                        'bg-white': currentImageIndex === index,
+                        'bg-white/50': currentImageIndex !== index,
+                      }"
+                    />
+                  </button>
                 </div>
               </div>
 
@@ -347,7 +358,7 @@
                 </UButton>
 
                 <UButton
-                  color="green"
+                  color="gray"
                   size="sm"
                   variant="outline"
                   block
@@ -417,11 +428,11 @@ const { data: clubStats, pending } = await useLazyFetch<ClubStats>(
   },
 );
 
-// Chargement des informations du club (static data)
-const clubInfo = await $fetch("/api/club/about");
-
-// Load club configuration for Google Maps links
-const clubConfig = await $fetch("/api/club/config");
+// Parallel data fetching to avoid sequential SSR blocking
+const [clubInfo, clubConfig] = await Promise.all([
+  $fetch("/api/club/about"),
+  $fetch("/api/club/config"),
+]);
 const locationData = clubConfig;
 
 // Configuration SEO using dynamic club name

@@ -54,7 +54,7 @@
                     session.time
                   }}</span>
                   <span
-                    class="text-xs bg-club-green text-white px-2 py-1 rounded-full"
+                    class="text-xs bg-club-green text-club-navy px-2 py-1 rounded-full"
                   >
                     {{ session.coach }}
                   </span>
@@ -177,7 +177,7 @@
               <h4 class="font-bold adaptive-title mb-2">
                 {{ service.category }}
               </h4>
-              <div class="text-2xl font-bold text-club-green mb-1">
+              <div class="text-2xl font-bold text-teal-700 mb-1">
                 {{ formatPrice(service.price) }}
               </div>
               <div class="text-sm adaptive-text mb-3">
@@ -284,7 +284,7 @@
                           </p>
                           <p
                             v-if="'condition' in document && document.condition"
-                            class="text-sm text-orange-600 font-medium mb-2"
+                            class="text-sm text-orange-800 font-medium mb-2"
                           >
                             <UIcon
                               name="i-heroicons-exclamation-triangle"
@@ -299,7 +299,7 @@
                             :href="document.url"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="inline-flex items-center text-sm bg-club-green text-white px-4 py-2 rounded-lg font-semibold hover:bg-club-navy transition-all duration-200 shadow-md hover:shadow-lg"
+                            class="inline-flex items-center text-sm bg-club-green text-club-navy px-4 py-2 rounded-lg font-semibold hover:bg-club-navy hover:text-white transition-all duration-200 shadow-md hover:shadow-lg"
                           >
                             <UIcon
                               name="i-heroicons-arrow-down-tray"
@@ -365,7 +365,7 @@
     </section>
 
     <!-- Section CTA -->
-    <section class="py-16 bg-club-green">
+    <section class="py-16 bg-club-navy">
       <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl font-bold text-white mb-4">
           Prêt à rejoindre notre club ?
@@ -389,7 +389,7 @@
             variant="outline"
             color="white"
             size="lg"
-            class="font-semibold"
+            class="font-semibold border-white text-white hover:bg-white hover:text-club-navy"
           >
             <UIcon name="i-heroicons-information-circle" class="mr-2" />
             En savoir plus sur le club
@@ -401,8 +401,11 @@
 </template>
 
 <script setup lang="ts">
-// Load club configuration for dynamic content
-const { data: clubConfig } = await useFetch("/api/club/config");
+// Parallel data fetching to avoid sequential SSR blocking
+const [{ data: clubConfig }, data] = await Promise.all([
+  useFetch("/api/club/config"),
+  $fetch("/api/club/schedules-pricing"),
+]);
 
 // Configuration SEO with dynamic club name
 useSeoMeta({
@@ -412,14 +415,13 @@ useSeoMeta({
     "horaires tennis de table, tarifs club, entraînement ping-pong, créneaux Libercourt, inscription club",
 });
 
-// Load schedule and pricing data
-const data = await $fetch("/api/club/schedules-pricing");
-
 // Function to get icon based on document type
 function formatPrice(euros: number | string) {
   return Number(euros).toLocaleString("fr-FR", {
     style: "currency",
     currency: "EUR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   });
 }
 

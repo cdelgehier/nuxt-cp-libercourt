@@ -30,7 +30,7 @@
             </p>
             <div class="pt-2">
               <span
-                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-club-green/10 text-club-green"
+                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-club-green/20 text-club-navy"
               >
                 {{ activity.ageGroup }}
               </span>

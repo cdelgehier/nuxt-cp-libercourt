@@ -62,7 +62,7 @@
           <div
             class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center"
           >
-            <div class="text-2xl font-bold text-club-green">
+            <div class="text-2xl font-bold text-teal-700">
               {{ currentPhaseTeams.length }}
             </div>
             <div class="text-sm text-gray-600 dark:text-gray-400">
@@ -112,14 +112,14 @@
           </UButton>
           <UButton
             :variant="selectedCategory === 'seniors' ? 'solid' : 'outline'"
-            color="blue"
+            :color="selectedCategory === 'seniors' ? 'blue' : 'gray'"
             @click="selectedCategory = 'seniors'"
           >
             Adultes ({{ seniorTeams.length }})
           </UButton>
           <UButton
             :variant="selectedCategory === 'juniors' ? 'solid' : 'outline'"
-            color="green"
+            :color="selectedCategory === 'juniors' ? 'green' : 'gray'"
             @click="selectedCategory = 'juniors'"
           >
             Juniors ({{ juniorTeams.length }})
@@ -141,7 +141,7 @@
             >
               <div class="flex items-center space-x-4">
                 <div
-                  class="flex items-center justify-center w-10 h-10 rounded-full bg-club-green text-white font-bold text-lg"
+                  class="flex items-center justify-center w-10 h-10 rounded-full bg-club-green text-club-navy font-bold text-lg"
                 >
                   {{ phase }}
                 </div>
@@ -156,7 +156,7 @@
                 </div>
                 <span
                   v-if="phase === sortedPhases[0]"
-                  class="ml-2 px-2 py-0.5 text-xs font-semibold bg-club-green text-white rounded-full"
+                  class="ml-2 px-2 py-0.5 text-xs font-semibold bg-club-green text-club-navy rounded-full"
                 >
                   En cours
                 </span>
@@ -733,12 +733,12 @@ const poolRankings = ref<Record<string, any[]>>({});
 const loadingRankings = ref<Record<string, boolean>>({});
 const rankingErrors = ref<Record<string, string>>({});
 
-// Fetch teams data
+// Fetch teams data — useLazyFetch to avoid blocking SSR (SmartPing is slow)
 const {
   data: teams,
   pending: teamsLoading,
   error: teamsError,
-} = await useFetch<{
+} = useLazyFetch<{
   success: boolean;
   data?: TeamDataEnriched[];
   error?: string;

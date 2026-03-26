@@ -37,6 +37,7 @@
             icon="i-heroicons-bars-3"
             variant="ghost"
             color="gray"
+            aria-label="Ouvrir le menu de navigation"
             @click="mobileMenuOpen = !mobileMenuOpen"
           />
         </div>

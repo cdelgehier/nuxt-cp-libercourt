@@ -18,7 +18,7 @@ importers:
         version: 2.0.0(db0@0.3.4(drizzle-orm@0.45.1(@neondatabase/serverless@1.0.2)(@types/pg@8.20.0)(pg@8.20.0)))(ioredis@5.10.1)(magicast@0.5.2)
       "@nuxt/ui":
         specifier: ^2.17.0
-        version: 2.22.0(focus-trap@8.0.1)(jwt-decode@4.0.0)(magicast@0.5.2)(vite@7.3.1(@types/node@20.19.1)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))(vue@3.5.30(typescript@5.8.3))(zod@3.25.67)
+        version: 2.22.0(focus-trap@8.0.1)(jwt-decode@4.0.0)(magicast@0.5.2)(vite@7.3.1(@types/node@20.19.1)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))(vue@3.5.30(typescript@5.8.3))(zod@4.3.6)
       "@nuxtjs/color-mode":
         specifier: ^3.5.2
         version: 3.5.2(magicast@0.5.2)
@@ -39,7 +39,7 @@ importers:
         version: 0.45.1(@neondatabase/serverless@1.0.2)(@types/pg@8.20.0)(pg@8.20.0)
       drizzle-zod:
         specifier: ^0.8.3
-        version: 0.8.3(drizzle-orm@0.45.1(@neondatabase/serverless@1.0.2)(@types/pg@8.20.0)(pg@8.20.0))(zod@3.25.67)
+        version: 0.8.3(drizzle-orm@0.45.1(@neondatabase/serverless@1.0.2)(@types/pg@8.20.0)(pg@8.20.0))(zod@4.3.6)
       fast-xml-parser:
         specifier: ^5.2.5
         version: 5.2.5
@@ -62,8 +62,8 @@ importers:
         specifier: ^5.3.2
         version: 5.3.2(chart.js@4.5.0)(vue@3.5.30(typescript@5.8.3))
       zod:
-        specifier: ^3.25.67
-        version: 3.25.67
+        specifier: ^4.0.0
+        version: 4.3.6
     devDependencies:
       "@iconify-json/heroicons":
         specifier: ^1.2.2
@@ -11207,10 +11207,10 @@ packages:
       }
     engines: { node: ">= 14" }
 
-  zod@3.25.67:
+  zod@4.3.6:
     resolution:
       {
-        integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==,
+        integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==,
       }
 
 snapshots:
@@ -12610,7 +12610,7 @@ snapshots:
       rc9: 3.0.0
       std-env: 3.10.0
 
-  "@nuxt/ui@2.22.0(focus-trap@8.0.1)(jwt-decode@4.0.0)(magicast@0.5.2)(vite@7.3.1(@types/node@20.19.1)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))(vue@3.5.30(typescript@5.8.3))(zod@3.25.67)":
+  "@nuxt/ui@2.22.0(focus-trap@8.0.1)(jwt-decode@4.0.0)(magicast@0.5.2)(vite@7.3.1(@types/node@20.19.1)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))(vue@3.5.30(typescript@5.8.3))(zod@4.3.6)":
     dependencies:
       "@headlessui/tailwindcss": 0.2.2(tailwindcss@3.4.17)
       "@headlessui/vue": 1.7.23(vue@3.5.30(typescript@5.8.3))
@@ -12636,7 +12636,7 @@ snapshots:
       tailwind-merge: 2.6.0
       tailwindcss: 3.4.17
     optionalDependencies:
-      zod: 3.25.67
+      zod: 4.3.6
     transitivePeerDependencies:
       - async-validator
       - axios
@@ -14849,10 +14849,10 @@ snapshots:
       "@types/pg": 8.20.0
       pg: 8.20.0
 
-  drizzle-zod@0.8.3(drizzle-orm@0.45.1(@neondatabase/serverless@1.0.2)(@types/pg@8.20.0)(pg@8.20.0))(zod@3.25.67):
+  drizzle-zod@0.8.3(drizzle-orm@0.45.1(@neondatabase/serverless@1.0.2)(@types/pg@8.20.0)(pg@8.20.0))(zod@4.3.6):
     dependencies:
       drizzle-orm: 0.45.1(@neondatabase/serverless@1.0.2)(@types/pg@8.20.0)(pg@8.20.0)
-      zod: 3.25.67
+      zod: 4.3.6
 
   dunder-proto@1.0.1:
     dependencies:
@@ -18539,4 +18539,4 @@ snapshots:
       compress-commons: 6.0.2
       readable-stream: 4.7.0
 
-  zod@3.25.67: {}
+  zod@4.3.6: {}

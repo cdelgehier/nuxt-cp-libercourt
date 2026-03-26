@@ -10,9 +10,7 @@ export const PartnerSchema = z.object({
   website: z.string().optional(),
   description: z.string().optional(),
   category: z.enum(["sponsor", "partenaire", "institutionnel"], {
-    errorMap: () => ({
-      message: "Category must be sponsor, partenaire, or institutionnel",
-    }),
+    error: "Category must be sponsor, partenaire, or institutionnel",
   }),
   since: z.number().int().min(1970).max(new Date().getFullYear()).optional(),
 });
@@ -52,10 +50,7 @@ export const CalendarEventSchema = z.object({
   currentParticipants: z.number().int().min(0).default(0),
   registrationOpen: z.boolean().default(false),
   registrationDeadline: z.string().nullable().optional(),
-  price: z
-    .union([z.number(), z.string().transform(Number)])
-    .nullable()
-    .optional(),
+  price: z.coerce.number().nullable().optional(),
   multiDay: z.boolean().optional(),
   contact: z
     .union([

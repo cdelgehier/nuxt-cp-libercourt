@@ -20,7 +20,11 @@
             <div
               class="inline-flex items-center justify-center w-16 h-16 bg-club-yellow/10 rounded-full"
             >
-              <UIcon :name="activity.icon" class="text-2xl text-club-green" />
+              <UIcon
+                :name="activity.icon"
+                class="text-2xl text-club-green"
+                aria-hidden="true"
+              />
             </div>
             <h3 class="text-xl font-semibold adaptive-title">
               {{ activity.title }}

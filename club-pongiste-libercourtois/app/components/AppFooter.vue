@@ -40,6 +40,7 @@
               <UIcon
                 name="i-heroicons-map-pin"
                 class="text-club-yellow mt-0.5"
+                aria-hidden="true"
               />
               <div class="text-gray-300 text-sm">
                 <p>{{ config?.salle || "Salle Deladerriere" }}</p>
@@ -54,7 +55,11 @@
             </div>
 
             <div class="flex items-center space-x-3">
-              <UIcon name="i-heroicons-phone" class="text-club-yellow" />
+              <UIcon
+                name="i-heroicons-phone"
+                class="text-club-yellow"
+                aria-hidden="true"
+              />
               <a
                 v-if="config?.phone"
                 :href="`tel:+33${config.phone.replace(/\s/g, '').slice(1)}`"
@@ -65,7 +70,11 @@
             </div>
 
             <div class="flex items-center space-x-3">
-              <UIcon name="i-heroicons-envelope" class="text-club-yellow" />
+              <UIcon
+                name="i-heroicons-envelope"
+                class="text-club-yellow"
+                aria-hidden="true"
+              />
               <a
                 v-if="config?.email"
                 :href="`mailto:${config.email}`"
@@ -89,7 +98,11 @@
               class="text-gray-300 hover:text-club-yellow transition-colors"
               aria-label="Facebook"
             >
-              <UIcon name="i-simple-icons-facebook" size="20" />
+              <UIcon
+                name="i-simple-icons-facebook"
+                size="20"
+                aria-hidden="true"
+              />
             </a>
           </div>
 
@@ -135,11 +148,9 @@
 </template>
 
 <script setup lang="ts">
-// Parallel data fetching to avoid sequential SSR blocking
-const [{ data: config }, { data: schedulesData }] = await Promise.all([
-  useFetch("/api/club/config"),
-  useFetch("/api/club/schedules-pricing"),
-]);
+// Lazy fetching: footer is always below the fold, no need to block SSR
+const { data: config } = useLazyFetch("/api/club/config");
+const { data: schedulesData } = useLazyFetch("/api/club/schedules-pricing");
 
 // Current year for copyright
 const currentYear = new Date().getFullYear();

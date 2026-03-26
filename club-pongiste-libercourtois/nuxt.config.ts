@@ -54,6 +54,7 @@ export default defineNuxtConfig({
   // SEO and Meta
   app: {
     head: {
+      htmlAttrs: { lang: "fr" },
       title: "Club Pongiste Libercourtois - Depuis 1970",
       meta: [
         { charset: "utf-8" },
@@ -75,10 +76,21 @@ export default defineNuxtConfig({
           content: "Club de tennis de table à Libercourt depuis 1970",
         },
         { property: "og:type", content: "website" },
-        { property: "og:image", content: "/images/logo-club.webp" },
+        { property: "og:url", content: "https://cplibercourt.netlify.app" },
+        {
+          property: "og:image",
+          content: "https://cplibercourt.netlify.app/images/logo-club.webp",
+        },
       ],
       link: [
         { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+        // Preload logo (LCP element) for faster rendering
+        {
+          rel: "preload",
+          as: "image",
+          href: "/images/logo-club.webp",
+          type: "image/webp",
+        },
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         {
           rel: "preconnect",
@@ -104,6 +116,40 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
     typeCheck: false, // Disable typeCheck to avoid Vue type conflicts
+  },
+
+  // Route-level caching: CDN (Netlify edge) caches public API responses
+  routeRules: {
+    "/api/activities": {
+      headers: {
+        "Cache-Control": "public, max-age=300, stale-while-revalidate=600",
+      },
+    },
+    "/api/sponsors": {
+      headers: {
+        "Cache-Control": "public, max-age=300, stale-while-revalidate=600",
+      },
+    },
+    "/api/events/upcoming": {
+      headers: {
+        "Cache-Control": "public, max-age=60, stale-while-revalidate=120",
+      },
+    },
+    "/api/events/calendar": {
+      headers: {
+        "Cache-Control": "public, max-age=60, stale-while-revalidate=120",
+      },
+    },
+    "/api/club/faq": {
+      headers: {
+        "Cache-Control": "public, max-age=300, stale-while-revalidate=600",
+      },
+    },
+    "/api/club/config": {
+      headers: {
+        "Cache-Control": "public, max-age=3600, stale-while-revalidate=7200",
+      },
+    },
   },
 
   // Build configuration

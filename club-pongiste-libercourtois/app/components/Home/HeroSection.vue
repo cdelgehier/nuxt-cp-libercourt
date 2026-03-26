@@ -18,7 +18,11 @@
             size="lg"
             class="font-semibold bg-club-yellow text-club-navy hover:bg-yellow-400"
           >
-            <UIcon name="i-heroicons-user-plus" class="mr-2" />
+            <UIcon
+              name="i-heroicons-user-plus"
+              class="mr-2"
+              aria-hidden="true"
+            />
             Nous rejoindre
           </UButton>
           <UButton
@@ -28,7 +32,11 @@
             size="lg"
             class="font-semibold border-white text-white hover:bg-white hover:text-club-navy"
           >
-            <UIcon name="i-heroicons-information-circle" class="mr-2" />
+            <UIcon
+              name="i-heroicons-information-circle"
+              class="mr-2"
+              aria-hidden="true"
+            />
             Découvrir le club
           </UButton>
         </div>

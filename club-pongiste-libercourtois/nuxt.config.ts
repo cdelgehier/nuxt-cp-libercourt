@@ -118,8 +118,10 @@ export default defineNuxtConfig({
     typeCheck: false, // Disable typeCheck to avoid Vue type conflicts
   },
 
-  // Route-level caching: CDN (Netlify edge) caches public API responses
+  // Route-level caching
   routeRules: {
+    // Pre-render home page as static HTML — eliminates Netlify Function cold start (~3s TTFB)
+    "/": { prerender: true },
     "/api/activities": {
       headers: {
         "Cache-Control": "public, max-age=300, stale-while-revalidate=600",

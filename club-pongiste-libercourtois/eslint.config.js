@@ -7,7 +7,7 @@ export default createConfigForNuxt({
   features: {
     typescript: true,
     vue: true,
-    stylistic: true,
+    stylistic: false,
   },
 }).append(
   // Rules applied to all files
@@ -26,7 +26,14 @@ export default createConfigForNuxt({
         { argsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
       ],
       "@typescript-eslint/no-explicit-any": "warn",
-      "vue/html-self-closing": "error",
+      "vue/html-self-closing": [
+        "error",
+        {
+          html: { void: "any", normal: "always", component: "always" },
+          svg: "always",
+          math: "always",
+        },
+      ],
       "vue/require-default-prop": "error",
       "vue/multi-word-component-names": [
         "error",

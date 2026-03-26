@@ -33,12 +33,7 @@ useSeoMeta({
     "tennis de table, ping-pong, club sportif, Libercourt, activités jeunes adultes",
 });
 
-// Load sponsors data using composable with Zod validation
-const { sponsors } = await useSponsors();
-
-// Load activities data using composable with Zod validation
-const { activities } = await useActivities();
-
-// Load upcoming events using composable with Zod validation
-const { events: upcomingEvents } = await useUpcomingEvents(3);
+// Parallel data fetching to avoid sequential SSR blocking
+const [{ sponsors }, { activities }, { events: upcomingEvents }] =
+  await Promise.all([useSponsors(), useActivities(), useUpcomingEvents(3)]);
 </script>

@@ -20,7 +20,7 @@
         <div
           class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center"
         >
-          <div class="text-2xl font-bold text-club-green">
+          <div class="text-2xl font-bold text-teal-700">
             {{ filteredLicensees.length }}
           </div>
           <div class="text-sm text-gray-600 dark:text-gray-400">
@@ -222,10 +222,10 @@
               </div>
             </div>
             <div class="ml-3 flex-1">
-              <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+              <h2 class="text-base font-semibold text-gray-900 dark:text-white">
                 {{ (licensee as any).firstName }}
                 {{ (licensee as any).lastName }}
-              </h3>
+              </h2>
               <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ getCategoryLabel((licensee as any).cat) }}
                 <span
@@ -273,8 +273,8 @@ const searchQuery = ref("");
 const genderFilter = ref("all");
 const ageFilter = ref("all");
 
-// Chargement des données
-const { data, pending, error } = await useFetch("/api/club/licensees");
+// useLazyFetch to avoid blocking SSR (SmartPing is slow)
+const { data, pending, error } = useLazyFetch("/api/club/licensees");
 
 // Données des licenciés
 const licensees = computed(() => data.value?.licensees || []);
@@ -373,29 +373,29 @@ function getClassificationColor(clast: string | number): string {
 
   // Fine-tuned color scale for small club reality (most players 5-14)
   if (classification <= 5) {
-    return "bg-red-500"; // Beginner level - red
+    return "bg-red-700"; // Beginner level - red
   } else if (classification === 6) {
-    return "bg-orange-500"; // Beginner+ level - orange
+    return "bg-orange-700"; // Beginner+ level - orange
   } else if (classification === 7) {
-    return "bg-amber-500"; // Below average level - amber
+    return "bg-amber-700"; // Below average level - amber
   } else if (classification === 8) {
-    return "bg-yellow-500"; // Average- level - yellow
+    return "bg-yellow-700"; // Average- level - yellow
   } else if (classification === 9) {
-    return "bg-lime-500"; // Average level - lime
+    return "bg-lime-700"; // Average level - lime
   } else if (classification === 10) {
-    return "bg-green-500"; // Average+ level - green
+    return "bg-green-700"; // Average+ level - green
   } else if (classification === 11) {
-    return "bg-emerald-500"; // Good- level - emerald
+    return "bg-emerald-700"; // Good- level - emerald
   } else if (classification === 12) {
-    return "bg-teal-500"; // Good level - teal
+    return "bg-teal-700"; // Good level - teal
   } else if (classification === 13) {
-    return "bg-cyan-500"; // Good+ level - cyan
+    return "bg-cyan-700"; // Good+ level - cyan
   } else if (classification === 14) {
-    return "bg-sky-500"; // Strong level - sky
+    return "bg-sky-700"; // Strong level - sky
   } else if (classification >= 15) {
-    return "bg-blue-500"; // Elite level - blue
+    return "bg-blue-700"; // Elite level - blue
   } else {
-    return "bg-gray-500"; // Unknown/fallback - gray
+    return "bg-gray-700"; // Unknown/fallback - gray
   }
 }
 

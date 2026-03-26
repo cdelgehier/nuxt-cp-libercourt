@@ -196,6 +196,8 @@ function formatPrice(euros: number | string) {
   return Number(euros).toLocaleString("fr-FR", {
     style: "currency",
     currency: "EUR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   });
 }
 

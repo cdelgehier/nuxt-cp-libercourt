@@ -32,9 +32,9 @@
                 class="text-3xl text-club-yellow"
               />
             </div>
-            <h3 class="text-xl font-bold adaptive-title mb-4">
+            <h2 class="text-xl font-bold adaptive-title mb-4">
               {{ data.club.name }}
-            </h3>
+            </h2>
             <div class="space-y-2 adaptive-text">
               <div class="flex items-center justify-center">
                 <UIcon
@@ -150,7 +150,7 @@
                 <h3 class="text-xl font-bold adaptive-title mb-1">
                   {{ contact.name }}
                 </h3>
-                <div class="text-club-green font-medium mb-4">
+                <div class="text-teal-700 font-medium mb-4">
                   {{ contact.role }}
                 </div>
 
@@ -166,7 +166,7 @@
                     >
                       <UIcon
                         name="i-heroicons-check-circle"
-                        class="text-club-green mr-2 text-xs"
+                        class="text-teal-700 mr-2 text-xs"
                       />
                       <span>{{ responsibility }}</span>
                     </li>
@@ -217,13 +217,13 @@
               <h4 class="font-bold adaptive-title mb-2">
                 {{ session.day }}
               </h4>
-              <div class="text-lg font-semibold text-club-green mb-2">
+              <div class="text-lg font-semibold text-teal-700 mb-2">
                 {{ session.time }}
               </div>
               <div class="text-sm adaptive-text mb-1">
                 {{ session.location }}
               </div>
-              <div class="text-sm adaptive-text opacity-75">
+              <div class="text-sm adaptive-text">
                 {{ session.contact }}
               </div>
             </div>
@@ -378,11 +378,11 @@
 </template>
 
 <script setup lang="ts">
-// Load contact data
-const data = await $fetch("/api/club/contact");
-
-// Load club configuration for dynamic content
-const { data: clubConfig } = await useFetch("/api/club/config");
+// Parallel data fetching to avoid sequential SSR blocking
+const [data, { data: clubConfig }] = await Promise.all([
+  $fetch("/api/club/contact"),
+  useFetch("/api/club/config"),
+]);
 
 // Configuration SEO with dynamic club name
 useSeoMeta({

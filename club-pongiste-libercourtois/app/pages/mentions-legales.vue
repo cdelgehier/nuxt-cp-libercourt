@@ -46,13 +46,13 @@
                 Email :
                 <a
                   :href="`mailto:${clubConfig?.email || 'cplibercourt@gmail.com'}`"
-                  class="text-club-green hover:underline"
+                  class="text-teal-700 underline"
                   >{{ clubConfig?.email || "cplibercourt@gmail.com" }}</a
                 ><br />
                 Téléphone :
                 <a
                   :href="`tel:${clubConfig?.phone || '06 60 05 12 41'}`"
-                  class="text-club-green hover:underline"
+                  class="text-teal-700 underline"
                   >{{ clubConfig?.phone || "06 60 05 12 41" }}</a
                 >
               </div>
@@ -78,7 +78,7 @@
                 <a
                   href="https://netlify.com"
                   target="_blank"
-                  class="text-club-green hover:underline"
+                  class="text-teal-700 underline"
                   >netlify.com</a
                 >
               </div>
@@ -153,7 +153,7 @@
                   l'adresse :
                   <a
                     :href="`mailto:${clubConfig?.email || 'cplibercourt@gmail.com'}`"
-                    class="text-club-green hover:underline"
+                    class="text-teal-700 underline"
                     >{{ clubConfig?.email || "cplibercourt@gmail.com" }}</a
                   >
                 </p>
@@ -259,7 +259,7 @@
               <div class="flex flex-col sm:flex-row gap-4 mt-4">
                 <a
                   :href="`mailto:${clubConfig?.email || 'cplibercourt@gmail.com'}`"
-                  class="inline-flex items-center px-4 py-2 bg-club-green text-white rounded-lg hover:bg-club-green/90 transition-colors"
+                  class="inline-flex items-center px-4 py-2 bg-club-green text-club-navy rounded-lg hover:bg-club-green/90 transition-colors"
                 >
                   <UIcon name="i-heroicons-envelope" class="mr-2" />
                   Nous contacter par email
@@ -277,7 +277,7 @@
         </div>
 
         <!-- Date de mise à jour -->
-        <div class="text-center adaptive-text text-sm opacity-75">
+        <div class="text-center adaptive-text text-sm">
           <p>
             Dernière mise à jour : {{ new Date().toLocaleDateString("fr-FR") }}
           </p>

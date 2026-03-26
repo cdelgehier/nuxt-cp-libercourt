@@ -75,9 +75,9 @@
             </div>
 
             <!-- Title -->
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ article.title }}
-            </h3>
+            </h2>
 
             <!-- Full description for Facebook -->
             <p
@@ -105,7 +105,7 @@
               :href="article.link"
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-1 text-sm font-medium text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300"
+              class="inline-flex items-center gap-1 text-sm font-medium text-green-800 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300"
             >
               Voir sur Facebook
               <UIcon
@@ -129,11 +129,11 @@
             <!-- Text content -->
             <div class="flex-1 min-w-0">
               <!-- Title -->
-              <h3
+              <h2
                 class="text-lg font-semibold text-gray-900 dark:text-white mb-2"
               >
                 {{ article.title }}
-              </h3>
+              </h2>
 
               <!-- Categories -->
               <div
@@ -154,12 +154,14 @@
                 :href="article.link"
                 target="_blank"
                 rel="noopener noreferrer"
+                :aria-label="`Lire la suite : ${article.title}`"
                 class="inline-flex items-center gap-1 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
               >
                 Lire la suite
                 <UIcon
                   name="i-heroicons-arrow-top-right-on-square"
                   class="w-3 h-3"
+                  aria-hidden="true"
                 />
               </a>
             </div>
@@ -191,8 +193,8 @@ const props = withDefaults(
   },
 );
 
-// Fetch news from API
-const { data, pending, error, refresh } = await useFetch<NewsResponse>(
+// useLazyFetch to avoid blocking SSR (RSS feeds are slow)
+const { data, pending, error, refresh } = useLazyFetch<NewsResponse>(
   "/api/news",
   {
     query: {

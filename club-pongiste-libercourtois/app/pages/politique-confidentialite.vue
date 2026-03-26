@@ -62,13 +62,13 @@
                 <strong>Email :</strong>
                 <a
                   :href="`mailto:${clubConfig?.email || 'cplibercourt@gmail.com'}`"
-                  class="text-club-green hover:underline"
+                  class="text-teal-700 underline"
                   >{{ clubConfig?.email || "cplibercourt@gmail.com" }}</a
                 ><br />
                 <strong>Téléphone :</strong>
                 <a
                   :href="`tel:${clubConfig?.phone || '06 60 05 12 41'}`"
-                  class="text-club-green hover:underline"
+                  class="text-teal-700 underline"
                   >{{ clubConfig?.phone || "06 60 05 12 41" }}</a
                 >
               </div>
@@ -293,7 +293,7 @@
                 <div class="flex flex-col sm:flex-row gap-3">
                   <a
                     :href="`mailto:${clubConfig?.email || 'cplibercourt@gmail.com'}?subject=Demande RGPD`"
-                    class="inline-flex items-center px-4 py-2 bg-club-green text-white rounded-lg hover:bg-club-green/90 transition-colors text-sm"
+                    class="inline-flex items-center px-4 py-2 bg-club-green text-club-navy rounded-lg hover:bg-club-green/90 transition-colors text-sm"
                   >
                     <UIcon name="i-heroicons-envelope" class="mr-2" />
                     Demande par email
@@ -384,7 +384,7 @@
                   <a
                     href="https://www.cnil.fr"
                     target="_blank"
-                    class="text-club-green hover:underline"
+                    class="text-teal-700 underline"
                     >www.cnil.fr</a
                   >
                 </p>
@@ -427,7 +427,7 @@
               <div class="flex flex-col sm:flex-row gap-4 mt-4">
                 <a
                   :href="`mailto:${clubConfig?.email || 'cplibercourt@gmail.com'}`"
-                  class="inline-flex items-center px-4 py-2 bg-club-green text-white rounded-lg hover:bg-club-green/90 transition-colors"
+                  class="inline-flex items-center px-4 py-2 bg-club-green text-club-navy rounded-lg hover:bg-club-green/90 transition-colors"
                 >
                   <UIcon name="i-heroicons-envelope" class="mr-2" />
                   Nous contacter par email
@@ -445,7 +445,7 @@
         </div>
 
         <!-- Date de mise à jour -->
-        <div class="text-center adaptive-text text-sm opacity-75">
+        <div class="text-center adaptive-text text-sm">
           <p>
             Dernière mise à jour : {{ new Date().toLocaleDateString("fr-FR") }}
           </p>

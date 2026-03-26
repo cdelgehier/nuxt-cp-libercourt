@@ -19,7 +19,7 @@
 
         <!-- Navigation rapide -->
         <div>
-          <h4 class="text-white font-semibold mb-4">Navigation</h4>
+          <h3 class="text-white font-semibold mb-4">Navigation</h3>
           <ul class="space-y-2">
             <li v-for="item in footerNavigation" :key="item.href">
               <NuxtLink
@@ -34,7 +34,7 @@
 
         <!-- Contact -->
         <div>
-          <h4 class="text-white font-semibold mb-4">Contact</h4>
+          <h3 class="text-white font-semibold mb-4">Contact</h3>
           <div class="space-y-3">
             <div class="flex items-start space-x-3">
               <UIcon
@@ -79,7 +79,7 @@
 
         <!-- Social media and schedules -->
         <div>
-          <h4 class="text-white font-semibold mb-4">Suivez-nous</h4>
+          <h3 class="text-white font-semibold mb-4">Suivez-nous</h3>
           <div class="flex space-x-4 mb-6">
             <a
               v-if="config?.facebookUrl"
@@ -94,7 +94,7 @@
           </div>
 
           <div>
-            <h5 class="text-white font-medium mb-2 text-sm">Horaires salle</h5>
+            <h4 class="text-white font-medium mb-2 text-sm">Horaires salle</h4>
             <div class="text-gray-300 text-sm space-y-1">
               <p v-for="schedule in computedOpenHours" :key="schedule.day">
                 {{ formatDayName(schedule.day) }}: {{ schedule.hours }}
@@ -135,11 +135,11 @@
 </template>
 
 <script setup lang="ts">
-// Load centralized configuration
-const { data: config } = await useFetch("/api/club/config");
-
-// Load schedules data for dynamic opening hours
-const { data: schedulesData } = await useFetch("/api/club/schedules-pricing");
+// Parallel data fetching to avoid sequential SSR blocking
+const [{ data: config }, { data: schedulesData }] = await Promise.all([
+  useFetch("/api/club/config"),
+  useFetch("/api/club/schedules-pricing"),
+]);
 
 // Current year for copyright
 const currentYear = new Date().getFullYear();

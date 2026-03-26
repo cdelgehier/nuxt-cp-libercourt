@@ -15,7 +15,7 @@
         <img
           :src="sponsor.logo.replace(/\.(png|jpg|jpeg)$/i, '.webp')"
           :alt="`${sponsor.name} logo`"
-          loading="lazy"
+          loading="eager"
           width="180"
           height="64"
           class="max-h-full max-w-full object-contain"

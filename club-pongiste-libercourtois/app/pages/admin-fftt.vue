@@ -137,7 +137,7 @@
                     v-if="doc"
                     :href="doc.url"
                     target="_blank"
-                    color="blue"
+                    color="info"
                     variant="outline"
                     size="sm"
                   >
@@ -162,7 +162,7 @@
               </p>
               <UButton
                 :loading="testingIntegration"
-                color="green"
+                color="success"
                 variant="outline"
                 @click="testIntegration"
               >

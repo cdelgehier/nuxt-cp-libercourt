@@ -47,14 +47,15 @@
         </p>
 
         <form class="space-y-3" @submit.prevent="submitPassword">
-          <UFormGroup label="Mot de passe" name="password" :error="error">
+          <UFormField label="Mot de passe" name="password" :error="error">
             <UInput
               v-model="password"
               type="password"
               placeholder="••••••••"
               autocomplete="current-password"
+              class="w-full"
             />
-          </UFormGroup>
+          </UFormField>
 
           <UButton type="submit" block variant="outline" :loading="loading">
             Se connecter

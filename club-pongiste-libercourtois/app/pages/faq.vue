@@ -35,7 +35,7 @@
             v-model="searchTerm"
             type="text"
             placeholder="Rechercher une question..."
-            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-club-blue focus:border-transparent"
+            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-club-yellow focus:border-transparent"
           />
         </div>
       </div>
@@ -46,17 +46,27 @@
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="adaptive-card rounded-lg shadow-sm p-6 text-center">
-            <div class="text-2xl font-bold text-club-blue mb-2">
+            <div
+              class="text-2xl font-bold text-club-navy dark:text-club-yellow mb-2"
+            >
               {{ faqData?.stats.totalQuestions || 0 }}
             </div>
             <div class="adaptive-text">Questions répondues</div>
           </div>
           <div class="adaptive-card rounded-lg shadow-sm p-6 text-center">
-            <div class="text-2xl font-bold text-club-blue mb-2">2</div>
+            <div
+              class="text-2xl font-bold text-club-navy dark:text-club-yellow mb-2"
+            >
+              2
+            </div>
             <div class="adaptive-text">Essais gratuits</div>
           </div>
           <div class="adaptive-card rounded-lg shadow-sm p-6 text-center">
-            <div class="text-2xl font-bold text-club-blue mb-2">45€</div>
+            <div
+              class="text-2xl font-bold text-club-navy dark:text-club-yellow mb-2"
+            >
+              45€
+            </div>
             <div class="adaptive-text">À partir de</div>
           </div>
         </div>
@@ -75,8 +85,8 @@
               :class="[
                 'px-6 py-2 rounded-full border transition-all duration-200',
                 selectedCategory === category.key
-                  ? 'bg-club-blue text-white border-club-blue'
-                  : 'adaptive-card text-gray-700 border-gray-300 hover:border-club-blue hover:text-club-blue',
+                  ? 'bg-club-navy text-white border-club-navy dark:bg-club-yellow dark:text-club-navy dark:border-club-yellow'
+                  : 'adaptive-card text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-club-navy hover:text-club-navy dark:hover:border-club-yellow dark:hover:text-club-yellow',
               ]"
               @click="selectedCategory = category.key"
             >
@@ -103,24 +113,24 @@
         </div>
 
         <!-- Contact pour autres questions -->
-        <div class="mt-16 bg-club-blue rounded-xl p-8 text-center text-white">
+        <div class="mt-16 bg-club-navy rounded-xl p-8 text-center text-white">
           <h2 class="text-2xl font-bold mb-4">
             Vous ne trouvez pas votre réponse ?
           </h2>
-          <p class="text-blue-100 mb-6">
+          <p class="text-gray-300 mb-6">
             Notre équipe est là pour vous aider ! Contactez-nous directement.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <NuxtLink
               to="/contact"
-              class="inline-flex items-center justify-center px-6 py-3 adaptive-card text-club-blue rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+              class="inline-flex items-center justify-center px-6 py-3 bg-club-yellow text-club-navy rounded-lg font-semibold hover:bg-yellow-400 transition-colors"
             >
               <Icon name="i-heroicons-envelope" class="w-5 h-5 mr-2" />
               Nous contacter
             </NuxtLink>
             <a
               :href="`tel:${contactData.club.phone}`"
-              class="inline-flex items-center justify-center px-6 py-3 border-2 border-white text-white rounded-lg font-semibold hover:adaptive-card hover:text-club-blue transition-colors"
+              class="inline-flex items-center justify-center px-6 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-club-navy transition-colors"
             >
               <Icon name="i-heroicons-phone" class="w-5 h-5 mr-2" />
               {{ contactData.club.phone }}

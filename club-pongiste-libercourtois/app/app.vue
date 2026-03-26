@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <UApp>
     <!-- Skip to content link for accessibility -->
     <a href="#main-content" class="skip-to-content">
       Aller au contenu principal
@@ -9,10 +9,7 @@
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-
-    <!-- Global modals and overlays -->
-    <UNotifications />
-  </div>
+  </UApp>
 </template>
 
 <script setup lang="ts">
@@ -36,15 +33,6 @@ useSeoMeta({
   titleTemplate: "%s | Club Pongiste Libercourtois",
   ogImage: "/images/logo-club.webp",
   twitterCard: "summary_large_image",
-});
-
-// Force light mode on mount
-onMounted(() => {
-  if (import.meta.client) {
-    document.documentElement.classList.remove("dark");
-    document.documentElement.classList.add("light");
-    document.documentElement.setAttribute("data-theme", "light");
-  }
 });
 </script>
 

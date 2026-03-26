@@ -59,9 +59,9 @@
             <td class="px-4 py-3 text-center">
               <UBadge
                 v-if="p.isReduction"
-                color="orange"
+                color="info"
                 variant="subtle"
-                size="xs"
+                size="sm"
               >
                 {{ p.reductionLabel ?? "Réduction" }}
               </UBadge>
@@ -70,15 +70,16 @@
             <td class="px-4 py-3 text-right">
               <div class="flex items-center justify-end gap-2">
                 <UButton
-                  size="xs"
+                  size="sm"
                   variant="ghost"
                   icon="i-heroicons-pencil"
+                  color="neutral"
                   @click="openEdit(p)"
                 />
                 <UButton
-                  size="xs"
+                  size="sm"
                   variant="ghost"
-                  color="red"
+                  color="error"
                   icon="i-heroicons-trash"
                   @click="confirmDelete(p)"
                 />
@@ -90,91 +91,124 @@
     </div>
 
     <!-- Modal -->
-    <UModal v-model="modalOpen">
-      <div class="p-6 space-y-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {{ editing ? "Modifier le tarif" : "Nouveau tarif" }}
-        </h3>
-        <form class="space-y-4" @submit.prevent="save">
-          <div class="grid grid-cols-2 gap-4">
-            <UFormGroup
-              label="Catégorie"
-              name="category"
-              class="col-span-2"
-              required
-            >
-              <UInput
-                v-model="form.category"
-                placeholder="Licence Loisir, Compétition..."
+    <UModal
+      v-model:open="modalOpen"
+      :ui="{
+        content:
+          'ring-0 outline-none focus:outline-none focus:ring-0 focus-visible:ring-0',
+      }"
+    >
+      <template #content>
+        <div class="p-6 space-y-4">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            {{ editing ? "Modifier le tarif" : "Nouveau tarif" }}
+          </h3>
+          <form class="space-y-4" @submit.prevent="save">
+            <div class="grid grid-cols-2 gap-4">
+              <UFormField
+                label="Catégorie"
+                name="category"
+                class="col-span-2"
+                required
+              >
+                <UInput
+                  v-model="form.category"
+                  placeholder="Licence Loisir, Compétition..."
+                  class="w-full"
+                />
+              </UFormField>
+              <UFormField label="Tranche d'âge" name="ageRange">
+                <UInput
+                  v-model="form.ageRange"
+                  placeholder="Adulte, Jeune (-18 ans)..."
+                  class="w-full"
+                />
+              </UFormField>
+              <UFormField label="Prix (€)" name="price" required>
+                <UInput
+                  v-model.number="form.price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  class="w-full"
+                />
+              </UFormField>
+              <UFormField label="Détails" name="details" class="col-span-2">
+                <UTextarea
+                  v-model="form.details"
+                  :rows="2"
+                  placeholder="Informations complémentaires..."
+                  class="w-full"
+                />
+              </UFormField>
+            </div>
+            <UFormField label="Réduction" name="isReduction">
+              <UCheckbox
+                v-model="form.isReduction"
+                label="C'est une réduction"
               />
-            </UFormGroup>
-            <UFormGroup label="Tranche d'âge" name="ageRange">
-              <UInput
-                v-model="form.ageRange"
-                placeholder="Adulte, Jeune (-18 ans)..."
-              />
-            </UFormGroup>
-            <UFormGroup label="Prix (€)" name="price" required>
-              <UInput
-                v-model.number="form.price"
-                type="number"
-                min="0"
-                step="0.01"
-              />
-            </UFormGroup>
-            <UFormGroup label="Détails" name="details" class="col-span-2">
-              <UTextarea
-                v-model="form.details"
-                :rows="2"
-                placeholder="Informations complémentaires..."
-              />
-            </UFormGroup>
-          </div>
-          <UFormGroup label="Réduction" name="isReduction">
-            <UCheckbox v-model="form.isReduction" label="C'est une réduction" />
-          </UFormGroup>
-          <div v-if="form.isReduction" class="grid grid-cols-2 gap-4">
-            <UFormGroup label="Libellé réduction" name="reductionLabel">
-              <UInput
-                v-model="form.reductionLabel"
-                placeholder="Pass'Sport État, Famille..."
-              />
-            </UFormGroup>
-            <UFormGroup label="Montant réduction (€)" name="reductionAmount">
-              <UInput
-                v-model.number="form.reductionAmount"
-                type="number"
-                min="0"
-                step="0.01"
-              />
-            </UFormGroup>
-          </div>
-          <div class="flex justify-end gap-3 pt-2">
-            <UButton variant="ghost" @click="modalOpen = false">
-              Annuler
-            </UButton>
-            <UButton type="submit" :loading="saving">
-              {{ editing ? "Enregistrer" : "Créer" }}
-            </UButton>
-          </div>
-        </form>
-      </div>
+            </UFormField>
+            <div v-if="form.isReduction" class="grid grid-cols-2 gap-4">
+              <UFormField label="Libellé réduction" name="reductionLabel">
+                <UInput
+                  v-model="form.reductionLabel"
+                  placeholder="Pass'Sport État, Famille..."
+                  class="w-full"
+                />
+              </UFormField>
+              <UFormField label="Montant réduction (€)" name="reductionAmount">
+                <UInput
+                  v-model.number="form.reductionAmount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  class="w-full"
+                />
+              </UFormField>
+            </div>
+            <div class="flex justify-end gap-3 pt-2">
+              <UButton
+                variant="ghost"
+                color="neutral"
+                @click="modalOpen = false"
+              >
+                Annuler
+              </UButton>
+              <UButton type="submit" :loading="saving">
+                {{ editing ? "Enregistrer" : "Créer" }}
+              </UButton>
+            </div>
+          </form>
+        </div>
+      </template>
     </UModal>
 
     <!-- Modal suppression -->
-    <UModal v-model="deleteModalOpen">
-      <div class="p-6 space-y-4">
-        <h3 class="text-lg font-semibold">Supprimer ce tarif ?</h3>
-        <p class="text-sm text-red-600">Cette action est irréversible.</p>
-        <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="deleteModalOpen = false">
-            Annuler
-          </UButton>
-          <UButton color="red" :loading="deleting" @click="doDelete">
-            Supprimer
-          </UButton>
+    <UModal
+      v-model:open="deleteModalOpen"
+      :ui="{
+        content:
+          'ring-0 outline-none focus:outline-none focus:ring-0 focus-visible:ring-0',
+      }"
+    >
+      <template #content>
+        <div class="p-6 space-y-4">
+          <h3 class="text-lg font-semibold">Supprimer ce tarif ?</h3>
+          <p class="text-sm text-red-600">Cette action est irréversible.</p>
+          <div class="flex justify-end gap-3">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              @click="deleteModalOpen = false"
+            >
+              Annuler
+            </UButton>
+            <UButton color="error" :loading="deleting" @click="doDelete">
+              Supprimer
+            </UButton>
+          </div>
         </div>
-      </div>
+      </template>
     </UModal>
   </div>
 </template>
@@ -255,15 +289,15 @@ async function save() {
         method: "PATCH",
         body: form,
       });
-      toast.add({ title: "Tarif mis à jour", color: "green" });
+      toast.add({ title: "Tarif mis à jour", color: "success" });
     } else {
       await $fetch("/api/admin/pricing", { method: "POST", body: form });
-      toast.add({ title: "Tarif créé", color: "green" });
+      toast.add({ title: "Tarif créé", color: "success" });
     }
     modalOpen.value = false;
     await refresh();
   } catch {
-    toast.add({ title: "Erreur", color: "red" });
+    toast.add({ title: "Erreur", color: "error" });
   } finally {
     saving.value = false;
   }
@@ -285,11 +319,11 @@ async function doDelete() {
     await $fetch(`/api/admin/pricing/${toDelete.value.id}`, {
       method: "DELETE",
     });
-    toast.add({ title: "Tarif supprimé", color: "green" });
+    toast.add({ title: "Tarif supprimé", color: "success" });
     deleteModalOpen.value = false;
     await refresh();
   } catch {
-    toast.add({ title: "Erreur", color: "red" });
+    toast.add({ title: "Erreur", color: "error" });
   } finally {
     deleting.value = false;
   }

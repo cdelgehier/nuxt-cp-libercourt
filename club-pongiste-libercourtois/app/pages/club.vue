@@ -103,7 +103,7 @@
             >
               <UIcon
                 :name="getValueIcon(index)"
-                class="adaptive-text-primary text-xl"
+                class="text-club-navy text-xl"
               />
             </div>
             <h3 class="font-semibold adaptive-title">
@@ -346,11 +346,9 @@
 
               <div class="space-y-3">
                 <UButton
-                  color="primary"
                   size="sm"
-                  variant="outline"
                   block
-                  class="font-semibold"
+                  class="font-semibold bg-club-yellow text-club-navy hover:bg-yellow-400 border-0"
                   @click="openGoogleMaps"
                 >
                   <UIcon name="i-heroicons-map" class="mr-2" />
@@ -358,11 +356,9 @@
                 </UButton>
 
                 <UButton
-                  color="gray"
                   size="sm"
-                  variant="outline"
                   block
-                  class="font-semibold"
+                  class="font-semibold bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                   @click="openDirections"
                 >
                   <UIcon name="i-heroicons-map-pin" class="mr-2" />
@@ -398,7 +394,7 @@
           <UButton
             to="/horaires-tarifs"
             variant="solid"
-            color="white"
+            color="neutral"
             size="lg"
             class="font-semibold bg-white text-club-navy hover:bg-gray-100 border-0 dark:bg-gray-100 dark:text-club-navy dark:hover:bg-gray-200"
           >

@@ -130,12 +130,13 @@ test.describe("Admin — page login", () => {
   test("mot de passe incorrect → message d'erreur", async ({ page }) => {
     test.setTimeout(20_000);
     await page.goto("/admin/login");
+    await page.waitForLoadState("networkidle");
     await page.locator('input[type="password"]').fill("mauvais-mot-de-passe");
     await page.locator('button[type="submit"]').click();
-    // Un message d'erreur doit apparaître (bcrypt peut être lent sous charge)
+    // Un message d'erreur doit apparaître (Nuxt UI v4: UFormField error → <div data-slot="error">)
     await expect(
       page
-        .locator("p")
+        .locator("[data-slot='error'], p")
         .filter({ hasText: /incorrect|invalide|erreur|configuré|requis/i }),
     ).toBeVisible({ timeout: 15_000 });
   });

@@ -56,9 +56,7 @@
         <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
           {{ pageTitle }}
         </h1>
-        <div class="flex items-center gap-4">
-          <ColorModeToggle />
-        </div>
+        <div class="flex items-center gap-4" />
       </header>
 
       <!-- Page content -->
@@ -74,6 +72,17 @@ defineOptions({ name: "AdminLayout" });
 
 const route = useRoute();
 const { loggedIn, logout: oidcLogout } = useOidcAuth();
+
+// Force light mode in admin (back-office doesn't need dark mode)
+const colorMode = useColorMode();
+const previousPreference = ref(colorMode.preference);
+onMounted(() => {
+  previousPreference.value = colorMode.preference;
+  colorMode.preference = "light";
+});
+onUnmounted(() => {
+  colorMode.preference = previousPreference.value;
+});
 
 async function logout() {
   if (loggedIn.value) {

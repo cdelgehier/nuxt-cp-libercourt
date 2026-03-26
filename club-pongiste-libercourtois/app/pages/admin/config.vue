@@ -20,28 +20,28 @@
             Identité
           </legend>
           <div class="grid grid-cols-2 gap-4">
-            <UFormGroup label="Nom du club" name="name" class="col-span-2">
-              <UInput v-model="form.name" />
-            </UFormGroup>
-            <UFormGroup label="ID FFTT" name="clubId">
-              <UInput v-model="form.clubId" />
-            </UFormGroup>
-            <UFormGroup label="Email" name="email">
-              <UInput v-model="form.email" type="email" />
-            </UFormGroup>
-            <UFormGroup label="Téléphone" name="phone">
-              <UInput v-model="form.phone" />
-            </UFormGroup>
-            <UFormGroup label="Site web" name="website">
-              <UInput v-model="form.website" />
-            </UFormGroup>
-            <UFormGroup
+            <UFormField label="Nom du club" name="name" class="col-span-2">
+              <UInput v-model="form.name" class="w-full" />
+            </UFormField>
+            <UFormField label="ID FFTT" name="clubId">
+              <UInput v-model="form.clubId" class="w-full" />
+            </UFormField>
+            <UFormField label="Email" name="email">
+              <UInput v-model="form.email" type="email" class="w-full" />
+            </UFormField>
+            <UFormField label="Téléphone" name="phone">
+              <UInput v-model="form.phone" class="w-full" />
+            </UFormField>
+            <UFormField label="Site web" name="website">
+              <UInput v-model="form.website" class="w-full" />
+            </UFormField>
+            <UFormField
               label="Page Facebook"
               name="facebookUrl"
               class="col-span-2"
             >
-              <UInput v-model="form.facebookUrl" />
-            </UFormGroup>
+              <UInput v-model="form.facebookUrl" class="w-full" />
+            </UFormField>
           </div>
         </fieldset>
 
@@ -53,34 +53,38 @@
             Localisation
           </legend>
           <div class="grid grid-cols-2 gap-4">
-            <UFormGroup label="Salle" name="salle" class="col-span-2">
-              <UInput v-model="form.salle" placeholder="Salle omnisports" />
-            </UFormGroup>
-            <UFormGroup label="Complexe" name="complexe" class="col-span-2">
-              <UInput v-model="form.complexe" />
-            </UFormGroup>
-            <UFormGroup label="Adresse" name="street" class="col-span-2">
-              <UInput v-model="form.street" />
-            </UFormGroup>
-            <UFormGroup label="Code postal" name="postalCode">
-              <UInput v-model="form.postalCode" />
-            </UFormGroup>
-            <UFormGroup label="Ville" name="city">
-              <UInput v-model="form.city" />
-            </UFormGroup>
-            <UFormGroup label="Latitude" name="lat">
-              <UInput v-model="form.lat" />
-            </UFormGroup>
-            <UFormGroup label="Longitude" name="lng">
-              <UInput v-model="form.lng" />
-            </UFormGroup>
-            <UFormGroup
+            <UFormField label="Salle" name="salle" class="col-span-2">
+              <UInput
+                v-model="form.salle"
+                placeholder="Salle omnisports"
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField label="Complexe" name="complexe" class="col-span-2">
+              <UInput v-model="form.complexe" class="w-full" />
+            </UFormField>
+            <UFormField label="Adresse" name="street" class="col-span-2">
+              <UInput v-model="form.street" class="w-full" />
+            </UFormField>
+            <UFormField label="Code postal" name="postalCode">
+              <UInput v-model="form.postalCode" class="w-full" />
+            </UFormField>
+            <UFormField label="Ville" name="city">
+              <UInput v-model="form.city" class="w-full" />
+            </UFormField>
+            <UFormField label="Latitude" name="lat">
+              <UInput v-model="form.lat" class="w-full" />
+            </UFormField>
+            <UFormField label="Longitude" name="lng">
+              <UInput v-model="form.lng" class="w-full" />
+            </UFormField>
+            <UFormField
               label="URL Google Maps"
               name="googleMapsUrl"
               class="col-span-2"
             >
-              <UInput v-model="form.googleMapsUrl" />
-            </UFormGroup>
+              <UInput v-model="form.googleMapsUrl" class="w-full" />
+            </UFormField>
           </div>
         </fieldset>
 
@@ -152,9 +156,9 @@ async function save() {
   saving.value = true;
   try {
     await $fetch("/api/admin/config", { method: "PUT", body: form });
-    toast.add({ title: "Configuration enregistrée", color: "green" });
+    toast.add({ title: "Configuration enregistrée", color: "success" });
   } catch {
-    toast.add({ title: "Erreur lors de la sauvegarde", color: "red" });
+    toast.add({ title: "Erreur lors de la sauvegarde", color: "error" });
   } finally {
     saving.value = false;
   }

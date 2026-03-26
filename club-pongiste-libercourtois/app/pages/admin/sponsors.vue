@@ -46,7 +46,7 @@
               <UBadge
                 :color="categoryColor(sponsor.category)"
                 variant="subtle"
-                size="xs"
+                size="sm"
               >
                 {{ sponsor.category }}
               </UBadge>
@@ -56,9 +56,9 @@
             </td>
             <td class="px-4 py-3 text-center">
               <UBadge
-                :color="sponsor.active ? 'green' : 'gray'"
+                :color="sponsor.active ? 'success' : 'neutral'"
                 variant="subtle"
-                size="xs"
+                size="sm"
               >
                 {{ sponsor.active ? "Actif" : "Inactif" }}
               </UBadge>
@@ -66,15 +66,16 @@
             <td class="px-4 py-3 text-right">
               <div class="flex items-center justify-end gap-2">
                 <UButton
-                  size="xs"
+                  size="sm"
                   variant="ghost"
                   icon="i-heroicons-pencil"
+                  color="neutral"
                   @click="openEdit(sponsor)"
                 />
                 <UButton
-                  size="xs"
+                  size="sm"
                   variant="ghost"
-                  color="red"
+                  color="error"
                   icon="i-heroicons-trash"
                   @click="confirmDelete(sponsor)"
                 />
@@ -86,58 +87,94 @@
     </div>
 
     <!-- Modal -->
-    <UModal v-model="modalOpen">
-      <div class="p-6 space-y-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {{ editing ? "Modifier le sponsor" : "Nouveau sponsor" }}
-        </h3>
-        <form class="space-y-4" @submit.prevent="save">
-          <UFormGroup label="Nom" name="name" required>
-            <UInput v-model="form.name" placeholder="Nom de l'entreprise" />
-          </UFormGroup>
-          <UFormGroup label="Catégorie" name="category" required>
-            <USelect v-model="form.category" :options="categories" />
-          </UFormGroup>
-          <UFormGroup label="Site web" name="website">
-            <UInput v-model="form.website" placeholder="https://..." />
-          </UFormGroup>
-          <UFormGroup label="Logo (URL ou chemin)" name="logo">
-            <UInput v-model="form.logo" placeholder="/sponsors/logo.webp" />
-          </UFormGroup>
-          <UFormGroup label="Description" name="description">
-            <UTextarea v-model="form.description" :rows="2" />
-          </UFormGroup>
-          <UFormGroup label="Actif" name="active">
-            <UCheckbox v-model="form.active" label="Sponsor actif" />
-          </UFormGroup>
-          <div class="flex justify-end gap-3 pt-2">
-            <UButton variant="ghost" @click="modalOpen = false">
-              Annuler
-            </UButton>
-            <UButton type="submit" :loading="saving">
-              {{ editing ? "Enregistrer" : "Créer" }}
-            </UButton>
-          </div>
-        </form>
-      </div>
+    <UModal
+      v-model:open="modalOpen"
+      :ui="{
+        content:
+          'ring-0 outline-none focus:outline-none focus:ring-0 focus-visible:ring-0',
+      }"
+    >
+      <template #content>
+        <div class="p-6 space-y-4">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            {{ editing ? "Modifier le sponsor" : "Nouveau sponsor" }}
+          </h3>
+          <form class="space-y-4" @submit.prevent="save">
+            <UFormField label="Nom" name="name" required>
+              <UInput
+                v-model="form.name"
+                placeholder="Nom de l'entreprise"
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField label="Catégorie" name="category" required>
+              <USelect v-model="form.category" :items="categories" />
+            </UFormField>
+            <UFormField label="Site web" name="website">
+              <UInput
+                v-model="form.website"
+                placeholder="https://..."
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField label="Logo (URL ou chemin)" name="logo">
+              <UInput
+                v-model="form.logo"
+                placeholder="/sponsors/logo.webp"
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField label="Description" name="description">
+              <UTextarea v-model="form.description" :rows="2" class="w-full" />
+            </UFormField>
+            <UFormField label="Actif" name="active">
+              <UCheckbox v-model="form.active" label="Sponsor actif" />
+            </UFormField>
+            <div class="flex justify-end gap-3 pt-2">
+              <UButton
+                variant="ghost"
+                color="neutral"
+                @click="modalOpen = false"
+              >
+                Annuler
+              </UButton>
+              <UButton type="submit" :loading="saving">
+                {{ editing ? "Enregistrer" : "Créer" }}
+              </UButton>
+            </div>
+          </form>
+        </div>
+      </template>
     </UModal>
 
     <!-- Modal suppression -->
-    <UModal v-model="deleteModalOpen">
-      <div class="p-6 space-y-4">
-        <h3 class="text-lg font-semibold">
-          Supprimer "{{ toDelete?.name }}" ?
-        </h3>
-        <p class="text-sm text-red-600">Cette action est irréversible.</p>
-        <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="deleteModalOpen = false">
-            Annuler
-          </UButton>
-          <UButton color="red" :loading="deleting" @click="doDelete">
-            Supprimer
-          </UButton>
+    <UModal
+      v-model:open="deleteModalOpen"
+      :ui="{
+        content:
+          'ring-0 outline-none focus:outline-none focus:ring-0 focus-visible:ring-0',
+      }"
+    >
+      <template #content>
+        <div class="p-6 space-y-4">
+          <h3 class="text-lg font-semibold">
+            Supprimer "{{ toDelete?.name }}" ?
+          </h3>
+          <p class="text-sm text-red-600">Cette action est irréversible.</p>
+          <div class="flex justify-end gap-3">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              @click="deleteModalOpen = false"
+            >
+              Annuler
+            </UButton>
+            <UButton color="error" :loading="deleting" @click="doDelete">
+              Supprimer
+            </UButton>
+          </div>
         </div>
-      </div>
+      </template>
     </UModal>
   </div>
 </template>
@@ -162,9 +199,9 @@ const categories = [
 ];
 
 function categoryColor(cat: string) {
-  if (cat === "partenaire") return "blue";
-  if (cat === "institutionnel") return "purple";
-  return "orange";
+  if (cat === "partenaire") return "info";
+  if (cat === "institutionnel") return "secondary";
+  return "neutral";
 }
 
 const modalOpen = ref(false);
@@ -218,15 +255,15 @@ async function save() {
         method: "PATCH",
         body: form,
       });
-      toast.add({ title: "Sponsor mis à jour", color: "green" });
+      toast.add({ title: "Sponsor mis à jour", color: "success" });
     } else {
       await $fetch("/api/admin/sponsors", { method: "POST", body: form });
-      toast.add({ title: "Sponsor créé", color: "green" });
+      toast.add({ title: "Sponsor créé", color: "success" });
     }
     modalOpen.value = false;
     await refresh();
   } catch {
-    toast.add({ title: "Erreur", color: "red" });
+    toast.add({ title: "Erreur", color: "error" });
   } finally {
     saving.value = false;
   }
@@ -248,11 +285,11 @@ async function doDelete() {
     await $fetch(`/api/admin/sponsors/${toDelete.value.id}`, {
       method: "DELETE",
     });
-    toast.add({ title: "Sponsor supprimé", color: "green" });
+    toast.add({ title: "Sponsor supprimé", color: "success" });
     deleteModalOpen.value = false;
     await refresh();
   } catch {
-    toast.add({ title: "Erreur", color: "red" });
+    toast.add({ title: "Erreur", color: "error" });
   } finally {
     deleting.value = false;
   }

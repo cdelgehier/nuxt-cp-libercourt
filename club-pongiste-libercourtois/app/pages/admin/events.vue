@@ -64,7 +64,7 @@
               <UButton
                 size="xs"
                 :variant="event.isRegistrationOpen ? 'solid' : 'outline'"
-                :color="event.isRegistrationOpen ? 'green' : 'gray'"
+                :color="event.isRegistrationOpen ? 'success' : 'neutral'"
                 @click="toggleRegistration(event)"
               >
                 {{ event.isRegistrationOpen ? "Ouvertes" : "Fermées" }}
@@ -73,15 +73,16 @@
             <td class="px-4 py-3 text-right">
               <div class="flex items-center justify-end gap-2">
                 <UButton
-                  size="xs"
+                  size="sm"
                   variant="ghost"
                   icon="i-heroicons-pencil"
+                  color="neutral"
                   @click="openEdit(event)"
                 />
                 <UButton
-                  size="xs"
+                  size="sm"
                   variant="ghost"
-                  color="red"
+                  color="error"
                   icon="i-heroicons-trash"
                   @click="confirmDelete(event)"
                 />
@@ -93,107 +94,164 @@
     </div>
 
     <!-- Modal créer / éditer -->
-    <UModal v-model="modalOpen">
-      <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {{ editing ? "Modifier l'événement" : "Nouvel événement" }}
-        </h3>
+    <UModal
+      v-model:open="modalOpen"
+      :ui="{
+        content:
+          'ring-0 outline-none focus:outline-none focus:ring-0 focus-visible:ring-0',
+      }"
+    >
+      <template #content>
+        <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            {{ editing ? "Modifier l'événement" : "Nouvel événement" }}
+          </h3>
 
-        <form class="space-y-4" @submit.prevent="save">
-          <div class="grid grid-cols-2 gap-4">
-            <UFormGroup
-              label="Titre"
-              name="title"
-              :error="errors.title"
-              class="col-span-2"
-              required
-            >
-              <UInput v-model="form.title" placeholder="Tournoi open..." />
-            </UFormGroup>
+          <form class="space-y-4" @submit.prevent="save">
+            <div class="grid grid-cols-2 gap-4">
+              <UFormField
+                label="Titre"
+                name="title"
+                :error="errors.title"
+                class="col-span-2"
+                required
+              >
+                <UInput
+                  v-model="form.title"
+                  placeholder="Tournoi open..."
+                  class="w-full"
+                />
+              </UFormField>
 
-            <UFormGroup label="Slug" name="slug" :error="errors.slug" required>
-              <UInput v-model="form.slug" placeholder="tournoi-open-2026" />
-            </UFormGroup>
+              <UFormField
+                label="Slug"
+                name="slug"
+                :error="errors.slug"
+                required
+              >
+                <UInput
+                  v-model="form.slug"
+                  placeholder="tournoi-open-2026"
+                  class="w-full"
+                />
+              </UFormField>
 
-            <UFormGroup label="Type" name="type" :error="errors.type" required>
-              <USelect v-model="form.type" :options="eventTypes" />
-            </UFormGroup>
+              <UFormField
+                label="Type"
+                name="type"
+                :error="errors.type"
+                required
+              >
+                <USelect v-model="form.type" :items="eventTypes" />
+              </UFormField>
 
-            <UFormGroup
-              label="Date de début"
-              name="startDate"
-              :error="errors.startDate"
-              required
-            >
-              <UInput v-model="form.startDate" type="datetime-local" />
-            </UFormGroup>
+              <UFormField
+                label="Date de début"
+                name="startDate"
+                :error="errors.startDate"
+                required
+              >
+                <UInput
+                  v-model="form.startDate"
+                  type="datetime-local"
+                  class="w-full"
+                />
+              </UFormField>
 
-            <UFormGroup label="Date de fin" name="endDate">
-              <UInput v-model="form.endDate" type="datetime-local" />
-            </UFormGroup>
+              <UFormField label="Date de fin" name="endDate">
+                <UInput
+                  v-model="form.endDate"
+                  type="datetime-local"
+                  class="w-full"
+                />
+              </UFormField>
 
-            <UFormGroup label="Lieu" name="location" class="col-span-2">
-              <UInput
-                v-model="form.location"
-                placeholder="Salle omnisports de Libercourt"
-              />
-            </UFormGroup>
+              <UFormField label="Lieu" name="location" class="col-span-2">
+                <UInput
+                  v-model="form.location"
+                  placeholder="Salle omnisports de Libercourt"
+                  class="w-full"
+                />
+              </UFormField>
 
-            <UFormGroup label="Participants max" name="maxParticipants">
-              <UInput
-                v-model.number="form.maxParticipants"
-                type="number"
-                min="0"
-              />
-            </UFormGroup>
+              <UFormField label="Participants max" name="maxParticipants">
+                <UInput
+                  v-model.number="form.maxParticipants"
+                  type="number"
+                  min="0"
+                  class="w-full"
+                />
+              </UFormField>
 
-            <UFormGroup label="Prix (en €)" name="price">
-              <UInput
-                v-model.number="form.price"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0 = gratuit"
-              />
-            </UFormGroup>
+              <UFormField label="Prix (en €)" name="price">
+                <UInput
+                  v-model.number="form.price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0 = gratuit"
+                  class="w-full"
+                />
+              </UFormField>
 
-            <UFormGroup
-              label="Description"
-              name="description"
-              class="col-span-2"
-            >
-              <UTextarea v-model="form.description" :rows="3" />
-            </UFormGroup>
-          </div>
+              <UFormField
+                label="Description"
+                name="description"
+                class="col-span-2"
+              >
+                <UTextarea
+                  v-model="form.description"
+                  :rows="3"
+                  class="w-full"
+                />
+              </UFormField>
+            </div>
 
-          <div class="flex justify-end gap-3 pt-2">
-            <UButton variant="ghost" @click="modalOpen = false">
-              Annuler
-            </UButton>
-            <UButton type="submit" :loading="saving">
-              {{ editing ? "Enregistrer" : "Créer" }}
-            </UButton>
-          </div>
-        </form>
-      </div>
+            <div class="flex justify-end gap-3 pt-2">
+              <UButton
+                variant="ghost"
+                color="neutral"
+                @click="modalOpen = false"
+              >
+                Annuler
+              </UButton>
+              <UButton type="submit" :loading="saving">
+                {{ editing ? "Enregistrer" : "Créer" }}
+              </UButton>
+            </div>
+          </form>
+        </div>
+      </template>
     </UModal>
 
     <!-- Modal suppression -->
-    <UModal v-model="deleteModalOpen">
-      <div class="p-6 space-y-4">
-        <h3 class="text-lg font-semibold">
-          Supprimer "{{ eventToDelete?.title }}" ?
-        </h3>
-        <p class="text-sm text-red-600">Cette action est irréversible.</p>
-        <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="deleteModalOpen = false">
-            Annuler
-          </UButton>
-          <UButton color="red" :loading="deleting" @click="doDelete">
-            Supprimer
-          </UButton>
+    <UModal
+      v-model:open="deleteModalOpen"
+      :ui="{
+        content:
+          'ring-0 outline-none focus:outline-none focus:ring-0 focus-visible:ring-0',
+      }"
+    >
+      <template #content>
+        <div class="p-6 space-y-4">
+          <h3 class="text-lg font-semibold">
+            Supprimer "{{ eventToDelete?.title }}" ?
+          </h3>
+          <p class="text-sm text-red-600">Cette action est irréversible.</p>
+          <div class="flex justify-end gap-3">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              @click="deleteModalOpen = false"
+            >
+              Annuler
+            </UButton>
+            <UButton color="error" :loading="deleting" @click="doDelete">
+              Supprimer
+            </UButton>
+          </div>
         </div>
-      </div>
+      </template>
     </UModal>
   </div>
 </template>
@@ -328,15 +386,15 @@ async function save() {
         method: "PATCH",
         body: result.data,
       });
-      toast.add({ title: "Événement mis à jour", color: "green" });
+      toast.add({ title: "Événement mis à jour", color: "success" });
     } else {
       await $fetch("/api/admin/events", { method: "POST", body: result.data });
-      toast.add({ title: "Événement créé", color: "green" });
+      toast.add({ title: "Événement créé", color: "success" });
     }
     modalOpen.value = false;
     await refresh();
   } catch {
-    toast.add({ title: "Erreur lors de la sauvegarde", color: "red" });
+    toast.add({ title: "Erreur lors de la sauvegarde", color: "error" });
   } finally {
     saving.value = false;
   }
@@ -350,7 +408,7 @@ async function toggleRegistration(event: Record<string, unknown>) {
     });
     await refresh();
   } catch {
-    toast.add({ title: "Erreur", color: "red" });
+    toast.add({ title: "Erreur", color: "error" });
   }
 }
 
@@ -374,11 +432,11 @@ async function doDelete() {
     await $fetch(`/api/admin/events/${eventToDelete.value.id}`, {
       method: "DELETE",
     });
-    toast.add({ title: "Événement supprimé", color: "green" });
+    toast.add({ title: "Événement supprimé", color: "success" });
     deleteModalOpen.value = false;
     await refresh();
   } catch {
-    toast.add({ title: "Erreur lors de la suppression", color: "red" });
+    toast.add({ title: "Erreur lors de la suppression", color: "error" });
   } finally {
     deleting.value = false;
   }

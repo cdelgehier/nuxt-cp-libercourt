@@ -1,3 +1,9 @@
+## v1.3.1 (2026-03-27)
+
+### Perf
+
+- add ISR caching and Netlify CDN cache headers to eliminate SSR cold starts
+
 ## v1.3.0 (2026-03-27)
 
 ## v1.2.1 (2026-03-26)

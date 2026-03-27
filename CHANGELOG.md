@@ -1,3 +1,9 @@
+## v1.4.0 (2026-03-27)
+
+### Feat
+
+- add Netlify cache tags and on-demand purge on admin mutations
+
 ## v1.3.1 (2026-03-27)
 
 ### Perf

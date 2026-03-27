@@ -5,7 +5,7 @@
       :href="sponsor.website"
       target="_blank"
       rel="noopener noreferrer"
-      class="sponsor-link group flex flex-col bg-white dark:bg-gray-800 rounded-lg p-3 hover:scale-105 hover:shadow-2xl transition-all duration-300 shadow-lg h-full"
+      class="sponsor-link group flex flex-col bg-white dark:bg-gray-600 rounded-lg p-3 hover:scale-105 hover:shadow-2xl transition-all duration-300 shadow-lg h-full"
       :aria-label="ariaLabel"
       :title="sponsor.name"
       :tabindex="tabindex"

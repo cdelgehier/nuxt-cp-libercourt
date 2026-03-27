@@ -1,216 +1,241 @@
 <template>
   <UModal
-    v-model="isOpen"
-    :ui="{ width: 'w-full max-w-4xl sm:max-w-2xl md:max-w-3xl lg:max-w-4xl' }"
+    v-model:open="isOpen"
+    :ui="{
+      width: 'w-full max-w-4xl sm:max-w-2xl md:max-w-3xl lg:max-w-4xl',
+      content: 'ring-0 focus:outline-none',
+    }"
   >
-    <UCard>
-      <template #header>
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <div class="relative">
-              <div
-                :class="[
-                  'w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg',
-                  getClassificationColor(licensee?.clast || 500),
-                ]"
-              >
-                {{ getDisplayClassification(licensee?.clast) }}
+    <template #content>
+      <UCard
+        class="max-h-[90vh] flex flex-col overflow-hidden dark:bg-gray-900 ring-0 shadow-none border border-gray-200 dark:border-gray-700"
+        :ui="{ body: 'overflow-y-auto flex-1' }"
+      >
+        <template #header>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="relative">
+                <div
+                  :class="[
+                    'w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg',
+                    getClassificationColor(licensee?.clast || 500),
+                  ]"
+                >
+                  {{ getDisplayClassification(licensee?.clast) }}
+                </div>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                  {{ licensee?.firstName }} {{ licensee?.lastName }}
+                  <span
+                    v-if="licensee?.sexe === 'F'"
+                    class="ml-2 text-pink-600 dark:text-pink-400"
+                    >♀</span
+                  >
+                  <span v-else class="ml-2 text-blue-600 dark:text-blue-400"
+                    >♂</span
+                  >
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300">
+                  Licence {{ licensee?.licence }}
+                </p>
               </div>
             </div>
-            <div>
-              <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                {{ licensee?.firstName }} {{ licensee?.lastName }}
-                <span
-                  v-if="licensee?.sexe === 'F'"
-                  class="ml-2 text-pink-600 dark:text-pink-400"
-                  >♀</span
-                >
-                <span v-else class="ml-2 text-blue-600 dark:text-blue-400"
-                  >♂</span
-                >
-              </h3>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                Licence {{ licensee?.licence }}
+            <button
+              class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors"
+              aria-label="Fermer"
+              @click="isOpen = false"
+            >
+              <UIcon name="i-heroicons-x-mark-20-solid" class="w-5 h-5" />
+            </button>
+          </div>
+        </template>
+
+        <div v-if="loading" class="text-center py-8">
+          <UIcon
+            name="i-heroicons-arrow-path"
+            class="animate-spin text-4xl text-club-green mb-4"
+          />
+          <p class="text-gray-600 dark:text-gray-400">
+            Chargement des détails...
+          </p>
+        </div>
+
+        <div v-else class="space-y-6 overflow-y-auto">
+          <!-- Informations essentielles -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+            <div
+              class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-4 rounded-lg"
+            >
+              <span class="text-gray-600 dark:text-gray-400 text-sm"
+                >Points</span
+              >
+              <p class="font-bold text-lg text-club-navy dark:text-club-yellow">
+                {{ licensee?.points || licensee?.pointm || "N/A" }}
+              </p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                {{
+                  licensee?.points || licensee?.pointm
+                    ? "Points mensuels"
+                    : "Non disponible"
+                }}
+              </p>
+            </div>
+            <div
+              class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-4 rounded-lg"
+            >
+              <span class="text-gray-600 dark:text-gray-400 text-sm"
+                >Victoires saison</span
+              >
+              <p class="font-bold text-lg" :class="winrateColor">
+                {{ seasonWinrate }}%
+              </p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                {{ seasonMatches.length }} match{{
+                  seasonMatches.length !== 1 ? "s" : ""
+                }}
+              </p>
+            </div>
+            <div
+              class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-4 rounded-lg"
+            >
+              <span class="text-gray-600 dark:text-gray-400 text-sm"
+                >Catégorie</span
+              >
+              <p class="font-bold text-lg text-club-navy dark:text-club-yellow">
+                {{ decodeFfttCategory(licensee?.cat || "") || "N/A" }}
               </p>
             </div>
           </div>
-          <UButton
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-x-mark-20-solid"
-            @click="isOpen = false"
-          />
-        </div>
-      </template>
 
-      <div v-if="loading" class="text-center py-8">
-        <UIcon
-          name="i-heroicons-arrow-path"
-          class="animate-spin text-4xl text-club-green mb-4"
-        />
-        <p class="text-gray-600 dark:text-gray-400">
-          Chargement des détails...
-        </p>
-      </div>
-
-      <div v-else class="space-y-6">
-        <!-- Informations essentielles -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-          <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-            <span class="text-gray-600 dark:text-gray-400 text-sm">Points</span>
-            <p class="font-bold text-lg text-club-navy dark:text-blue-400">
-              {{ licensee?.points || licensee?.pointm || "N/A" }}
-            </p>
-            <p class="text-xs text-gray-500 dark:text-gray-400">
-              {{
-                licensee?.points || licensee?.pointm
-                  ? "Points mensuels"
-                  : "Non disponible"
-              }}
-            </p>
-          </div>
-          <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-            <span class="text-gray-600 dark:text-gray-400 text-sm"
-              >Victoires saison</span
-            >
-            <p class="font-bold text-lg" :class="winrateColor">
-              {{ seasonWinrate }}%
-            </p>
-            <p class="text-xs text-gray-500 dark:text-gray-400">
-              {{ seasonMatches.length }} match{{
-                seasonMatches.length !== 1 ? "s" : ""
-              }}
-            </p>
-          </div>
-          <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-            <span class="text-gray-600 dark:text-gray-400 text-sm"
-              >Catégorie</span
-            >
-            <p class="font-bold text-lg text-purple-600 dark:text-purple-400">
-              {{ decodeFfttCategory(licensee?.cat || "") || "N/A" }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Graphique d'évolution des points -->
-        <div
-          v-if="rankingHistory && rankingHistory.length > 0"
-          class="bg-white dark:bg-gray-800 p-6 rounded-lg border"
-        >
-          <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Évolution des points
-          </h4>
-          <div class="h-64">
-            <Line :data="chartData" :options="chartOptions" />
-          </div>
-        </div>
-
-        <!-- Derniers matchs -->
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg border">
-          <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            10 derniers matchs
-          </h4>
-
-          <div v-if="loadingMatches" class="text-center py-4">
-            <UIcon
-              name="i-heroicons-arrow-path"
-              class="animate-spin text-2xl text-club-green mb-2"
-            />
-            <p class="text-gray-600 dark:text-gray-400 text-sm">
-              Chargement des matchs...
-            </p>
-          </div>
-
+          <!-- Graphique d'évolution des points -->
           <div
-            v-else-if="!matches || matches.length === 0"
-            class="text-center py-8"
+            v-if="rankingHistory && rankingHistory.length > 0"
+            class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-6 rounded-lg"
           >
-            <UIcon
-              name="i-heroicons-information-circle"
-              class="text-3xl text-gray-400 mb-3"
-            />
-            <p class="text-gray-600 dark:text-gray-400 text-sm">
-              Aucun match trouvé
-            </p>
+            <h4
+              class="text-lg font-semibold text-gray-900 dark:text-white mb-4"
+            >
+              Évolution des points
+            </h4>
+            <div class="h-64">
+              <Line :data="chartData" :options="chartOptions" />
+            </div>
           </div>
 
-          <div v-else class="space-y-4">
-            <div
-              v-for="(dateGroup, date) in groupedMatches"
-              :key="date"
-              class="space-y-2"
+          <!-- Derniers matchs -->
+          <div
+            class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-6 rounded-lg"
+          >
+            <h4
+              class="text-lg font-semibold text-gray-900 dark:text-white mb-4"
             >
-              <!-- Date header -->
-              <div class="flex items-center">
-                <div class="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full" />
-                <h5
-                  class="ml-3 text-sm font-semibold text-gray-900 dark:text-white"
-                >
-                  {{ formatDate(date) }}
-                </h5>
-                <div class="ml-auto text-xs text-gray-500 dark:text-gray-400">
-                  {{ dateGroup.length }} match{{
-                    dateGroup.length > 1 ? "s" : ""
-                  }}
-                </div>
-              </div>
+              10 derniers matchs
+            </h4>
 
-              <!-- Matches for this date -->
-              <div class="ml-5 space-y-2">
-                <div
-                  v-for="(match, index) in dateGroup"
-                  :key="index"
-                  class="p-3 bg-gray-50 dark:bg-gray-700 rounded-md border-l-4"
-                  :class="
-                    match.victoire === 'V'
-                      ? 'border-green-500'
-                      : 'border-red-500'
-                  "
-                >
-                  <!-- Résultat en haut -->
-                  <div class="flex items-center justify-center mb-3">
-                    <div
-                      :class="[
-                        'w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold',
-                        match.victoire === 'V' ? 'bg-green-500' : 'bg-red-500',
-                      ]"
-                    >
-                      {{ match.victoire === "V" ? "✓" : "✗" }}
-                    </div>
+            <div v-if="loadingMatches" class="text-center py-4">
+              <UIcon
+                name="i-heroicons-arrow-path"
+                class="animate-spin text-2xl text-club-green mb-2"
+              />
+              <p class="text-gray-600 dark:text-gray-400 text-sm">
+                Chargement des matchs...
+              </p>
+            </div>
+
+            <div
+              v-else-if="!matches || matches.length === 0"
+              class="text-center py-8"
+            >
+              <UIcon
+                name="i-heroicons-information-circle"
+                class="text-3xl text-gray-400 mb-3"
+              />
+              <p class="text-gray-600 dark:text-gray-400 text-sm">
+                Aucun match trouvé
+              </p>
+            </div>
+
+            <div v-else class="space-y-4">
+              <div
+                v-for="(dateGroup, date) in groupedMatches"
+                :key="date"
+                class="space-y-2"
+              >
+                <!-- Date header -->
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full" />
+                  <h5
+                    class="ml-3 text-sm font-semibold text-gray-900 dark:text-white"
+                  >
+                    {{ formatDate(date) }}
+                  </h5>
+                  <div class="ml-auto text-xs text-gray-500 dark:text-gray-400">
+                    {{ dateGroup.length }} match{{
+                      dateGroup.length > 1 ? "s" : ""
+                    }}
                   </div>
+                </div>
 
-                  <!-- Détails de la rencontre en dessous -->
-                  <div class="text-center space-y-2">
-                    <div class="flex items-center justify-center space-x-2">
-                      <p class="font-medium text-gray-900 dark:text-white">
-                        {{ formatPlayerName(match.nom) }}
-                      </p>
-                      <span
-                        class="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full"
-                      >
-                        {{ match.classement }}
-                      </span>
-                      <span
-                        v-if="getMatchPoints(match)"
+                <!-- Matches for this date -->
+                <div class="ml-5 space-y-2">
+                  <div
+                    v-for="(match, index) in dateGroup"
+                    :key="index"
+                    class="p-3 bg-gray-50 dark:bg-gray-700 rounded-md border-l-4"
+                    :class="
+                      match.victoire === 'V'
+                        ? 'border-green-500'
+                        : 'border-red-500'
+                    "
+                  >
+                    <!-- Résultat en haut -->
+                    <div class="flex items-center justify-center mb-3">
+                      <div
                         :class="[
-                          'px-2 py-1 text-xs font-medium rounded-full',
-                          getMatchPoints(match)?.style.color,
+                          'w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold',
+                          match.victoire === 'V'
+                            ? 'bg-green-500'
+                            : 'bg-red-500',
                         ]"
                       >
-                        {{ getMatchPoints(match)?.style.text }}
-                      </span>
+                        {{ match.victoire === "V" ? "✓" : "✗" }}
+                      </div>
                     </div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      {{ match.epreuve }}
-                    </p>
+
+                    <!-- Détails de la rencontre en dessous -->
+                    <div class="text-center space-y-2">
+                      <div class="flex items-center justify-center space-x-2">
+                        <p class="font-medium text-gray-900 dark:text-white">
+                          {{ formatPlayerName(match.nom) }}
+                        </p>
+                        <span
+                          class="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full"
+                        >
+                          {{ match.classement }}
+                        </span>
+                        <span
+                          v-if="getMatchPoints(match)"
+                          :class="[
+                            'px-2 py-1 text-xs font-medium rounded-full',
+                            getMatchPoints(match)?.style.color,
+                          ]"
+                        >
+                          {{ getMatchPoints(match)?.style.text }}
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-600 dark:text-gray-400">
+                        {{ match.epreuve }}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </UCard>
+      </UCard>
+    </template>
   </UModal>
 </template>
 

@@ -8,31 +8,11 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@pinia/nuxt",
     "@vueuse/nuxt",
-    "@nuxtjs/color-mode",
-    "@nuxtjs/tailwindcss",
     "nuxt-oidc-auth",
   ],
 
   // CSS Framework
   css: ["~/assets/css/main.css"],
-
-  // UI Configuration
-  ui: {
-    global: true,
-    safelistColors: ["club-green", "club-yellow", "club-navy"],
-  },
-
-  // Color Mode Configuration
-  colorMode: {
-    preference: "light", // default value
-    fallback: "light", // fallback value if not set in system or localStorage
-    hid: "nuxt-color-mode-script",
-    globalName: "__NUXT_COLOR_MODE__",
-    componentName: "ColorScheme",
-    classPrefix: "",
-    classSuffix: "",
-    storageKey: "nuxt-color-mode",
-  },
 
   // Image optimization - configured for Netlify static hosting
   image: {
@@ -189,11 +169,6 @@ export default defineNuxtConfig({
     public: {
       clubId: process.env.CLUB_FFTT_ID ?? "07620112",
     },
-  },
-
-  // Tailwind CSS configuration will extend our custom theme
-  tailwindcss: {
-    configPath: "~/tailwind.config.js",
   },
 
   // OIDC Auth — protection manuelle via middleware admin (pas de protection globale)

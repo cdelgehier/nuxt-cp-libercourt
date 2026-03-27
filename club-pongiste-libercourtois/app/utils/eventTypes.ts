@@ -4,35 +4,33 @@ export const EVENT_TYPE_CONFIG: Record<
 > = {
   tournament: {
     label: "Tournoi",
-    class: "bg-accent-50 text-accent-600",
+    class: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
   },
   competition: {
     label: "Compétition",
-    class:
-      "bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-300",
+    class: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
   },
   stage: {
     label: "Stage",
-    class:
-      "bg-secondary-50 text-secondary-800 dark:bg-secondary-900/20 dark:text-secondary-200",
+    class: "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
   },
   meeting: {
     label: "Réunion",
     class:
-      "bg-club-navy/10 text-club-navy dark:bg-club-navy/20 dark:text-club-yellow",
+      "bg-slate-100 text-slate-700 dark:bg-slate-700/50 dark:text-slate-300",
   },
   training: {
     label: "Entraînement",
     class:
-      "bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-300",
+      "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
   },
   social: {
     label: "Social",
-    class: "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-300",
+    class: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
   },
   other: {
     label: "Autre",
-    class: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+    class: "bg-gray-100 text-gray-600 dark:bg-gray-700/50 dark:text-gray-300",
   },
 };
 

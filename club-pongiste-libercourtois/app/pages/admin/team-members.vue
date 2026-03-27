@@ -50,9 +50,9 @@
             </td>
             <td class="px-4 py-3 text-center">
               <UBadge
-                :color="member.active ? 'green' : 'gray'"
+                :color="member.active ? 'success' : 'neutral'"
                 variant="subtle"
-                size="xs"
+                size="sm"
               >
                 {{ member.active ? "Actif" : "Inactif" }}
               </UBadge>
@@ -60,15 +60,16 @@
             <td class="px-4 py-3 text-right">
               <div class="flex items-center justify-end gap-2">
                 <UButton
-                  size="xs"
+                  size="sm"
                   variant="ghost"
                   icon="i-heroicons-pencil"
+                  color="neutral"
                   @click="openEdit(member)"
                 />
                 <UButton
-                  size="xs"
+                  size="sm"
                   variant="ghost"
-                  color="red"
+                  color="error"
                   icon="i-heroicons-trash"
                   @click="confirmDelete(member)"
                 />
@@ -80,69 +81,98 @@
     </div>
 
     <!-- Modal -->
-    <UModal v-model="modalOpen">
-      <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {{ editing ? "Modifier le membre" : "Nouveau membre" }}
-        </h3>
-        <form class="space-y-4" @submit.prevent="save">
-          <div class="grid grid-cols-2 gap-4">
-            <UFormGroup label="Prénom" name="firstName" required>
-              <UInput v-model="form.firstName" />
-            </UFormGroup>
-            <UFormGroup label="Nom" name="lastName" required>
-              <UInput v-model="form.lastName" />
-            </UFormGroup>
-            <UFormGroup label="Rôle (clé)" name="role" required>
-              <UInput
-                v-model="form.role"
-                placeholder="president, secretary..."
-              />
-            </UFormGroup>
-            <UFormGroup label="Rôle (libellé)" name="fullRole">
-              <UInput v-model="form.fullRole" placeholder="Président du club" />
-            </UFormGroup>
-            <UFormGroup label="Email" name="email">
-              <UInput v-model="form.email" type="email" />
-            </UFormGroup>
-            <UFormGroup label="Téléphone" name="phone">
-              <UInput v-model="form.phone" />
-            </UFormGroup>
-            <UFormGroup label="Bio" name="bio" class="col-span-2">
-              <UTextarea v-model="form.bio" :rows="3" />
-            </UFormGroup>
-          </div>
-          <UFormGroup label="Actif" name="active">
-            <UCheckbox v-model="form.active" label="Membre actif" />
-          </UFormGroup>
-          <div class="flex justify-end gap-3 pt-2">
-            <UButton variant="ghost" @click="modalOpen = false">
-              Annuler
-            </UButton>
-            <UButton type="submit" :loading="saving">
-              {{ editing ? "Enregistrer" : "Créer" }}
-            </UButton>
-          </div>
-        </form>
-      </div>
+    <UModal
+      v-model:open="modalOpen"
+      :ui="{
+        content:
+          'ring-0 outline-none focus:outline-none focus:ring-0 focus-visible:ring-0',
+      }"
+    >
+      <template #content>
+        <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            {{ editing ? "Modifier le membre" : "Nouveau membre" }}
+          </h3>
+          <form class="space-y-4" @submit.prevent="save">
+            <div class="grid grid-cols-2 gap-4">
+              <UFormField label="Prénom" name="firstName" required>
+                <UInput v-model="form.firstName" class="w-full" />
+              </UFormField>
+              <UFormField label="Nom" name="lastName" required>
+                <UInput v-model="form.lastName" class="w-full" />
+              </UFormField>
+              <UFormField label="Rôle (clé)" name="role" required>
+                <UInput
+                  v-model="form.role"
+                  placeholder="president, secretary..."
+                  class="w-full"
+                />
+              </UFormField>
+              <UFormField label="Rôle (libellé)" name="fullRole">
+                <UInput
+                  v-model="form.fullRole"
+                  placeholder="Président du club"
+                  class="w-full"
+                />
+              </UFormField>
+              <UFormField label="Email" name="email">
+                <UInput v-model="form.email" type="email" class="w-full" />
+              </UFormField>
+              <UFormField label="Téléphone" name="phone">
+                <UInput v-model="form.phone" class="w-full" />
+              </UFormField>
+              <UFormField label="Bio" name="bio" class="col-span-2">
+                <UTextarea v-model="form.bio" :rows="3" class="w-full" />
+              </UFormField>
+            </div>
+            <UFormField label="Actif" name="active">
+              <UCheckbox v-model="form.active" label="Membre actif" />
+            </UFormField>
+            <div class="flex justify-end gap-3 pt-2">
+              <UButton
+                variant="ghost"
+                color="neutral"
+                @click="modalOpen = false"
+              >
+                Annuler
+              </UButton>
+              <UButton type="submit" :loading="saving">
+                {{ editing ? "Enregistrer" : "Créer" }}
+              </UButton>
+            </div>
+          </form>
+        </div>
+      </template>
     </UModal>
 
     <!-- Modal suppression -->
-    <UModal v-model="deleteModalOpen">
-      <div class="p-6 space-y-4">
-        <h3 class="text-lg font-semibold">
-          Supprimer "{{ toDelete?.firstName }} {{ toDelete?.lastName }}" ?
-        </h3>
-        <p class="text-sm text-red-600">Cette action est irréversible.</p>
-        <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="deleteModalOpen = false">
-            Annuler
-          </UButton>
-          <UButton color="red" :loading="deleting" @click="doDelete">
-            Supprimer
-          </UButton>
+    <UModal
+      v-model:open="deleteModalOpen"
+      :ui="{
+        content:
+          'ring-0 outline-none focus:outline-none focus:ring-0 focus-visible:ring-0',
+      }"
+    >
+      <template #content>
+        <div class="p-6 space-y-4">
+          <h3 class="text-lg font-semibold">
+            Supprimer "{{ toDelete?.firstName }} {{ toDelete?.lastName }}" ?
+          </h3>
+          <p class="text-sm text-red-600">Cette action est irréversible.</p>
+          <div class="flex justify-end gap-3">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              @click="deleteModalOpen = false"
+            >
+              Annuler
+            </UButton>
+            <UButton color="error" :loading="deleting" @click="doDelete">
+              Supprimer
+            </UButton>
+          </div>
         </div>
-      </div>
+      </template>
     </UModal>
   </div>
 </template>
@@ -217,15 +247,15 @@ async function save() {
         method: "PATCH",
         body: form,
       });
-      toast.add({ title: "Membre mis à jour", color: "green" });
+      toast.add({ title: "Membre mis à jour", color: "success" });
     } else {
       await $fetch("/api/admin/team-members", { method: "POST", body: form });
-      toast.add({ title: "Membre créé", color: "green" });
+      toast.add({ title: "Membre créé", color: "success" });
     }
     modalOpen.value = false;
     await refresh();
   } catch {
-    toast.add({ title: "Erreur", color: "red" });
+    toast.add({ title: "Erreur", color: "error" });
   } finally {
     saving.value = false;
   }
@@ -247,11 +277,11 @@ async function doDelete() {
     await $fetch(`/api/admin/team-members/${toDelete.value.id}`, {
       method: "DELETE",
     });
-    toast.add({ title: "Membre supprimé", color: "green" });
+    toast.add({ title: "Membre supprimé", color: "success" });
     deleteModalOpen.value = false;
     await refresh();
   } catch {
-    toast.add({ title: "Erreur", color: "red" });
+    toast.add({ title: "Erreur", color: "error" });
   } finally {
     deleting.value = false;
   }

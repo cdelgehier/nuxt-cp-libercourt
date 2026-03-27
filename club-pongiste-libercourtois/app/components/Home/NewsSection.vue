@@ -9,7 +9,10 @@
             Les dernières nouvelles du Comité, de la Ligue et du club
           </p>
         </div>
-        <UButton to="/actualites" variant="outline" color="primary">
+        <UButton
+          to="/actualites"
+          class="bg-club-yellow text-club-navy hover:bg-yellow-400 border-0 font-semibold"
+        >
           Toutes les actualités
         </UButton>
       </div>

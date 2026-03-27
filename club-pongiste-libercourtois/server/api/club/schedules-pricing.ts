@@ -38,6 +38,7 @@ export default defineEventHandler(async () => {
       category: string;
       level: string | null;
       coach: string | null;
+      type: string;
     }[];
   };
   const groupByDay = (list: typeof allSchedules): TrainingDay[] => {
@@ -49,6 +50,7 @@ export default defineEventHandler(async () => {
         category: s.category,
         level: s.level,
         coach: s.coach,
+        type: s.type,
       });
     }
     return Array.from(map.values());

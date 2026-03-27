@@ -18,7 +18,7 @@
       <!-- Statistiques avec répartition par genre et âge -->
       <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div
-          class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center"
+          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow text-center"
         >
           <div class="text-2xl font-bold text-teal-700">
             {{ filteredLicensees.length }}
@@ -28,44 +28,40 @@
           </div>
         </div>
         <div
-          class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center"
+          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow text-center"
         >
           <div class="text-2xl font-bold text-pink-600">
-            {{
-              filteredLicensees.filter((l) => (l as any).sexe === "F").length
-            }}
+            {{ filteredLicensees.filter((l: any) => l.sexe === "F").length }}
           </div>
           <div class="text-sm text-gray-600 dark:text-gray-400">♀ Femmes</div>
         </div>
         <div
-          class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center"
+          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow text-center"
         >
           <div class="text-2xl font-bold text-blue-600">
-            {{
-              filteredLicensees.filter((l) => (l as any).sexe === "M").length
-            }}
+            {{ filteredLicensees.filter((l: any) => l.sexe === "M").length }}
           </div>
           <div class="text-sm text-gray-600 dark:text-gray-400">♂ Hommes</div>
         </div>
         <div
-          class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center"
+          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow text-center"
         >
           <div class="text-2xl font-bold text-green-600">
             {{
               filteredLicensees.filter(
-                (l) => getAgeGroup((l as any).cat || "") === "junior",
+                (l: any) => getAgeGroup(l.cat || "") === "junior",
               ).length
             }}
           </div>
           <div class="text-sm text-gray-600 dark:text-gray-400">🧸 Juniors</div>
         </div>
         <div
-          class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center"
+          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow text-center"
         >
           <div class="text-2xl font-bold text-purple-600">
             {{
               filteredLicensees.filter(
-                (l) => getAgeGroup((l as any).cat || "") === "adult",
+                (l: any) => getAgeGroup(l.cat || "") === "adult",
               ).length
             }}
           </div>
@@ -98,7 +94,7 @@
             <div class="flex gap-2">
               <UButton
                 :variant="genderFilter === 'all' ? 'solid' : 'outline'"
-                :color="genderFilter === 'all' ? 'primary' : 'gray'"
+                :color="genderFilter === 'all' ? 'primary' : 'neutral'"
                 size="sm"
                 @click="genderFilter = 'all'"
               >
@@ -106,7 +102,7 @@
               </UButton>
               <UButton
                 :variant="genderFilter === 'F' ? 'solid' : 'outline'"
-                :color="genderFilter === 'F' ? 'pink' : 'gray'"
+                :color="genderFilter === 'F' ? 'pink' : 'neutral'"
                 size="sm"
                 @click="genderFilter = 'F'"
               >
@@ -114,7 +110,7 @@
               </UButton>
               <UButton
                 :variant="genderFilter === 'M' ? 'solid' : 'outline'"
-                :color="genderFilter === 'M' ? 'blue' : 'gray'"
+                :color="genderFilter === 'M' ? 'blue' : 'neutral'"
                 size="sm"
                 @click="genderFilter = 'M'"
               >
@@ -132,7 +128,7 @@
             <div class="flex gap-2">
               <UButton
                 :variant="ageFilter === 'all' ? 'solid' : 'outline'"
-                :color="ageFilter === 'all' ? 'primary' : 'gray'"
+                :color="ageFilter === 'all' ? 'primary' : 'neutral'"
                 size="sm"
                 @click="ageFilter = 'all'"
               >
@@ -140,7 +136,7 @@
               </UButton>
               <UButton
                 :variant="ageFilter === 'junior' ? 'solid' : 'outline'"
-                :color="ageFilter === 'junior' ? 'green' : 'gray'"
+                :color="ageFilter === 'junior' ? 'green' : 'neutral'"
                 size="sm"
                 @click="ageFilter = 'junior'"
               >
@@ -148,7 +144,7 @@
               </UButton>
               <UButton
                 :variant="ageFilter === 'adult' ? 'solid' : 'outline'"
-                :color="ageFilter === 'adult' ? 'purple' : 'gray'"
+                :color="ageFilter === 'adult' ? 'purple' : 'neutral'"
                 size="sm"
                 @click="ageFilter = 'adult'"
               >
@@ -172,7 +168,7 @@
 
       <div v-else-if="error" class="text-center py-12">
         <UAlert
-          color="red"
+          color="error"
           icon="i-heroicons-exclamation-triangle"
           title="Erreur"
           :description="error.message || 'Impossible de charger les licenciés'"

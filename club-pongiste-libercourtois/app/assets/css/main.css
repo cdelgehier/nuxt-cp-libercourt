@@ -1,8 +1,112 @@
 /* Styles globaux pour le Club Pongiste Libercourtois */
 
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme static {
+  /* Club colors */
+  --color-club-yellow: #ffd700;
+  --color-club-gold: #ffd700;
+  --color-club-green: #20b2aa;
+  --color-club-blue: #1e40af;
+  --color-club-red: #dc143c;
+  --color-club-navy: #1e293b;
+  --color-club-white: #ffffff;
+
+  /* Primary palette (yellow) */
+  --color-primary-50: #fefce8;
+  --color-primary-100: #fef9c3;
+  --color-primary-200: #fef08a;
+  --color-primary-300: #fde047;
+  --color-primary-400: #facc15;
+  --color-primary-500: #ffd700;
+  --color-primary-600: #ca8a04;
+  --color-primary-700: #a16207;
+  --color-primary-800: #854d0e;
+  --color-primary-900: #713f12;
+  --color-primary-950: #422006;
+
+  /* Secondary palette (teal) */
+  --color-secondary-50: #e0f2f1;
+  --color-secondary-100: #b2dfdb;
+  --color-secondary-200: #80cbc4;
+  --color-secondary-300: #4db6ac;
+  --color-secondary-400: #26a69a;
+  --color-secondary-500: #20b2aa;
+  --color-secondary-600: #00897b;
+  --color-secondary-700: #00695c;
+  --color-secondary-800: #004d40;
+  --color-secondary-900: #00251a;
+
+  /* Accent palette (red) */
+  --color-accent-50: #fce4ec;
+  --color-accent-100: #f8bbd9;
+  --color-accent-200: #f48fb1;
+  --color-accent-300: #f06292;
+  --color-accent-400: #ec407a;
+  --color-accent-500: #dc143c;
+  --color-accent-600: #c2185b;
+  --color-accent-700: #ad1457;
+  --color-accent-800: #880e4f;
+  --color-accent-900: #560027;
+
+  /* Fonts */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-heading: "Inter", system-ui, sans-serif;
+
+  /* Custom display font sizes */
+  --text-display-xl: 4.5rem;
+  --text-display-xl--line-height: 1.1;
+  --text-display-xl--letter-spacing: -0.025em;
+  --text-display-lg: 3.75rem;
+  --text-display-lg--line-height: 1.1;
+  --text-display-lg--letter-spacing: -0.025em;
+  --text-display-md: 3rem;
+  --text-display-md--line-height: 1.2;
+  --text-display-md--letter-spacing: -0.025em;
+  --text-display-sm: 2.25rem;
+  --text-display-sm--line-height: 1.3;
+  --text-display-sm--letter-spacing: -0.025em;
+
+  /* Animations */
+  --animate-ping-pong: bounce 1s infinite;
+  --animate-fade-in: fadeIn 0.5s ease-in-out;
+  --animate-slide-up: slideUp 0.5s ease-out;
+  --animate-infinite-scroll: infinite-scroll 25s linear infinite;
+
+  /* Box shadows */
+  --shadow-club: 0 4px 14px 0 rgba(255, 215, 0, 0.2);
+  --shadow-club-lg: 0 10px 25px 0 rgba(255, 215, 0, 0.3);
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes infinite-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
 
 /* Variables CSS pour les couleurs du club et les modes */
 :root {
@@ -11,6 +115,9 @@
   --club-red: #dc143c;
   --club-navy: #1e293b;
   --club-white: #ffffff;
+
+  /* Map Nuxt UI semantic color to our yellow palette */
+  --ui-primary: var(--color-primary-500);
 
   /* Variables adaptatives pour les modes clair/sombre */
   --bg-primary: #f9fafb;

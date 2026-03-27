@@ -54,7 +54,17 @@
                     session.time
                   }}</span>
                   <span
-                    class="text-xs bg-club-green text-club-navy px-2 py-1 rounded-full"
+                    class="text-xs px-2 py-1 rounded-full font-medium"
+                    :class="{
+                      'badge-libre': session.type === 'libre',
+                      'badge-entrainement': session.type === 'entrainement',
+                      'badge-competition': session.type === 'competition',
+                      'badge-other': ![
+                        'libre',
+                        'entrainement',
+                        'competition',
+                      ].includes(session.type),
+                    }"
                   >
                     {{ session.coach }}
                   </span>
@@ -284,7 +294,7 @@
                           </p>
                           <p
                             v-if="'condition' in document && document.condition"
-                            class="text-sm text-orange-800 font-medium mb-2"
+                            class="text-sm text-orange-600 dark:text-orange-400 font-medium mb-2"
                           >
                             <UIcon
                               name="i-heroicons-exclamation-triangle"
@@ -386,10 +396,8 @@
           </UButton>
           <UButton
             to="/club"
-            variant="outline"
-            color="white"
             size="lg"
-            class="font-semibold border-white text-white hover:bg-white hover:text-club-navy"
+            class="font-semibold bg-transparent border-2 border-white !text-white hover:bg-white hover:!text-club-navy"
           >
             <UIcon name="i-heroicons-information-circle" class="mr-2" />
             En savoir plus sur le club
@@ -436,3 +444,39 @@ function getDocumentIcon(type: string): string {
   return icons[type] || "i-heroicons-document";
 }
 </script>
+
+<style scoped>
+.badge-libre {
+  background: #ccfbf1;
+  color: #115e59;
+}
+.badge-entrainement {
+  background: #fef3c7;
+  color: #92400e;
+}
+.badge-competition {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.badge-other {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+:global(.dark) .badge-libre {
+  background: rgba(20, 184, 166, 0.2);
+  color: #5eead4;
+}
+:global(.dark) .badge-entrainement {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fcd34d;
+}
+:global(.dark) .badge-competition {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+:global(.dark) .badge-other {
+  background: rgba(107, 114, 128, 0.2);
+  color: #d1d5db;
+}
+</style>

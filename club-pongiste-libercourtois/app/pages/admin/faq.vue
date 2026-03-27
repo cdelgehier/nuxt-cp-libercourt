@@ -55,9 +55,9 @@
             </td>
             <td class="px-4 py-3 text-center">
               <UBadge
-                :color="faq.isPopular ? 'green' : 'gray'"
+                :color="faq.isPopular ? 'success' : 'neutral'"
                 variant="subtle"
-                size="xs"
+                size="sm"
               >
                 {{ faq.isPopular ? "Oui" : "Non" }}
               </UBadge>
@@ -65,15 +65,16 @@
             <td class="px-4 py-3 text-right">
               <div class="flex items-center justify-end gap-2">
                 <UButton
-                  size="xs"
+                  size="sm"
                   variant="ghost"
                   icon="i-heroicons-pencil"
+                  color="neutral"
                   @click="openEdit(faq)"
                 />
                 <UButton
-                  size="xs"
+                  size="sm"
                   variant="ghost"
-                  color="red"
+                  color="error"
                   icon="i-heroicons-trash"
                   @click="confirmDelete(faq)"
                 />
@@ -85,86 +86,113 @@
     </div>
 
     <!-- Modal créer / éditer -->
-    <UModal v-model="modalOpen">
-      <div class="p-6 space-y-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {{ editing ? "Modifier la FAQ" : "Nouvelle FAQ" }}
-        </h3>
+    <UModal
+      v-model:open="modalOpen"
+      :ui="{
+        content:
+          'ring-0 outline-none focus:outline-none focus:ring-0 focus-visible:ring-0',
+      }"
+    >
+      <template #content>
+        <div class="p-6 space-y-4">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            {{ editing ? "Modifier la FAQ" : "Nouvelle FAQ" }}
+          </h3>
 
-        <form class="space-y-4" @submit.prevent="save">
-          <UFormGroup
-            label="Question"
-            name="question"
-            :error="errors.question"
-            required
-          >
-            <UInput
-              v-model="form.question"
-              placeholder="Ex : Comment s'inscrire au club ?"
-            />
-          </UFormGroup>
+          <form class="space-y-4" @submit.prevent="save">
+            <UFormField
+              label="Question"
+              name="question"
+              :error="errors.question"
+              required
+            >
+              <UInput
+                v-model="form.question"
+                placeholder="Ex : Comment s'inscrire au club ?"
+                class="w-full"
+              />
+            </UFormField>
 
-          <UFormGroup
-            label="Réponse"
-            name="answer"
-            :error="errors.answer"
-            required
-          >
-            <UTextarea
-              v-model="form.answer"
-              :rows="4"
-              placeholder="Réponse complète..."
-            />
-          </UFormGroup>
+            <UFormField
+              label="Réponse"
+              name="answer"
+              :error="errors.answer"
+              required
+            >
+              <UTextarea
+                v-model="form.answer"
+                :rows="4"
+                placeholder="Réponse complète..."
+                class="w-full"
+              />
+            </UFormField>
 
-          <UFormGroup
-            label="Catégorie"
-            name="category"
-            :error="errors.category"
-            required
-          >
-            <UInput
-              v-model="form.category"
-              placeholder="Ex : Inscription, Compétition..."
-            />
-          </UFormGroup>
+            <UFormField
+              label="Catégorie"
+              name="category"
+              :error="errors.category"
+              required
+            >
+              <UInput
+                v-model="form.category"
+                placeholder="Ex : Inscription, Compétition..."
+                class="w-full"
+              />
+            </UFormField>
 
-          <UFormGroup label="Populaire" name="isPopular">
-            <UCheckbox
-              v-model="form.isPopular"
-              label="Afficher dans les questions populaires"
-            />
-          </UFormGroup>
+            <UFormField label="Populaire" name="isPopular">
+              <UCheckbox
+                v-model="form.isPopular"
+                label="Afficher dans les questions populaires"
+              />
+            </UFormField>
 
-          <div class="flex justify-end gap-3 pt-2">
-            <UButton variant="ghost" @click="modalOpen = false">
-              Annuler
-            </UButton>
-            <UButton type="submit" :loading="saving">
-              {{ editing ? "Enregistrer" : "Créer" }}
-            </UButton>
-          </div>
-        </form>
-      </div>
+            <div class="flex justify-end gap-3 pt-2">
+              <UButton
+                variant="ghost"
+                color="neutral"
+                @click="modalOpen = false"
+              >
+                Annuler
+              </UButton>
+              <UButton type="submit" :loading="saving">
+                {{ editing ? "Enregistrer" : "Créer" }}
+              </UButton>
+            </div>
+          </form>
+        </div>
+      </template>
     </UModal>
 
     <!-- Modal confirmation suppression -->
-    <UModal v-model="deleteModalOpen">
-      <div class="p-6 space-y-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          Supprimer cette FAQ ?
-        </h3>
-        <p class="text-sm text-gray-500">"{{ faqToDelete?.question }}"</p>
-        <p class="text-sm text-red-600">Cette action est irréversible.</p>
-        <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="deleteModalOpen = false">
-            Annuler
-          </UButton>
-          <UButton color="red" :loading="deleting" @click="doDelete">
-            Supprimer
-          </UButton>
+    <UModal
+      v-model:open="deleteModalOpen"
+      :ui="{
+        content:
+          'ring-0 outline-none focus:outline-none focus:ring-0 focus-visible:ring-0',
+      }"
+    >
+      <template #content>
+        <div class="p-6 space-y-4">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            Supprimer cette FAQ ?
+          </h3>
+          <p class="text-sm text-gray-500">"{{ faqToDelete?.question }}"</p>
+          <p class="text-sm text-red-600">Cette action est irréversible.</p>
+          <div class="flex justify-end gap-3">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              @click="deleteModalOpen = false"
+            >
+              Annuler
+            </UButton>
+            <UButton color="error" :loading="deleting" @click="doDelete">
+              Supprimer
+            </UButton>
+          </div>
         </div>
-      </div>
+      </template>
     </UModal>
   </div>
 </template>
@@ -250,15 +278,15 @@ async function save() {
         method: "PATCH",
         body: result.data,
       });
-      toast.add({ title: "FAQ mise à jour", color: "green" });
+      toast.add({ title: "FAQ mise à jour", color: "success" });
     } else {
       await $fetch("/api/admin/faqs", { method: "POST", body: result.data });
-      toast.add({ title: "FAQ créée", color: "green" });
+      toast.add({ title: "FAQ créée", color: "success" });
     }
     modalOpen.value = false;
     await refresh();
   } catch {
-    toast.add({ title: "Erreur lors de la sauvegarde", color: "red" });
+    toast.add({ title: "Erreur lors de la sauvegarde", color: "error" });
   } finally {
     saving.value = false;
   }
@@ -284,11 +312,11 @@ async function doDelete() {
     await $fetch(`/api/admin/faqs/${faqToDelete.value.id}`, {
       method: "DELETE",
     });
-    toast.add({ title: "FAQ supprimée", color: "green" });
+    toast.add({ title: "FAQ supprimée", color: "success" });
     deleteModalOpen.value = false;
     await refresh();
   } catch {
-    toast.add({ title: "Erreur lors de la suppression", color: "red" });
+    toast.add({ title: "Erreur lors de la suppression", color: "error" });
   } finally {
     deleting.value = false;
   }

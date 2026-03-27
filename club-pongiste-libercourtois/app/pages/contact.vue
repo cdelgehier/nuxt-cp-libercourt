@@ -83,10 +83,8 @@
               <div>{{ data.address.postalCode }} {{ data.address.city }}</div>
             </div>
             <UButton
-              variant="outline"
-              color="primary"
               size="sm"
-              class="mt-4"
+              class="mt-4 bg-club-yellow text-club-navy hover:bg-yellow-400 border-0 font-semibold"
               @click="scrollToSection('map')"
             >
               <UIcon name="i-heroicons-map" class="mr-2" />
@@ -341,10 +339,8 @@
             </div>
             <div class="mt-4 text-center">
               <UButton
-                variant="outline"
-                color="primary"
                 size="sm"
-                class="font-semibold"
+                class="font-semibold bg-club-yellow text-club-navy hover:bg-yellow-400 border-0"
                 @click="openDirections"
               >
                 <UIcon

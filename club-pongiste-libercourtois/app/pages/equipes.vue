@@ -60,7 +60,7 @@
       >
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div
-            class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow text-center"
           >
             <div class="text-2xl font-bold text-teal-700">
               {{ currentPhaseTeams.length }}
@@ -70,7 +70,7 @@
             </div>
           </div>
           <div
-            class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow text-center"
           >
             <div class="text-2xl font-bold text-blue-600">
               {{ seniorTeams.length }}
@@ -80,7 +80,7 @@
             </div>
           </div>
           <div
-            class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow text-center"
           >
             <div class="text-2xl font-bold text-green-600">
               {{ juniorTeams.length }}
@@ -90,7 +90,7 @@
             </div>
           </div>
           <div
-            class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow text-center"
           >
             <div class="text-2xl font-bold text-purple-600">
               {{ totalMatches }}
@@ -104,22 +104,31 @@
         <!-- Filtres -->
         <div class="mb-6 flex flex-wrap gap-2">
           <UButton
-            :variant="selectedCategory === 'all' ? 'solid' : 'outline'"
-            color="primary"
+            :class="
+              selectedCategory === 'all'
+                ? 'bg-club-yellow text-club-navy hover:bg-yellow-400 border-0 font-semibold'
+                : 'bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold'
+            "
             @click="selectedCategory = 'all'"
           >
             Toutes les équipes
           </UButton>
           <UButton
-            :variant="selectedCategory === 'seniors' ? 'solid' : 'outline'"
-            :color="selectedCategory === 'seniors' ? 'blue' : 'gray'"
+            :class="
+              selectedCategory === 'seniors'
+                ? 'bg-club-yellow text-club-navy hover:bg-yellow-400 border-0 font-semibold'
+                : 'bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold'
+            "
             @click="selectedCategory = 'seniors'"
           >
             Adultes ({{ seniorTeams.length }})
           </UButton>
           <UButton
-            :variant="selectedCategory === 'juniors' ? 'solid' : 'outline'"
-            :color="selectedCategory === 'juniors' ? 'green' : 'gray'"
+            :class="
+              selectedCategory === 'juniors'
+                ? 'bg-club-yellow text-club-navy hover:bg-yellow-400 border-0 font-semibold'
+                : 'bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold'
+            "
             @click="selectedCategory = 'juniors'"
           >
             Juniors ({{ juniorTeams.length }})
@@ -201,12 +210,12 @@
                       </span>
                     </div>
                     <UButton
-                      :variant="
-                        expandedTeams.includes(team.uniqueKey)
-                          ? 'solid'
-                          : 'outline'
-                      "
                       size="sm"
+                      :class="
+                        expandedTeams.includes(team.uniqueKey)
+                          ? 'bg-club-yellow text-club-navy hover:bg-yellow-400 border-0 font-semibold'
+                          : 'bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      "
                       @click="toggleTeamExpansion(team.uniqueKey)"
                     >
                       <UIcon
@@ -329,7 +338,7 @@
                           <!-- Bouton calendrier pour tous les matchs -->
                           <UButton
                             variant="ghost"
-                            color="green"
+                            color="success"
                             size="xs"
                             :title="`Ajouter le match au calendrier`"
                             class="flex-shrink-0"
@@ -342,10 +351,10 @@
                           <template v-if="!match.equa.includes('LIBERCOURT')">
                             <UButton
                               variant="ghost"
-                              color="blue"
+                              color="neutral"
                               size="xs"
                               icon="i-heroicons-map-pin"
-                              class="flex-shrink-0"
+                              class="flex-shrink-0 dark:text-gray-200 dark:hover:text-gray-900"
                               @click="openGoogleMaps(match, team)"
                             >
                               📍 Itinéraire
@@ -362,11 +371,11 @@
                           <UButton
                             v-if="match.scorea && match.scoreb"
                             variant="ghost"
-                            color="gray"
+                            color="neutral"
                             size="xs"
                             icon="i-heroicons-eye"
                             :title="`${expandedMatchDetails.includes(`${match.equipId1}-${match.equipId2}-${match.dateprevue}`) ? 'Masquer' : 'Voir'} les détails`"
-                            class="flex-shrink-0"
+                            class="flex-shrink-0 dark:text-gray-200 dark:hover:text-gray-900"
                             @click="toggleMatchDetails(match)"
                           >
                             📊 Détails
@@ -1147,14 +1156,14 @@ async function addMatchToCalendar(match: MatchData, team: TeamDataEnriched) {
             title: "Lien copié",
             description:
               "Collez-le dans votre navigateur pour ajouter le match à votre agenda.",
-            color: "green" as const,
+            color: "success" as const,
           });
         })
         .catch(() => {
           toast.add({
             title: "Impossible de copier",
             description: googleCalendarUrl,
-            color: "orange" as const,
+            color: "warning" as const,
           });
         });
     }
@@ -1164,7 +1173,7 @@ async function addMatchToCalendar(match: MatchData, team: TeamDataEnriched) {
       title: "Erreur",
       description:
         "Une erreur est survenue lors de la création de l'événement calendrier.",
-      color: "red" as const,
+      color: "error" as const,
     });
   }
 }

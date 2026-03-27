@@ -14,9 +14,8 @@
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <UButton
             to="/contact"
-            color="primary"
             size="lg"
-            class="font-semibold bg-club-yellow text-club-navy hover:bg-yellow-400"
+            class="font-semibold bg-club-yellow text-club-navy hover:bg-yellow-400 border-0"
           >
             <UIcon
               name="i-heroicons-user-plus"
@@ -27,10 +26,8 @@
           </UButton>
           <UButton
             to="/club"
-            variant="outline"
-            color="white"
             size="lg"
-            class="font-semibold border-white text-white hover:bg-white hover:text-club-navy"
+            class="font-semibold bg-transparent border-2 border-white !text-white hover:bg-white hover:!text-club-navy"
           >
             <UIcon
               name="i-heroicons-information-circle"

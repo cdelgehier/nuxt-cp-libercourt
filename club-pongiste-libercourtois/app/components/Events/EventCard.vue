@@ -382,14 +382,14 @@ const addToGoogleCalendar = () => {
             title: "Lien copié",
             description:
               "Collez-le dans votre navigateur pour ajouter l'événement à Google Agenda.",
-            color: "green" as const,
+            color: "success" as const,
           });
         })
         .catch(() => {
           toast.add({
             title: "Impossible de copier",
             description: googleCalendarUrl,
-            color: "orange" as const,
+            color: "warning" as const,
           });
         });
     }
@@ -399,7 +399,7 @@ const addToGoogleCalendar = () => {
       title: "Erreur",
       description:
         "Une erreur est survenue lors de la création de l'événement calendrier.",
-      color: "red" as const,
+      color: "error" as const,
     });
   }
 };

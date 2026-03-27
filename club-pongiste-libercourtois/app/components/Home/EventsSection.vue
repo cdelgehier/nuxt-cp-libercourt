@@ -4,7 +4,10 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between mb-8">
         <h2 class="text-3xl font-bold adaptive-title">Prochains Événements</h2>
-        <UButton to="/calendrier" variant="outline" color="primary">
+        <UButton
+          to="/calendrier"
+          class="bg-club-yellow text-club-navy hover:bg-yellow-400 border-0 font-semibold"
+        >
           Voir tout le calendrier
         </UButton>
       </div>

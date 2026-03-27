@@ -18,23 +18,23 @@
         >
           <div class="text-center space-y-4">
             <div
-              class="inline-flex items-center justify-center w-16 h-16 bg-club-yellow/10 rounded-full"
+              class="inline-flex items-center justify-center w-16 h-16 bg-club-yellow/20 dark:bg-club-yellow/15 rounded-full"
             >
               <UIcon
                 :name="activity.icon"
-                class="text-2xl text-club-green"
+                class="text-2xl text-club-green dark:text-teal-400"
                 aria-hidden="true"
               />
             </div>
             <h3 class="text-xl font-semibold adaptive-title">
               {{ activity.title }}
             </h3>
-            <p class="text-gray-600">
+            <p class="text-gray-600 dark:text-gray-300">
               {{ activity.description }}
             </p>
             <div class="pt-2">
               <span
-                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-club-green/20 text-club-navy"
+                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300"
               >
                 {{ activity.ageGroup }}
               </span>

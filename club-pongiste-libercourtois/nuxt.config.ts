@@ -100,36 +100,62 @@ export default defineNuxtConfig({
 
   // Route-level caching
   routeRules: {
-    // Pre-render home page as static HTML — eliminates Netlify Function cold start (~3s TTFB)
+    // Fully static pages — pre-rendered at build time, zero TTFB
     "/": { prerender: true },
+    "/mentions-legales": { prerender: true },
+    "/politique-confidentialite": { prerender: true },
+    "/contact": { prerender: true },
+
+    // ISR pages — SSR on first hit, then cached on Netlify CDN; background revalidation
+    "/club": { isr: 3600 },
+    "/faq": { isr: 3600 },
+    "/horaires-tarifs": { isr: 3600 },
+    "/actualites": { isr: 300 },
+    "/calendrier": { isr: 300 },
+    "/equipes": { isr: 300 },
+    "/licencies": { isr: 300 },
+
+    // API routes — Netlify-CDN-Cache-Control for actual CDN caching (not just browser)
     "/api/activities": {
       headers: {
-        "Cache-Control": "public, max-age=300, stale-while-revalidate=600",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Netlify-CDN-Cache-Control": "public, max-age=300, durable",
       },
     },
     "/api/sponsors": {
       headers: {
-        "Cache-Control": "public, max-age=300, stale-while-revalidate=600",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Netlify-CDN-Cache-Control": "public, max-age=300, durable",
       },
     },
     "/api/events/upcoming": {
       headers: {
-        "Cache-Control": "public, max-age=60, stale-while-revalidate=120",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Netlify-CDN-Cache-Control": "public, max-age=60, durable",
       },
     },
     "/api/events/calendar": {
       headers: {
-        "Cache-Control": "public, max-age=60, stale-while-revalidate=120",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Netlify-CDN-Cache-Control": "public, max-age=60, durable",
       },
     },
     "/api/club/faq": {
       headers: {
-        "Cache-Control": "public, max-age=300, stale-while-revalidate=600",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Netlify-CDN-Cache-Control": "public, max-age=300, durable",
       },
     },
     "/api/club/config": {
       headers: {
-        "Cache-Control": "public, max-age=3600, stale-while-revalidate=7200",
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Netlify-CDN-Cache-Control": "public, max-age=3600, durable",
+      },
+    },
+    "/api/news": {
+      headers: {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Netlify-CDN-Cache-Control": "public, max-age=300, durable",
       },
     },
   },
@@ -139,7 +165,12 @@ export default defineNuxtConfig({
     preset: "netlify",
     compressPublicAssets: true,
     prerender: {
-      routes: ["/"],
+      routes: [
+        "/",
+        "/mentions-legales",
+        "/politique-confidentialite",
+        "/contact",
+      ],
       crawlLinks: false,
     },
   },

@@ -107,13 +107,17 @@ export default defineNuxtConfig({
     "/contact": { prerender: true },
 
     // ISR pages — SSR on first hit, then cached on Netlify CDN; background revalidation
-    "/club": { isr: 3600 },
-    "/faq": { isr: 3600 },
-    "/horaires-tarifs": { isr: 3600 },
-    "/actualites": { isr: 300 },
-    "/calendrier": { isr: 300 },
-    "/equipes": { isr: 300 },
-    "/licencies": { isr: 300 },
+    // Cache tags allow on-demand purge from admin mutations
+    "/club": { isr: 3600, headers: { "Netlify-Cache-Tag": "club" } },
+    "/faq": { isr: 3600, headers: { "Netlify-Cache-Tag": "faq" } },
+    "/horaires-tarifs": {
+      isr: 3600,
+      headers: { "Netlify-Cache-Tag": "horaires-pricing" },
+    },
+    "/actualites": { isr: 300, headers: { "Netlify-Cache-Tag": "news" } },
+    "/calendrier": { isr: 300, headers: { "Netlify-Cache-Tag": "events" } },
+    "/equipes": { isr: 300, headers: { "Netlify-Cache-Tag": "equipes" } },
+    "/licencies": { isr: 300, headers: { "Netlify-Cache-Tag": "licencies" } },
 
     // API routes — Netlify-CDN-Cache-Control for actual CDN caching (not just browser)
     "/api/activities": {

@@ -10,6 +10,9 @@ importers:
       "@neondatabase/serverless":
         specifier: ^1.0.2
         version: 1.0.2
+      "@netlify/functions":
+        specifier: ^5.1.5
+        version: 5.1.5
       "@netlify/neon":
         specifier: ^0.1.2
         version: 0.1.2
@@ -1778,11 +1781,25 @@ packages:
       }
     engines: { node: ">=19.0.0" }
 
+  "@netlify/functions@5.1.5":
+    resolution:
+      {
+        integrity: sha512-mhTl6x3TWoRwNgz8HZ9zvSR9OHB/hDEA6VinBmWY5ubgycKNCerf6XyFaFnujH2Ygx3c32yg6QOOr1v9y8euug==,
+      }
+    engines: { node: ">=18.0.0" }
+
   "@netlify/neon@0.1.2":
     resolution:
       {
         integrity: sha512-F8+Dnu+nvGZruskblFwTopv/CUbHi2VOP4bJpDhRo85UFawZ/wMPmxnWQ0CLYwdAERU1OYoQyXOQM19HxAHjQQ==,
       }
+
+  "@netlify/types@2.6.0":
+    resolution:
+      {
+        integrity: sha512-yD20EizHJDQxajJ66Vo8RTwLwR2jMNVxufPG8MHd2AScX8jW4z0VPnnJHArq2GYPFTFZRHmiAhDrXr5m8zof6w==,
+      }
+    engines: { node: ^18.14.0 || >=20 }
 
   "@nodelib/fs.scandir@2.1.5":
     resolution:
@@ -12410,9 +12427,15 @@ snapshots:
       "@types/node": 22.19.15
       "@types/pg": 8.20.0
 
+  "@netlify/functions@5.1.5":
+    dependencies:
+      "@netlify/types": 2.6.0
+
   "@netlify/neon@0.1.2":
     dependencies:
       "@neondatabase/serverless": 1.0.2
+
+  "@netlify/types@2.6.0": {}
 
   "@nodelib/fs.scandir@2.1.5":
     dependencies:

@@ -4,6 +4,7 @@ import {
   toggleRegistration,
   updateEvent,
 } from "~~/server/domains/events/service";
+import { purgeTags } from "~~/server/utils/purgeCache";
 
 export default defineEventHandler(async (event) => {
   const id = Number(getRouterParam(event, "id"));
@@ -13,12 +14,17 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     // Cas spécial : toggle des inscriptions
     if ("isRegistrationOpen" in body && Object.keys(body).length === 1) {
-      return toggleRegistration(id, body.isRegistrationOpen);
+      const result = await toggleRegistration(id, body.isRegistrationOpen);
+      await purgeTags("events");
+      return result;
     }
-    return updateEvent(id, body);
+    const result = await updateEvent(id, body);
+    await purgeTags("events");
+    return result;
   }
   if (event.method === "DELETE") {
     await deleteEvent(id);
+    await purgeTags("events");
     return { success: true };
   }
   if (event.method === "GET") {

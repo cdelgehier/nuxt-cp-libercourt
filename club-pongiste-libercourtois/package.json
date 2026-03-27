@@ -63,6 +63,7 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
+    "@netlify/functions": "^5.1.5",
     "@netlify/neon": "^0.1.2",
     "@nuxt/image": "^2.0.0",
     "@nuxt/ui": "^4.6.0",

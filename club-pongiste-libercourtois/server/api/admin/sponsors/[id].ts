@@ -1,4 +1,5 @@
 import { deleteSponsor, updateSponsor } from "~~/server/domains/club/service";
+import { purgeTags } from "~~/server/utils/purgeCache";
 
 export default defineEventHandler(async (event) => {
   const id = Number(getRouterParam(event, "id"));
@@ -6,10 +7,13 @@ export default defineEventHandler(async (event) => {
 
   if (event.method === "PATCH" || event.method === "PUT") {
     const body = await readBody(event);
-    return updateSponsor(id, body);
+    const result = await updateSponsor(id, body);
+    await purgeTags("sponsors");
+    return result;
   }
   if (event.method === "DELETE") {
     await deleteSponsor(id);
+    await purgeTags("sponsors");
     return { success: true };
   }
 });

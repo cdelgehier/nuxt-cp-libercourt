@@ -1,4 +1,5 @@
 import { deleteFaq, updateFaq } from "~~/server/domains/club/service";
+import { purgeTags } from "~~/server/utils/purgeCache";
 
 export default defineEventHandler(async (event) => {
   const id = Number(getRouterParam(event, "id"));
@@ -6,10 +7,13 @@ export default defineEventHandler(async (event) => {
 
   if (event.method === "PATCH" || event.method === "PUT") {
     const body = await readBody(event);
-    return updateFaq(id, body);
+    const result = await updateFaq(id, body);
+    await purgeTags("faq");
+    return result;
   }
   if (event.method === "DELETE") {
     await deleteFaq(id);
+    await purgeTags("faq");
     return { success: true };
   }
 });

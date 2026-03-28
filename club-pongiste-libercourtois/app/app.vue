@@ -13,20 +13,19 @@
 </template>
 
 <script setup lang="ts">
+const colorMode = useColorMode();
+
 // Meta configuration globale
-useHead({
+useHead(() => ({
   htmlAttrs: {
     lang: "fr",
-    "data-theme": "light",
+    "data-theme": colorMode.value,
   },
   meta: [
     { name: "viewport", content: "width=device-width, initial-scale=1" },
     { name: "format-detection", content: "telephone=no" },
   ],
-  bodyAttrs: {
-    class: "light",
-  },
-});
+}));
 
 // SEO Configuration
 useSeoMeta({

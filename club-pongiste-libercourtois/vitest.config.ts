@@ -14,6 +14,8 @@ export default defineConfig({
         "server/domains/**/teams.ts",
         "server/domains/**/helpers.ts",
         "server/domains/identity/basic.ts",
+        "server/domains/tournament/helpers.ts",
+        "server/domains/tournament/types.ts",
       ],
       exclude: [],
       thresholds: {

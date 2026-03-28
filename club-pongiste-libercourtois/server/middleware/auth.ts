@@ -1,11 +1,9 @@
 /**
- * Middleware serveur — protège toutes les routes /api/admin/*.
+ * Middleware serveur — protège :
+ *   - /api/admin/* : admin uniquement (OIDC ou basic auth)
+ *   - /api/ja/tournois/* : JA ou admin (session JA ou session admin)
  *
- * Flux :
- * 1. Vérifier le cookie de session OIDC (via nuxt-oidc-auth)
- * 2. Vérifier la session basic auth (cookie httpOnly, POST /api/auth/basic-login)
- * 3. Vérifier le header Authorization: Basic (compatibilité scripts/curl)
- * 4. Si aucun n'est valide → 401
+ * Les routes /api/ja/auth (login/logout JA) sont publiques.
  */
 
 // @ts-expect-error — auto-imported by nuxt-oidc-auth at runtime
@@ -16,9 +14,14 @@ const SESSION_PASSWORD =
   process.env.SESSION_SECRET ?? "fallback-change-me-in-production";
 
 export default defineEventHandler(async (event) => {
-  // Ne s'applique qu'aux routes admin
-  if (!event.path.startsWith("/api/admin")) return;
+  const path = event.path;
 
+  // Only applies to admin and JA tournament routes
+  const isAdminRoute = path.startsWith("/api/admin");
+  const isJaRoute = path.startsWith("/api/ja/tournois");
+  if (!isAdminRoute && !isJaRoute) return;
+
+  // Check admin session (shared by both route types)
   // 1. Session OIDC
   try {
     const session = await getUserSession(event);
@@ -40,6 +43,15 @@ export default defineEventHandler(async (event) => {
   const result = await verifyBasicAuth(authHeader);
   if (result.valid) return;
 
-  // 4. Non authentifié
+  // JA routes also accept a valid JA session
+  if (isJaRoute) {
+    try {
+      const session = await useSession(event, { password: SESSION_PASSWORD });
+      if (session.data.jaAccessId) return;
+    } catch {
+      // pas de session JA
+    }
+  }
+
   throw createError({ statusCode: 401, message: "Authentification requise" });
 });

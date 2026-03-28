@@ -15,6 +15,55 @@
       "when": 1774479612047,
       "tag": "0001_slippery_malice",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774639205192,
+      "tag": "0002_ordinary_zaladane",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1774730774951,
+      "tag": "0003_nebulous_psylocke",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1774731725593,
+      "tag": "0004_mixed_psynapse",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1774800000000,
+      "tag": "0005_females_only",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1774800001000,
+      "tag": "0006_tournament_gps",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1774800002000,
+      "tag": "0007_tournament_date_end",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1774800003000,
+      "tag": "0008_series_schedule",
+      "breakpoints": true
     }
   ]
 }

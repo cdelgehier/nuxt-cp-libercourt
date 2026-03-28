@@ -3,6 +3,11 @@
   functions = "netlify/functions"
   command = "pnpm build"
 
+[dev]
+  command = "pnpm dev"
+  targetPort = 3000
+  port = 8888
+
 [build.environment]
   # Exclude certain paths from secrets scanning
   SECRETS_SCAN_OMIT_PATHS = ".env.example,.netlify/functions-internal/**,.nuxt/**"

@@ -50,6 +50,8 @@ export default createConfigForNuxt({
             "equipes",
             "licencies",
             "login",
+            "[slug]",
+            "[id]",
           ],
         },
       ],
@@ -60,6 +62,13 @@ export default createConfigForNuxt({
     files: ["server/**/*.ts"],
     rules: {
       "no-console": "off",
+    },
+  },
+  // Admin & JA pages : confirm() dialogs are acceptable in trusted internal UIs
+  {
+    files: ["app/pages/admin/**/*.vue", "app/pages/tournois/**/ja/**/*.vue"],
+    rules: {
+      "no-alert": "off",
     },
   },
   // SmartPing : parsing XML untyped — any inévitable

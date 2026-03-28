@@ -95,6 +95,7 @@ async function logout() {
 
 const navItems = [
   { to: "/admin", label: "Tableau de bord", icon: "i-heroicons-home" },
+  { to: "/admin/tournois", label: "Tournois", icon: "i-heroicons-trophy" },
   { to: "/admin/faq", label: "FAQ", icon: "i-heroicons-question-mark-circle" },
   {
     to: "/admin/events",

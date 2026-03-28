@@ -1839,6 +1839,72 @@ export class SmartPingAPI {
       };
     }
   }
+
+  /**
+   * Search players by last name (and optionally first name) using xml_liste_joueur.php.
+   * Returns licence, nom, prenom, club name, ranking (clast).
+   */
+  async searchPlayers(
+    nom: string,
+    prenom?: string,
+  ): Promise<SmartPingResult<LicenseeData[]>> {
+    const url = `${this.baseUrl}xml_liste_joueur.php`;
+    const authParams = this.getAuthParams();
+
+    const searchParams: Record<string, string> = {
+      serie: authParams.serie,
+      tm: authParams.tm,
+      tmc: authParams.tmc,
+      id: authParams.id,
+      nom: nom.toUpperCase(),
+    };
+    if (prenom) searchParams.prenom = prenom.toUpperCase();
+
+    const params = new URLSearchParams(searchParams);
+
+    try {
+      const response = await fetch(`${url}?${params}`, {
+        method: "GET",
+        headers: {
+          "User-Agent": "Club Pongiste Libercourtois",
+          Accept: "application/xml, text/xml, */*",
+        },
+      });
+
+      const buffer = await response.arrayBuffer();
+      const decoder = new TextDecoder("iso-8859-1");
+      const responseText = decoder.decode(buffer);
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: `HTTP ${response.status}: ${responseText}`,
+        };
+      }
+
+      if (
+        responseText.includes("<erreurs>") ||
+        responseText.includes("<erreur>")
+      ) {
+        const errorMatch = responseText.match(/<erreur>([^<]+)<\/erreur>/);
+        const errorMessage = errorMatch ? errorMatch[1] : "Unknown FFTT error";
+        return { success: false, error: `FFTT Error: ${errorMessage}` };
+      }
+
+      if (responseText.includes("<joueur")) {
+        const players = this.parseXMLJoueursFromRankingDB(responseText);
+        return { success: true, data: players };
+      }
+
+      return { success: true, data: [] };
+    } catch (error) {
+      console.error("searchPlayers API request failed:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
 }
 
 /**

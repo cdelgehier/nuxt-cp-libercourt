@@ -104,6 +104,7 @@ const navigation: NavigationItem[] = [
   { label: "Licenciés", href: "/licencies" },
   { label: "Équipes", href: "/equipes" },
   { label: "Calendrier", href: "/calendrier" },
+  { label: "Tournois", href: "/tournois" },
   { label: "Horaires & Tarifs", href: "/horaires-tarifs" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },

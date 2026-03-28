@@ -1,3 +1,5 @@
+const isDev = process.env.NODE_ENV !== "production";
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
   compatibilityDate: "2025-07-01",
@@ -118,6 +120,20 @@ export default defineNuxtConfig({
     "/calendrier": { isr: 300, headers: { "Netlify-Cache-Tag": "events" } },
     "/equipes": { isr: 300, headers: { "Netlify-Cache-Tag": "equipes" } },
     "/licencies": { isr: 300, headers: { "Netlify-Cache-Tag": "licencies" } },
+
+    // Tournois — ISR 60s en prod, SSR pur en dev (évite les conflits du cache filesystem)
+    "/tournois": isDev
+      ? { ssr: true }
+      : { isr: 60, headers: { "Netlify-Cache-Tag": "tournois" } },
+    "/tournois/**": isDev
+      ? { ssr: true }
+      : { isr: 60, headers: { "Netlify-Cache-Tag": "tournois" } },
+
+    // JA interface and admin — no cache (authenticated, real-time)
+    "/tournois/*/ja": { ssr: true },
+    "/tournois/*/ja/**": { ssr: true },
+    "/admin/tournois": { ssr: true },
+    "/admin/tournois/**": { ssr: true },
 
     // API routes — Netlify-CDN-Cache-Control for actual CDN caching (not just browser)
     "/api/activities": {

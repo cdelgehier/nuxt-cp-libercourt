@@ -11,8 +11,8 @@
   },
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
-    "dev:open": "nuxt dev --open",
+    "dev": "rm -rf .nuxt/cache && nuxt dev",
+    "dev:open": "rm -rf .nuxt/cache && nuxt dev --open",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -31,6 +31,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx server/db/seed.ts",
+    "db:seed-series": "tsx server/db/seed-series.ts",
     "db:reset": "tsx server/db/reset.ts && tsx server/db/seed.ts",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",

@@ -29,30 +29,3 @@ const toggleColorMode = () => {
   $colorMode.preference = $colorMode.preference === "dark" ? "light" : "dark";
 };
 </script>
-
-<style scoped>
-.color-mode-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3rem;
-  height: 3rem;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.color-mode-toggle:hover {
-  background-color: var(--club-yellow);
-  color: var(--club-navy);
-  border-color: var(--club-yellow);
-}
-
-.color-mode-toggle:focus {
-  outline: 2px solid var(--club-yellow);
-  outline-offset: 2px;
-}
-</style>

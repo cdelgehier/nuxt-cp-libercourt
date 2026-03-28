@@ -181,11 +181,41 @@ export const useFfttCategories = () => {
     return "unknown";
   };
 
+  /**
+   * Map a FFTT category code to our internal AgeCategory value.
+   * Returns undefined for seniors (no restriction applies).
+   */
+  const toAgeCategory = (
+    categoryCode: string,
+  ):
+    | "poussin"
+    | "benjamin"
+    | "minimes"
+    | "cadets"
+    | "juniors"
+    | "veterans"
+    | "super_veterans"
+    | undefined => {
+    if (!categoryCode) return undefined;
+    const c = categoryCode.toUpperCase();
+    if (c.startsWith("P")) return "poussin";
+    if (c.startsWith("B")) return "benjamin";
+    if (c.startsWith("M")) return "minimes";
+    if (c.startsWith("C")) return "cadets";
+    if (c.startsWith("J")) return "juniors";
+    if (c.startsWith("V")) {
+      const age = parseInt(c.substring(1) || "0", 10);
+      return age >= 55 ? "super_veterans" : "veterans";
+    }
+    return undefined; // senior = no category restriction
+  };
+
   return {
     decodeFfttCategory,
     getCategoryType,
     getCategoryColor,
     getCategoryIcon,
     getAgeGroup,
+    toAgeCategory,
   };
 };

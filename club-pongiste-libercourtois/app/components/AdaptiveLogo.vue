@@ -1,11 +1,17 @@
 <template>
   <img
-    :src="logoSrc"
+    src="/images/logo-club.webp"
     alt="Club Pongiste Libercourtois"
     :class="classes"
-    class="transition-opacity duration-300"
+    class="transition-opacity duration-300 dark:hidden"
     fetchpriority="high"
     loading="eager"
+  />
+  <img
+    src="/images/logo-club-white.webp"
+    alt="Club Pongiste Libercourtois"
+    :class="classes"
+    class="transition-opacity duration-300 hidden dark:block"
   />
 </template>
 
@@ -16,13 +22,5 @@ interface Props {
 
 withDefaults(defineProps<Props>(), {
   classes: "h-20 w-auto hover:scale-105 transition-transform duration-200",
-});
-
-const { $colorMode } = useNuxtApp();
-
-const logoSrc = computed(() => {
-  return $colorMode.preference === "dark"
-    ? "/images/logo-club-white.webp"
-    : "/images/logo-club.webp";
 });
 </script>

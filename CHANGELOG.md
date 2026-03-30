@@ -1,3 +1,14 @@
+## v1.5.0 (2026-03-30)
+
+### Feat
+
+- **ci**: add e2e job to test pipeline
+- **tournament**: add full tournament management module
+
+### Fix
+
+- **ci**: force NITRO_PRESET=node-server for e2e build
+
 ## v1.4.0 (2026-03-27)
 
 ### Feat

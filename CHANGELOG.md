@@ -1,3 +1,9 @@
+## v1.6.0 (2026-03-30)
+
+### Feat
+
+- **bracket**: extract buildLicenseeFromRegistration utility with Zod schema and unit tests
+
 ## v1.5.0 (2026-03-30)
 
 ### Feat

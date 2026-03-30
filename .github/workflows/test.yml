@@ -78,6 +78,7 @@ jobs:
         run: pnpm build
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NITRO_PRESET: node-server
 
       - name: Start server
         run: node .output/server/index.mjs &

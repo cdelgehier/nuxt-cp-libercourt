@@ -3,6 +3,11 @@ import type {
   BracketRound,
   BracketMatchWithPlayers,
 } from "~~/server/domains/tournament/types";
+import {
+  buildLicenseeFromRegistration,
+  licenseeDetailsSchema,
+  type LicenseeModalData,
+} from "~/utils/bracketPlayer";
 
 const props = defineProps<{
   rounds: BracketRound[];
@@ -11,27 +16,30 @@ const props = defineProps<{
 
 type Registration = NonNullable<BracketMatchWithPlayers["player1"]>;
 
-const selectedPlayer = ref<Registration | null>(null);
+const licensee = ref<LicenseeModalData | null>(null);
 const modalOpen = ref(false);
 
-function openPlayer(reg: Registration) {
-  selectedPlayer.value = reg;
+async function openPlayer(reg: Registration) {
+  if (!reg.licenceNumber) return;
+
+  try {
+    const result = await $fetch<{ success: boolean; licensee: unknown }>(
+      `/api/club/licensee/${reg.licenceNumber}`,
+    );
+    const parsed =
+      result?.success && result.licensee
+        ? licenseeDetailsSchema.safeParse(result.licensee)
+        : null;
+    licensee.value = buildLicenseeFromRegistration(
+      reg,
+      parsed?.success ? parsed.data : null,
+    );
+  } catch (_e) {
+    licensee.value = buildLicenseeFromRegistration(reg);
+  }
+
   modalOpen.value = true;
 }
-
-const licensee = computed(() => {
-  const r = selectedPlayer.value;
-  if (!r?.licenceNumber) return null;
-  return {
-    licence: r.licenceNumber,
-    firstName: r.firstName,
-    lastName: r.lastName,
-    sexe: r.playerGender ?? "M",
-    cat: r.playerCategory ?? "",
-    clast: r.ranking ? String(r.ranking) : "NC",
-    points: r.ranking ?? undefined,
-  };
-});
 
 const connectorStroke = useBracketConnectorStroke();
 

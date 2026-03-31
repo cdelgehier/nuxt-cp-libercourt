@@ -1,3 +1,9 @@
+## v1.7.0 (2026-03-31)
+
+### Feat
+
+- **events**: inscriptions publiques avec suivi admin
+
 ## v1.6.0 (2026-03-30)
 
 ### Feat

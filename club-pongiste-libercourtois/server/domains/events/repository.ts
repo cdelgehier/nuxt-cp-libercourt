@@ -99,3 +99,59 @@ export async function insertRegistration(data: InsertRegistration) {
     .returning();
   return created;
 }
+
+export async function findRegistrationByName(
+  eventId: number,
+  firstName: string,
+  lastName: string,
+): Promise<typeof eventRegistrations.$inferSelect | null> {
+  const rows = await db
+    .select()
+    .from(eventRegistrations)
+    .where(eq(eventRegistrations.eventId, eventId));
+  const match = rows.find(
+    (r) =>
+      r.firstName.toLowerCase() === firstName.toLowerCase() &&
+      r.lastName.toLowerCase() === lastName.toLowerCase(),
+  );
+  return match ?? null;
+}
+
+export async function deleteRegistration(id: number): Promise<void> {
+  await db.delete(eventRegistrations).where(eq(eventRegistrations.id, id));
+}
+
+export async function getRegistrationById(
+  id: number,
+): Promise<typeof eventRegistrations.$inferSelect | null> {
+  const rows = await db
+    .select()
+    .from(eventRegistrations)
+    .where(eq(eventRegistrations.id, id));
+  return rows[0] ?? null;
+}
+
+export async function patchRegistrationPayment(
+  id: number,
+  isPaid: boolean,
+): Promise<typeof eventRegistrations.$inferSelect | null> {
+  const [updated] = await db
+    .update(eventRegistrations)
+    .set({ isPaid })
+    .where(eq(eventRegistrations.id, id))
+    .returning();
+  return updated ?? null;
+}
+
+export async function getEventRegistrationsByPaid(
+  eventId: number,
+  paid?: boolean,
+) {
+  const rows = await db
+    .select()
+    .from(eventRegistrations)
+    .where(eq(eventRegistrations.eventId, eventId))
+    .orderBy(asc(eventRegistrations.registeredAt));
+  if (paid === undefined) return rows;
+  return rows.filter((r) => r.isPaid === paid);
+}

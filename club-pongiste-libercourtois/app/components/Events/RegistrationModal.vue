@@ -1,288 +1,185 @@
 <template>
-  <teleport to="body">
-    <transition name="modal">
-      <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
+  <UModal :open="show" @update:open="$emit('close')">
+    <template #content>
+      <div class="p-6 space-y-4">
+        <div>
+          <h3 class="font-semibold text-lg">Inscription</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {{ event.title }}
+          </p>
+          <p v-if="event.date" class="text-xs text-gray-400 mt-0.5">
+            {{ formatDate(event.date) }}
+            <span v-if="event.time"> à {{ event.time }}</span>
+          </p>
+        </div>
+
+        <!-- Event summary -->
         <div
-          class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+          v-if="event.location || event.price || event.maxParticipants"
+          class="grid grid-cols-2 gap-3 text-sm bg-gray-50 dark:bg-gray-800 rounded-lg p-3"
         >
-          <!-- Background overlay -->
-          <div
-            class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-            aria-hidden="true"
-            @click="$emit('close')"
-          />
-
-          <!-- Modal panel -->
-          <div
-            class="modal-panel inline-block align-bottom rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
-          >
-            <!-- Header -->
-            <div class="sm:flex sm:items-start mb-6">
-              <div
-                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
-              >
-                <svg
-                  class="h-6 w-6 text-blue-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-              </div>
-              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1">
-                <h3 class="text-lg leading-6 font-medium modal-title">
-                  Inscription à l'événement
-                </h3>
-                <div class="mt-2">
-                  <p class="text-sm modal-subtitle">
-                    {{ event.title }}
-                  </p>
-                  <p class="text-xs modal-date mt-1">
-                    {{ event.date ? formatDate(event.date) : ""
-                    }}{{ event.time ? ` à ${event.time}` : "" }}
-                  </p>
-                </div>
-              </div>
-              <button
-                class="ml-4 modal-close-btn rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                @click="$emit('close')"
-              >
-                <svg
-                  class="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <!-- Event Info Summary -->
-            <div class="modal-info-panel rounded-lg p-4 mb-6">
-              <div class="grid grid-cols-2 gap-4 text-sm">
-                <div v-if="event.location">
-                  <span class="font-medium modal-label">Lieu:</span>
-                  <p class="modal-text">
-                    {{ event.location }}
-                  </p>
-                </div>
-                <div v-if="event.price">
-                  <span class="font-medium text-gray-700">Tarif:</span>
-                  <p class="text-gray-600">{{ event.price }}€</p>
-                </div>
-                <div v-if="event.maxParticipants">
-                  <span class="font-medium text-gray-700">Places:</span>
-                  <p class="text-gray-600">
-                    {{ spotsRemaining }} disponible{{
-                      spotsRemaining !== 1 ? "s" : ""
-                    }}
-                  </p>
-                </div>
-                <div v-if="event.registrationDeadline">
-                  <span class="font-medium text-gray-700">Limite:</span>
-                  <p class="text-gray-600">
-                    {{
-                      event.registrationDeadline
-                        ? formatDate(event.registrationDeadline)
-                        : ""
-                    }}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Registration Form -->
-            <form class="space-y-4" @submit.prevent="handleSubmit">
-              <!-- Member selection -->
-              <div>
-                <label
-                  for="licensee"
-                  class="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Sélectionner un licencié <span class="text-red-500">*</span>
-                </label>
-                <select
-                  id="licensee"
-                  v-model="form.licenseeId"
-                  required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  :class="{ 'border-red-500': errors.licenseeId }"
-                  @change="onLicenseeSelect"
-                >
-                  <option value="">Choisir un licencié...</option>
-                  <option
-                    v-for="licensee in licensees"
-                    :key="licensee.id"
-                    :value="licensee.id"
-                  >
-                    {{ licensee.lastName }} {{ licensee.firstName }} ({{
-                      licensee.category
-                    }})
-                  </option>
-                </select>
-                <p v-if="errors.licenseeId" class="mt-1 text-xs text-red-600">
-                  {{ errors.licenseeId }}
-                </p>
-              </div>
-
-              <!-- Selected member information -->
-              <div
-                v-if="selectedLicensee"
-                class="bg-blue-50 border border-blue-200 rounded-lg p-4"
-              >
-                <h4 class="font-medium text-blue-900 mb-2">
-                  Informations du licencié
-                </h4>
-                <div class="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span class="font-medium text-blue-700">Nom complet:</span>
-                    <p class="text-blue-600">
-                      {{ selectedLicensee.firstName }}
-                      {{ selectedLicensee.lastName }}
-                    </p>
-                  </div>
-                  <div>
-                    <span class="font-medium text-blue-700"
-                      >Numéro de licence:</span
-                    >
-                    <p class="text-blue-600">
-                      {{ selectedLicensee.licenseNumber }}
-                    </p>
-                  </div>
-                  <div>
-                    <span class="font-medium text-blue-700">Âge:</span>
-                    <p class="text-blue-600">{{ selectedLicensee.age }} ans</p>
-                  </div>
-                  <div>
-                    <span class="font-medium text-blue-700">Catégorie:</span>
-                    <p class="text-blue-600 capitalize">
-                      {{ selectedLicensee.category }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label
-                  for="comments"
-                  class="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Commentaires ou demandes particulières
-                </label>
-                <textarea
-                  id="comments"
-                  v-model="form.comments"
-                  rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Allergies, besoins spéciaux, questions..."
-                />
-              </div>
-
-              <!-- Terms and Conditions -->
-              <div class="flex items-start">
-                <input
-                  id="acceptTerms"
-                  v-model="form.acceptTerms"
-                  type="checkbox"
-                  required
-                  class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label for="acceptTerms" class="ml-2 text-sm text-gray-600">
-                  J'accepte les
-                  <a href="#" class="text-blue-600 hover:underline"
-                    >conditions d'inscription</a
-                  >
-                  et autorise le club à me contacter pour cet événement
-                  <span class="text-red-500">*</span>
-                </label>
-              </div>
-
-              <!-- Error Display -->
-              <div
-                v-if="submitError"
-                class="bg-red-50 border border-red-200 rounded-md p-3"
-              >
-                <p class="text-sm text-red-800">
-                  {{ submitError }}
-                </p>
-              </div>
-
-              <!-- Success Display -->
-              <div
-                v-if="submitSuccess"
-                class="bg-green-50 border border-green-200 rounded-md p-3"
-              >
-                <p class="text-sm text-green-800">
-                  {{ submitSuccess }}
-                </p>
-              </div>
-
-              <!-- Form Actions -->
-              <div
-                class="flex justify-end space-x-3 pt-6 border-t border-gray-200"
-              >
-                <button
-                  type="button"
-                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  :disabled="isSubmitting"
-                  @click="$emit('close')"
-                >
-                  Annuler
-                </button>
-                <button
-                  type="submit"
-                  class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  :disabled="isSubmitting || !form.acceptTerms"
-                >
-                  <span v-if="isSubmitting" class="flex items-center">
-                    <svg
-                      class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                      />
-                      <path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Inscription en cours...
-                  </span>
-                  <span v-else>Confirmer l'inscription</span>
-                </button>
-              </div>
-            </form>
+          <div v-if="event.location">
+            <span class="font-medium text-gray-600 dark:text-gray-400"
+              >Lieu</span
+            >
+            <p class="text-gray-800 dark:text-gray-200">{{ event.location }}</p>
+          </div>
+          <div v-if="event.price">
+            <span class="font-medium text-gray-600 dark:text-gray-400"
+              >Tarif</span
+            >
+            <p class="text-gray-800 dark:text-gray-200">{{ event.price }}€</p>
+          </div>
+          <div v-if="event.maxParticipants">
+            <span class="font-medium text-gray-600 dark:text-gray-400"
+              >Places</span
+            >
+            <p class="text-gray-800 dark:text-gray-200">
+              {{ spotsRemaining }} restante{{ spotsRemaining !== 1 ? "s" : "" }}
+            </p>
           </div>
         </div>
+
+        <form class="space-y-4" @submit.prevent="handleSubmit">
+          <!-- Nom + Prénom avec autocomplete sur Nom -->
+          <div class="grid grid-cols-2 gap-3">
+            <UFormField label="Nom" :error="errors.lastName" required>
+              <div class="relative">
+                <UInput
+                  :model-value="form.lastName"
+                  placeholder="DUPONT"
+                  autocomplete="off"
+                  :ui="{ base: 'w-full' }"
+                  @update:model-value="onLastNameInput(String($event))"
+                  @blur="closeSuggestions"
+                />
+                <div
+                  v-if="showSuggestions"
+                  class="absolute z-50 left-0 right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-52 overflow-y-auto"
+                >
+                  <div
+                    v-if="searchLoading"
+                    class="px-3 py-2 text-sm text-gray-400"
+                  >
+                    Recherche...
+                  </div>
+                  <div
+                    v-else-if="tooManyResults"
+                    class="px-3 py-2 text-sm text-amber-600"
+                  >
+                    Trop de résultats — précisez le prénom
+                  </div>
+                  <div
+                    v-else-if="suggestions.length === 0"
+                    class="px-3 py-2 text-sm text-gray-400"
+                  >
+                    Aucun résultat
+                  </div>
+                  <button
+                    v-for="p in suggestions"
+                    :key="p.licence"
+                    type="button"
+                    class="w-full text-left px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                    @mousedown.prevent="selectSuggestion(p)"
+                  >
+                    <span class="font-medium text-sm"
+                      >{{ p.lastName }} {{ p.firstName }}</span
+                    >
+                    <span class="text-xs text-gray-400 ml-2">{{ p.club }}</span>
+                  </button>
+                </div>
+              </div>
+            </UFormField>
+
+            <UFormField label="Prénom" :error="errors.firstName" required>
+              <UInput
+                :model-value="form.firstName"
+                placeholder="Jean"
+                @update:model-value="
+                  (v: string) => {
+                    form.firstName = String(v);
+                    refetchIfNeeded();
+                  }
+                "
+              />
+            </UFormField>
+          </div>
+
+          <!-- Accompagnants -->
+          <UFormField label="Accompagnants">
+            <USelect
+              v-model="form.companions"
+              :items="companionsOptions"
+              value-key="value"
+              label-key="label"
+            />
+          </UFormField>
+
+          <!-- Email -->
+          <UFormField label="Email" hint="facultatif" :error="errors.email">
+            <UInput
+              v-model="form.email"
+              type="email"
+              placeholder="jean.dupont@exemple.fr"
+              autocomplete="email"
+            />
+          </UFormField>
+
+          <!-- Téléphone -->
+          <UFormField label="Téléphone" hint="facultatif">
+            <UInput
+              v-model="form.phone"
+              type="tel"
+              placeholder="06 01 02 03 04"
+              autocomplete="tel"
+            />
+          </UFormField>
+
+          <!-- Notes -->
+          <UFormField
+            label="Remarques"
+            hint="facultatif — visible uniquement par les admins"
+          >
+            <UTextarea
+              v-model="form.notes"
+              :rows="2"
+              placeholder="Allergies, besoins spéciaux..."
+              :maxlength="500"
+            />
+          </UFormField>
+
+          <!-- Error / Success -->
+          <UAlert
+            v-if="submitError"
+            color="error"
+            variant="soft"
+            :description="submitError"
+          />
+          <UAlert
+            v-if="submitSuccess"
+            color="success"
+            variant="soft"
+            :description="submitSuccess"
+          />
+
+          <div class="flex justify-end gap-2 pt-2">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              :disabled="isSubmitting"
+              @click="$emit('close')"
+            >
+              Annuler
+            </UButton>
+            <UButton type="submit" :loading="isSubmitting"> Confirmer </UButton>
+          </div>
+        </form>
       </div>
-    </transition>
-  </teleport>
+    </template>
+  </UModal>
 </template>
 
 <script setup lang="ts">
-import type { EventRegistration, Licensee } from "~~/types";
-
 interface Props {
   event: {
     id: string | number;
@@ -303,228 +200,207 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
   close: [];
-  success: [registration: any];
+  success: [registration: unknown];
 }>();
 
-// Data
-const licensees = ref<Licensee[]>([]);
-const isLoadingLicensees = ref(false);
-
+// ---------------------------------------------------------------------------
 // Form state
+// ---------------------------------------------------------------------------
+
 const form = reactive({
-  licenseeId: "",
-  comments: "",
-  acceptTerms: false,
+  firstName: "",
+  lastName: "",
+  companions: 0,
+  email: "",
+  phone: "",
+  notes: "",
 });
 
-const errors = reactive({
-  licenseeId: "",
-});
-
+const errors = reactive({ firstName: "", lastName: "", email: "" });
 const isSubmitting = ref(false);
 const submitError = ref("");
 const submitSuccess = ref("");
-
-// Computed
-const selectedLicensee = computed(() => {
-  return licensees.value.find((l) => l.id === form.licenseeId) || null;
-});
 
 const spotsRemaining = computed(() => {
   if (!props.event.maxParticipants) return 999;
   return props.event.maxParticipants - (props.event.currentParticipants ?? 0);
 });
 
-// Methods
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("fr-FR", {
+const companionsOptions = Array.from({ length: 21 }, (_, i) => ({
+  value: i,
+  label: i === 0 ? "Aucun (juste moi)" : `${i} accompagnant${i > 1 ? "s" : ""}`,
+}));
+
+// ---------------------------------------------------------------------------
+// Autocomplete SmartPing — intégré dans le champ Nom (même pattern que tournoi)
+// ---------------------------------------------------------------------------
+
+interface PlayerSuggestion {
+  lastName: string;
+  firstName: string;
+  licence: string;
+  club: string;
+  ranking?: number;
+}
+
+const suggestions = ref<PlayerSuggestion[]>([]);
+const showSuggestions = ref(false);
+const searchLoading = ref(false);
+const tooManyResults = ref(false);
+const RESULTS_THRESHOLD = 15;
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+async function fetchSuggestions() {
+  if (form.lastName.length < 2) return;
+  searchLoading.value = true;
+  try {
+    const params: Record<string, string> = {
+      nom: form.lastName,
+      clubOnly: "true",
+    };
+    if (form.firstName) params.prenom = form.firstName;
+    const results = await $fetch<PlayerSuggestion[]>("/api/smartping/players", {
+      query: params,
+    });
+    if (results.length > RESULTS_THRESHOLD) {
+      tooManyResults.value = true;
+      suggestions.value = [];
+    } else {
+      tooManyResults.value = false;
+      suggestions.value = results;
+    }
+    showSuggestions.value = true;
+  } catch {
+    // silently ignore
+  } finally {
+    searchLoading.value = false;
+  }
+}
+
+function onLastNameInput(value: string) {
+  form.lastName = value;
+  tooManyResults.value = false;
+  suggestions.value = [];
+  showSuggestions.value = false;
+  if (value.length < 2) return;
+  if (debounceTimer) clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => fetchSuggestions(), 300);
+}
+
+function refetchIfNeeded() {
+  if (form.lastName.length >= 2) {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => fetchSuggestions(), 300);
+  }
+}
+
+function selectSuggestion(p: PlayerSuggestion) {
+  form.lastName = p.lastName;
+  form.firstName = p.firstName;
+  suggestions.value = [];
+  showSuggestions.value = false;
+  tooManyResults.value = false;
+}
+
+function closeSuggestions() {
+  setTimeout(() => {
+    showSuggestions.value = false;
+  }, 150);
+}
+
+// ---------------------------------------------------------------------------
+// Form actions
+// ---------------------------------------------------------------------------
+
+const formatDate = (d: string) =>
+  new Date(d).toLocaleDateString("fr-FR", {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
   });
-};
 
-const fetchLicensees = async () => {
-  isLoadingLicensees.value = true;
-  try {
-    const response = await $fetch<{ success: boolean; licensees: Licensee[] }>(
-      "/api/club/licensees",
-    );
-    if (response.success) {
-      licensees.value = response.licensees;
-    }
-  } catch (error) {
-    console.error("Error fetching licensees:", error);
-    submitError.value = "Erreur lors du chargement des licenciés";
-  } finally {
-    isLoadingLicensees.value = false;
+function validateForm() {
+  errors.firstName = "";
+  errors.lastName = "";
+  errors.email = "";
+  let ok = true;
+  if (!form.firstName || form.firstName.trim().length < 2) {
+    errors.firstName = "Prénom requis (min. 2 caractères)";
+    ok = false;
   }
-};
-
-const onLicenseeSelect = () => {
-  // Clear previous errors when a licensee is selected
-  errors.licenseeId = "";
-};
-
-const validateForm = () => {
-  // Reset errors
-  errors.licenseeId = "";
-
-  let isValid = true;
-
-  // Required field validation
-  if (!form.licenseeId) {
-    errors.licenseeId = "Veuillez sélectionner un licencié";
-    isValid = false;
+  if (!form.lastName || form.lastName.trim().length < 2) {
+    errors.lastName = "Nom requis (min. 2 caractères)";
+    ok = false;
   }
+  if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    errors.email = "Format d'email invalide";
+    ok = false;
+  }
+  return ok;
+}
 
-  return isValid;
-};
-
-const resetForm = () => {
+function resetForm() {
   Object.assign(form, {
-    licenseeId: "",
-    comments: "",
-    acceptTerms: false,
+    firstName: "",
+    lastName: "",
+    companions: 0,
+    email: "",
+    phone: "",
+    notes: "",
   });
-
-  errors.licenseeId = "";
+  errors.firstName = "";
+  errors.lastName = "";
+  errors.email = "";
   submitError.value = "";
   submitSuccess.value = "";
-};
+  suggestions.value = [];
+  showSuggestions.value = false;
+}
 
-const handleSubmit = async () => {
+async function handleSubmit() {
   if (!validateForm()) return;
-
-  if (!selectedLicensee.value) {
-    submitError.value = "Veuillez sélectionner un licencié";
-    return;
-  }
-
   isSubmitting.value = true;
   submitError.value = "";
   submitSuccess.value = "";
-
   try {
-    const registrationData: Omit<
-      EventRegistration,
-      "registrationDate" | "status"
-    > = {
-      eventId: String(props.event.id),
-      participant: {
-        firstName: selectedLicensee.value.firstName,
-        lastName: selectedLicensee.value.lastName,
-        email: selectedLicensee.value.email || "",
-        phone: selectedLicensee.value.phone || "",
-        age: selectedLicensee.value.age,
-        level: undefined, // No level for licensees
-        licenseNumber: selectedLicensee.value.licenseNumber,
-        comments: form.comments?.trim() || undefined,
-      },
-    };
-
-    const response = await $fetch<any>("/api/events/register", {
+    const response = await $fetch<{ id: number }>("/api/events/register", {
       method: "POST",
-      body: registrationData,
+      body: {
+        eventId: props.event.id,
+        participant: {
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          companions: form.companions,
+          email: form.email.trim() || undefined,
+          phone: form.phone.trim() || undefined,
+          notes: form.notes.trim() || undefined,
+        },
+      },
     });
-
-    if (response.success) {
-      submitSuccess.value = response.message;
-      emit("success", response);
-
-      // Close modal after a delay
-      setTimeout(() => {
-        resetForm();
-        emit("close");
-      }, 2000);
-    } else {
-      submitError.value = response.message || "Erreur lors de l'inscription";
-    }
-  } catch (error: any) {
-    console.error("Registration error:", error);
+    submitSuccess.value = "Inscription confirmée !";
+    emit("success", response);
+    setTimeout(() => {
+      resetForm();
+      emit("close");
+    }, 1500);
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } };
     submitError.value =
-      error?.data?.message ||
-      "Erreur lors de l'inscription. Veuillez réessayer.";
+      err?.data?.message || "Erreur lors de la soumission. Veuillez réessayer.";
   } finally {
     isSubmitting.value = false;
   }
-};
+}
 
-// Watch for modal close to reset form and load licensees
+// ---------------------------------------------------------------------------
+// Lifecycle
+// ---------------------------------------------------------------------------
+
 watch(
   () => props.show,
-  (newShow) => {
-    if (newShow) {
-      fetchLicensees();
-    } else {
-      resetForm();
-    }
+  (open) => {
+    if (!open) resetForm();
   },
 );
 </script>
-
-<style scoped>
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-active .inline-block,
-.modal-leave-active .inline-block {
-  transition: transform 0.3s ease;
-}
-
-.modal-enter-from .inline-block,
-.modal-leave-to .inline-block {
-  transform: scale(0.95);
-}
-
-/* Styles adaptatifs pour les modes clair/sombre */
-.modal-panel {
-  background-color: var(--card-bg);
-  color: var(--text-primary);
-}
-
-.modal-title {
-  color: var(--text-primary);
-}
-
-.modal-subtitle {
-  color: var(--text-secondary);
-}
-
-.modal-date {
-  color: var(--text-secondary);
-  opacity: 0.8;
-}
-
-.modal-close-btn {
-  background-color: var(--card-bg);
-  color: var(--text-secondary);
-  transition: color 0.2s ease;
-}
-
-.modal-close-btn:hover {
-  color: var(--text-primary);
-}
-
-.modal-info-panel {
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-color);
-}
-
-.modal-label {
-  color: var(--text-primary);
-}
-
-.modal-text {
-  color: var(--text-secondary);
-}
-</style>

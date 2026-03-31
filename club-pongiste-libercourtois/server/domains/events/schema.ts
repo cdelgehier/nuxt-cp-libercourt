@@ -33,10 +33,12 @@ export const eventRegistrations = pgTable("event_registrations", {
     .references(() => events.id, { onDelete: "cascade" }),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
-  email: text("email").notNull(),
+  email: text("email"),
   phone: text("phone"),
   licenceNumber: text("licence_number"),
   level: text("level"), // 'loisir', 'competition', etc.
-  notes: text("notes"),
+  notes: text("notes"), // private — admin only
+  companions: integer("companions").notNull().default(0),
+  isPaid: boolean("is_paid").notNull().default(false),
   registeredAt: timestamp("registered_at").defaultNow(),
 });

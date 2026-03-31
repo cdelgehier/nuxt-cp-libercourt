@@ -73,6 +73,13 @@
             <td class="px-4 py-3 text-right">
               <div class="flex items-center justify-end gap-2">
                 <UButton
+                  size="xs"
+                  variant="soft"
+                  color="blue"
+                  icon="i-heroicons-users"
+                  :to="`/admin/events/${event.id}/registrations`"
+                />
+                <UButton
                   size="sm"
                   variant="ghost"
                   icon="i-heroicons-pencil"
@@ -194,6 +201,14 @@
                 />
               </UFormField>
 
+              <UFormField label="Contact" name="contact" class="col-span-2">
+                <UInput
+                  v-model="form.contact"
+                  placeholder="nom ou email du responsable"
+                  class="w-full"
+                />
+              </UFormField>
+
               <UFormField
                 label="Description"
                 name="description"
@@ -205,6 +220,13 @@
                   class="w-full"
                 />
               </UFormField>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <USwitch v-model="form.isRegistrationOpen" />
+              <span class="text-sm text-gray-700 dark:text-gray-300">
+                Inscriptions ouvertes
+              </span>
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
@@ -297,9 +319,11 @@ const createEventSchema = z.object({
   startDate: z.string().min(1, "Date requise"),
   endDate: z.string().optional(),
   location: z.string().optional(),
+  contact: z.string().max(200).optional(),
   description: z.string().optional(),
   maxParticipants: z.number().int().positive().optional(),
   price: z.number().min(0).optional(),
+  isRegistrationOpen: z.boolean().optional(),
 });
 
 type EventForm = z.infer<typeof createEventSchema>;
@@ -308,16 +332,20 @@ const modalOpen = ref(false);
 const saving = ref(false);
 const editing = ref<{ id: number } | null>(null);
 
+const DEFAULT_LOCATION = "Complexe Sportif Léo Lagrange, Libercourt";
+
 const form = reactive<EventForm>({
   title: "",
   slug: "",
   type: "tournament",
   startDate: "",
   endDate: "",
-  location: "",
+  location: DEFAULT_LOCATION,
+  contact: "",
   description: "",
   maxParticipants: undefined,
   price: undefined,
+  isRegistrationOpen: false,
 });
 
 const errors = reactive<Partial<Record<keyof EventForm, string>>>({});
@@ -329,10 +357,12 @@ function resetForm() {
     type: "tournament",
     startDate: "",
     endDate: "",
-    location: "",
+    location: DEFAULT_LOCATION,
+    contact: "",
     description: "",
     maxParticipants: undefined,
     price: undefined,
+    isRegistrationOpen: false,
   });
 }
 
@@ -356,12 +386,14 @@ function openEdit(event: Record<string, unknown>) {
     startDate: toDatetimeLocal(event.startDate),
     endDate: toDatetimeLocal(event.endDate),
     location: event.location ?? "",
+    contact: event.contact ?? "",
     description: event.description ?? "",
     maxParticipants:
       event.maxParticipants != null
         ? (event.maxParticipants as number)
         : undefined,
     price: event.price != null ? Number(event.price) : undefined,
+    isRegistrationOpen: Boolean(event.isRegistrationOpen),
   });
   modalOpen.value = true;
 }

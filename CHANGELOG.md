@@ -83,7 +83,7 @@
 - Remove duplicate schedule
 - Remove Management team from club vue
 - Remove contact form
-- Configure Netligy to exclude  nuxt bundle from secret scan
+- Configure Netligy to exclude nuxt bundle from secret scan
 - Resolve tailwindcss imports and vue typescript conflicts
 - **contact**: Fix google maps link
 - **calendrier**: Remove testing date

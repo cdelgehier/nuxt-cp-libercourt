@@ -68,9 +68,14 @@ export const updateEventInputSchema = createEventInputSchema.partial();
 export const registerForEventSchema = z.object({
   firstName: z.string().min(2).max(100),
   lastName: z.string().min(2).max(100),
-  email: z.string().email(),
+  email: z.string().email().optional(),
   phone: z.string().max(20).optional(),
   licenceNumber: z.string().max(20).optional(),
   level: z.string().max(50).optional(),
   notes: z.string().max(500).optional(),
+  companions: z.number().int().min(0).max(20).optional().default(0),
+});
+
+export const patchRegistrationPaymentSchema = z.object({
+  isPaid: z.boolean(),
 });

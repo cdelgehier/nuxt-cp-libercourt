@@ -1,9 +1,11 @@
 import { SmartPingAPI } from "~~/server/utils/smartping";
+import { getClubId } from "~~/server/utils/clubConfig";
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const nom = String(query.nom ?? "").trim();
   const prenom = query.prenom ? String(query.prenom).trim() : undefined;
+  const clubOnly = query.clubOnly === "true";
 
   if (!nom || nom.length < 2) {
     throw createError({
@@ -30,7 +32,16 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 502, message: result.error });
   }
 
-  return (result.data ?? []).map((p) => ({
+  const clubId = getClubId();
+  const players = result.data ?? [];
+  // In parseXMLJoueursFromRankingDB: p.club = club number (XML <nclub>), p.nclub = club name (XML <club>)
+  const filtered = clubOnly
+    ? players.filter(
+        (p) => p.club === clubId || p.club === clubId.replace(/^0+/, ""),
+      )
+    : players;
+
+  return filtered.map((p) => ({
     licence: p.licence,
     lastName: p.nom,
     firstName: p.prenom,

@@ -3,346 +3,346 @@
 // Centralized club configuration
 export interface ClubConfig {
   club: {
-    name: string
-    id: string
-    salle: string
-    complexe: string
-    email: string
-    phone: string
-    website: string
-    description: string
-  }
+    name: string;
+    id: string;
+    salle: string;
+    complexe: string;
+    email: string;
+    phone: string;
+    website: string;
+    description: string;
+  };
   social: {
     facebook: {
-      name: string
-      url: string
-      icon: string
-      platform: string
-    }
-  }
+      name: string;
+      url: string;
+      icon: string;
+      platform: string;
+    };
+  };
   location: {
-    name: string
-    salle: string
-    complexe: string
-    street: string
-    postalCode: string
-    city: string
-    country: string
+    name: string;
+    salle: string;
+    complexe: string;
+    street: string;
+    postalCode: string;
+    city: string;
+    country: string;
     coordinates: {
-      lat: number
-      lng: number
-    }
-    googleMapsUrl: string
-  }
+      lat: number;
+      lng: number;
+    };
+    googleMapsUrl: string;
+  };
 }
 
 // Club statistics interface for real-time data from APIs
 export interface ClubStats {
-  licencies: number
-  equipes: number
-  annees: number
-  lastUpdated: string
+  licencies: number;
+  equipes: number;
+  annees: number;
+  lastUpdated: string;
 }
 
 export interface Article {
-  id: string
-  title: string
-  excerpt: string
-  content: string
-  publishedAt: Date
-  updatedAt?: Date
-  category: 'actualites' | 'tournois' | 'vie-du-club' | 'resultats'
-  featured: boolean
-  author: string
-  image?: string
-  tags: string[]
-  slug: string
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  publishedAt: Date;
+  updatedAt?: Date;
+  category: "actualites" | "tournois" | "vie-du-club" | "resultats";
+  featured: boolean;
+  author: string;
+  image?: string;
+  tags: string[];
+  slug: string;
 }
 
 // Types for event calendar
 export interface CalendarEvent {
-  id: string
-  title: string
-  description?: string
-  date: string
-  endDate?: string
-  time?: string
-  location?: string
+  id: string;
+  title: string;
+  description?: string;
+  date: string;
+  endDate?: string;
+  time?: string;
+  location?: string;
   type:
-    | 'tournament'
-    | 'stage'
-    | 'competition'
-    | 'meeting'
-    | 'training'
-    | 'other'
-  status: 'upcoming' | 'ongoing' | 'past' | 'cancelled'
-  maxParticipants?: number
-  currentParticipants: number
-  registrationOpen: boolean
-  registrationDeadline?: string
-  price?: number
-  multiDay?: boolean
+    | "tournament"
+    | "stage"
+    | "competition"
+    | "meeting"
+    | "training"
+    | "other";
+  status: "upcoming" | "ongoing" | "past" | "cancelled";
+  maxParticipants?: number;
+  currentParticipants: number;
+  registrationOpen: boolean;
+  registrationDeadline?: string;
+  price?: number;
+  multiDay?: boolean;
   contact?: {
-    name: string
-    email?: string
-    phone?: string
-    role?: string
-  }
-  createdAt?: string
-  updatedAt?: string
+    name: string;
+    email?: string;
+    phone?: string;
+    role?: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CalendarResponse {
-  events: CalendarEvent[]
-  totalEvents: number
-  upcomingEvents: number
-  lastUpdated: string
+  events: CalendarEvent[];
+  totalEvents: number;
+  upcomingEvents: number;
+  lastUpdated: string;
 }
 
 export interface EventRegistration {
-  eventId: string
+  eventId: string;
   participant: {
-    firstName: string
-    lastName: string
-    email: string
-    phone: string
-    age?: number
-    level?: 'debutant' | 'intermediaire' | 'avance' | 'expert'
-    licenseNumber?: string
-    comments?: string
-  }
-  registrationDate: string
-  status: 'pending' | 'confirmed' | 'cancelled'
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    age?: number;
+    level?: "debutant" | "intermediaire" | "avance" | "expert";
+    licenseNumber?: string;
+    comments?: string;
+  };
+  registrationDate: string;
+  status: "pending" | "confirmed" | "cancelled";
 }
 
 export interface RegistrationResponse {
-  success: boolean
-  message: string
-  registrationId?: string
+  success: boolean;
+  message: string;
+  registrationId?: string;
   eventInfo?: {
-    title: string
-    date: string
-    spotsRemaining?: number
-  }
+    title: string;
+    date: string;
+    spotsRemaining?: number;
+  };
 }
 
 export interface Event {
-  id: string
-  title: string
-  description: string
-  date: string
-  endDate?: string
-  startTime: string
-  endTime: string
-  location: string
-  category: string
-  coach?: string
-  maxParticipants?: number
-  registeredParticipants?: number
-  price?: number
-  opponent?: string
-  division?: string
-  prizePool?: string
-  image?: string
-  slug?: string
-  multiDay?: boolean
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  endDate?: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+  category: string;
+  coach?: string;
+  maxParticipants?: number;
+  registeredParticipants?: number;
+  price?: number;
+  opponent?: string;
+  division?: string;
+  prizePool?: string;
+  image?: string;
+  slug?: string;
+  multiDay?: boolean;
 }
 
 export interface EventCategory {
-  id: string
-  label: string
-  description: string
-  color: string
+  id: string;
+  label: string;
+  description: string;
+  color: string;
 }
 
 export interface ClubMember {
-  id: string
-  firstName: string
-  lastName: string
+  id: string;
+  firstName: string;
+  lastName: string;
   role:
-    | 'president'
-    | 'vice-president'
-    | 'secretary'
-    | 'treasurer'
-    | 'coach'
-    | 'member'
-  email?: string
-  phone?: string
-  bio?: string
-  image?: string
-  joinedDate: Date
-  licenseNumber?: string
+    | "president"
+    | "vice-president"
+    | "secretary"
+    | "treasurer"
+    | "coach"
+    | "member";
+  email?: string;
+  phone?: string;
+  bio?: string;
+  image?: string;
+  joinedDate: Date;
+  licenseNumber?: string;
 }
 
 export interface Schedule {
-  id: string
+  id: string;
   day:
-    | 'monday'
-    | 'tuesday'
-    | 'wednesday'
-    | 'thursday'
-    | 'friday'
-    | 'saturday'
-    | 'sunday'
-  startTime: string
-  endTime: string
-  activity: string
-  level: 'debutant' | 'intermediaire' | 'avance' | 'competition' | 'loisir'
-  ageGroup: 'enfants' | 'jeunes' | 'adultes' | 'veterans' | 'tous'
-  coach?: string
-  maxPlayers?: number
-  description?: string
+    | "monday"
+    | "tuesday"
+    | "wednesday"
+    | "thursday"
+    | "friday"
+    | "saturday"
+    | "sunday";
+  startTime: string;
+  endTime: string;
+  activity: string;
+  level: "debutant" | "intermediaire" | "avance" | "competition" | "loisir";
+  ageGroup: "enfants" | "jeunes" | "adultes" | "veterans" | "tous";
+  coach?: string;
+  maxPlayers?: number;
+  description?: string;
 }
 
 export interface Pricing {
-  id: string
-  type: 'adhesion' | 'cours' | 'stage' | 'competition' | 'materiel'
-  name: string
-  description: string
-  price: number
-  duration?: string
-  ageGroup?: 'enfants' | 'jeunes' | 'adultes' | 'veterans' | 'famille'
-  includes: string[]
-  conditions?: string[]
+  id: string;
+  type: "adhesion" | "cours" | "stage" | "competition" | "materiel";
+  name: string;
+  description: string;
+  price: number;
+  duration?: string;
+  ageGroup?: "enfants" | "jeunes" | "adultes" | "veterans" | "famille";
+  includes: string[];
+  conditions?: string[];
 }
 
 export interface Partner {
-  id: string
-  name: string
-  logo: string
-  website?: string
-  description?: string
-  category: 'sponsor' | 'partenaire' | 'institutionnel'
-  since?: Date
+  id: string;
+  name: string;
+  logo: string;
+  website?: string;
+  description?: string;
+  category: "sponsor" | "partenaire" | "institutionnel";
+  since?: Date;
 }
 
 export interface ContactInfo {
-  clubName: string
+  clubName: string;
   address: {
-    street: string
-    city: string
-    postalCode: string
-    country: string
-  }
-  phone: string
-  email: string
-  website?: string
+    street: string;
+    city: string;
+    postalCode: string;
+    country: string;
+  };
+  phone: string;
+  email: string;
+  website?: string;
   socialMedia: {
-    facebook?: string
-    twitter?: string
-    youtube?: string
-  }
+    facebook?: string;
+    twitter?: string;
+    youtube?: string;
+  };
   hours: {
     [key: string]: {
-      open: string
-      close: string
-    }
-  }
+      open: string;
+      close: string;
+    };
+  };
 }
 
 export interface NewsletterSubscription {
-  email: string
-  firstName?: string
-  lastName?: string
-  interests: string[]
-  subscribedAt: Date
-  active: boolean
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  interests: string[];
+  subscribedAt: Date;
+  active: boolean;
 }
 
 export interface ContactMessage {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
-  phone?: string
-  subject: string
-  message: string
-  category: 'information' | 'inscription' | 'partenariat' | 'autre'
-  sentAt: Date
-  status: 'nouveau' | 'lu' | 'traite' | 'archive'
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+  category: "information" | "inscription" | "partenariat" | "autre";
+  sentAt: Date;
+  status: "nouveau" | "lu" | "traite" | "archive";
 }
 
 // Club licensee (data from SmartPing API - real data only)
 export interface Licensee {
-  id: string
-  firstName: string
-  lastName: string
-  licenseNumber: string
-  age?: number // Age retrieved from xml_licence_c.php API only
-  gender?: 'M' | 'F' // Gender retrieved from xml_licence_c.php API only
-  ranking?: string // Points or ranking (e.g., "1200", "NC")
+  id: string;
+  firstName: string;
+  lastName: string;
+  licenseNumber: string;
+  age?: number; // Age retrieved from xml_licence_c.php API only
+  gender?: "M" | "F"; // Gender retrieved from xml_licence_c.php API only
+  ranking?: string; // Points or ranking (e.g., "1200", "NC")
   category?: // Category calculated from real age when available
-    | 'poussin'
-    | 'benjamin'
-    | 'minime'
-    | 'cadet'
-    | 'junior'
-    | 'senior'
-    | 'veteran'
-    | 'surclasse'
-  email?: string
-  phone?: string
-  active: boolean
+    | "poussin"
+    | "benjamin"
+    | "minime"
+    | "cadet"
+    | "junior"
+    | "senior"
+    | "veteran"
+    | "surclasse";
+  email?: string;
+  phone?: string;
+  active: boolean;
   // Real SmartPing data fields (when available)
-  clast?: string // Real FFTT classification (5, 6, 7, etc.)
-  point?: string // Real FFTT points (500, 523, etc.)
-  categ?: string // Real FFTT category (B2, C1, B1, etc.)
+  clast?: string; // Real FFTT classification (5, 6, 7, etc.)
+  point?: string; // Real FFTT points (500, 523, etc.)
+  categ?: string; // Real FFTT category (B2, C1, B1, etc.)
 }
 
 // Types pour les composants UI
 export interface NavigationItem {
-  label: string
-  href: string
-  icon?: string
-  children?: NavigationItem[]
+  label: string;
+  href: string;
+  icon?: string;
+  children?: NavigationItem[];
 }
 
 export interface Breadcrumb {
-  label: string
-  href?: string
+  label: string;
+  href?: string;
 }
 
 export interface SEOData {
-  title: string
-  description: string
-  keywords?: string
-  image?: string
-  url?: string
+  title: string;
+  description: string;
+  keywords?: string;
+  image?: string;
+  url?: string;
 }
 
 // News article types for external RSS feeds
 export interface NewsArticle {
-  id: string
-  title: string
-  description: string
-  content?: string
-  link: string
-  publishedAt: Date
-  author?: string
-  categories: string[]
-  image?: string
-  source: 'comite' | 'ligue' | 'facebook'
+  id: string;
+  title: string;
+  description: string;
+  content?: string;
+  link: string;
+  publishedAt: Date;
+  author?: string;
+  categories: string[];
+  image?: string;
+  source: "comite" | "ligue" | "facebook";
 }
 
 export interface NewsResponse {
-  articles: NewsArticle[]
-  total: number
-  source?: string
-  lastUpdated: string
+  articles: NewsArticle[];
+  total: number;
+  source?: string;
+  lastUpdated: string;
 }
 
 // Team data enriched with phase and unique identifiers
 export interface TeamDataEnriched {
-  idequipe: string
-  libequipe: string
-  libdivision: string
-  liendivision: string
-  idepr: string
-  libepr: string
+  idequipe: string;
+  libequipe: string;
+  libdivision: string;
+  liendivision: string;
+  idepr: string;
+  libepr: string;
   // Enriched fields
-  phase: number // Extracted from libequipe (1, 2, etc.)
-  uniqueKey: string // idequipe + cx_poule for unique identification
-  pouleId: string // cx_poule extracted from liendivision
-  divisionId: string // D1 extracted from liendivision
-  teamNumber: number // Team number (1, 2, 3, etc.)
+  phase: number; // Extracted from libequipe (1, 2, etc.)
+  uniqueKey: string; // idequipe + cx_poule for unique identification
+  pouleId: string; // cx_poule extracted from liendivision
+  divisionId: string; // D1 extracted from liendivision
+  teamNumber: number; // Team number (1, 2, 3, etc.)
 }

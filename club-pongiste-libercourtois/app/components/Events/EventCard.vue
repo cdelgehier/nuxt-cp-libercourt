@@ -217,6 +217,71 @@
         </span>
       </div>
 
+      <!-- Participants List -->
+      <div
+        v-if="
+          event.registrationOpen ||
+          (event.currentParticipants && event.currentParticipants > 0)
+        "
+        class="mt-3 pt-3 border-t border-gray-100"
+      >
+        <button
+          class="flex items-center text-sm font-medium event-card-text hover:text-blue-600 transition-colors w-full text-left"
+          @click="showParticipants = !showParticipants"
+        >
+          <svg
+            class="w-4 h-4 mr-1.5 event-card-icon"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            />
+          </svg>
+          {{ participantCount }} inscrit{{ participantCount !== 1 ? "s" : "" }}
+          <svg
+            class="w-3 h-3 ml-1 transition-transform"
+            :class="showParticipants ? 'rotate-180' : ''"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+        <ul v-if="showParticipants" class="mt-2 space-y-1">
+          <li v-if="isLoadingParticipants" class="text-xs event-card-text">
+            Chargement...
+          </li>
+          <li
+            v-else-if="participants.length === 0"
+            class="text-xs event-card-text"
+          >
+            Aucun inscrit pour l'instant
+          </li>
+          <li
+            v-for="p in participants"
+            :key="p.id"
+            class="text-xs event-card-text flex items-center gap-1"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0" />
+            {{ p.firstName }} {{ p.lastName }}
+            <span v-if="p.companions > 0" class="text-gray-400">
+              + {{ p.companions }} accompagnant{{ p.companions > 1 ? "s" : "" }}
+            </span>
+          </li>
+        </ul>
+      </div>
+
       <!-- Contact Info -->
       <div v-if="event.contact" class="mt-3 pt-3 border-t border-gray-100">
         <div class="flex items-center text-xs text-gray-500">
@@ -278,6 +343,47 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<{
   register: [event: EventProp];
 }>();
+
+// Participants list
+interface Participant {
+  id: number;
+  firstName: string;
+  lastName: string;
+  companions: number;
+  registeredAt: string | null;
+}
+
+const showParticipants = ref(false);
+const participants = ref<Participant[]>([]);
+const isLoadingParticipants = ref(false);
+
+const participantCount = computed(() => participants.value.length);
+
+const fetchParticipants = async () => {
+  isLoadingParticipants.value = true;
+  try {
+    const data = await $fetch<{ registrations: Participant[]; count: number }>(
+      `/api/events/${props.event.id}/registrations`,
+    );
+    participants.value = data.registrations;
+  } catch {
+    participants.value = [];
+  } finally {
+    isLoadingParticipants.value = false;
+  }
+};
+
+watch(showParticipants, (open) => {
+  if (open && participants.value.length === 0) fetchParticipants();
+});
+
+// Refetch when parent updates currentParticipants (after a new registration)
+watch(
+  () => props.event.currentParticipants,
+  () => {
+    if (showParticipants.value) fetchParticipants();
+  },
+);
 
 // Computed properties
 const eventTypeLabel = computed(

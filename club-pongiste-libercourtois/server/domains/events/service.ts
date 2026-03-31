@@ -7,6 +7,7 @@ import { enrichEvent } from "./helpers";
 import type { InsertEvent } from "./types";
 import {
   createEventInputSchema,
+  patchRegistrationPaymentSchema,
   registerForEventSchema,
   updateEventInputSchema,
 } from "./types";
@@ -102,14 +103,53 @@ export async function registerForEvent(eventId: number, input: unknown) {
       message: "Les inscriptions sont fermées",
     });
 
+  const data = registerForEventSchema.parse(input);
+
+  const duplicate = await repo.findRegistrationByName(
+    eventId,
+    data.firstName,
+    data.lastName,
+  );
+  if (duplicate)
+    throw createError({
+      statusCode: 409,
+      message: "Cette personne est déjà inscrite à cet événement",
+    });
+
   if (event.maxParticipants != null) {
     const count = await repo.countEventRegistrations(eventId);
-    if (count >= event.maxParticipants)
+    const totalIncoming = 1 + (data.companions ?? 0);
+    if (count + totalIncoming > event.maxParticipants)
       throw createError({ statusCode: 400, message: "Événement complet" });
   }
 
-  const data = registerForEventSchema.parse(input);
   return repo.insertRegistration({ ...data, eventId });
+}
+
+export async function deleteRegistration(id: number) {
+  const existing = await repo.getRegistrationById(id);
+  if (!existing)
+    throw createError({ statusCode: 404, message: "Inscription introuvable" });
+  await repo.deleteRegistration(id);
+}
+
+export async function patchRegistrationPayment(id: number, input: unknown) {
+  const { isPaid } = patchRegistrationPaymentSchema.parse(input);
+  const updated = await repo.patchRegistrationPayment(id, isPaid);
+  if (!updated)
+    throw createError({ statusCode: 404, message: "Inscription introuvable" });
+  return updated;
+}
+
+export async function getAdminEventRegistrations(
+  eventId: number,
+  paid?: boolean,
+) {
+  const event = await repo.getEventById(eventId);
+  if (!event)
+    throw createError({ statusCode: 404, message: "Événement introuvable" });
+  const registrations = await repo.getEventRegistrationsByPaid(eventId, paid);
+  return { event, registrations, count: registrations.length };
 }
 
 export async function getEventRegistrations(eventId: number) {

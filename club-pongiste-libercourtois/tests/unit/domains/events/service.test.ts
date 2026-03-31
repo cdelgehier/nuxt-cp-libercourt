@@ -12,6 +12,11 @@ vi.mock("~/server/domains/events/repository", () => ({
   deleteEvent: vi.fn(),
   toggleRegistration: vi.fn(),
   insertRegistration: vi.fn(),
+  findRegistrationByName: vi.fn(),
+  deleteRegistration: vi.fn(),
+  getRegistrationById: vi.fn(),
+  patchRegistrationPayment: vi.fn(),
+  getEventRegistrationsByPaid: vi.fn(),
 }));
 
 // createError est une globale Nitro — mock minimal
@@ -136,5 +141,229 @@ describe("Events — validation Zod", () => {
         email: "pas-un-email",
       }),
     ).toThrow();
+  });
+
+  it("email inscription absent → OK (optionnel)", async () => {
+    const { registerForEventSchema } =
+      await import("~/server/domains/events/types");
+    expect(() =>
+      registerForEventSchema.parse({
+        firstName: "Jean",
+        lastName: "Dupont",
+      }),
+    ).not.toThrow();
+  });
+});
+
+describe("registerForEvent — doublons", () => {
+  const baseEvent = {
+    id: 1,
+    title: "Loto",
+    slug: "loto",
+    type: "social",
+    startDate: new Date(Date.now() + 86400_000),
+    endDate: null,
+    location: null,
+    description: null,
+    maxParticipants: null,
+    isRegistrationOpen: true,
+    price: null,
+    contact: null,
+    imageUrl: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  it("même prénom+nom sur même événement → 409", async () => {
+    const repo = await import("~/server/domains/events/repository");
+    const { registerForEvent } =
+      await import("~/server/domains/events/service");
+    vi.mocked(repo.getEventById).mockResolvedValue(baseEvent);
+    vi.mocked(repo.findRegistrationByName).mockResolvedValue({
+      id: 99,
+      eventId: 1,
+      firstName: "Jean",
+      lastName: "Dupont",
+      email: null,
+      phone: null,
+      licenceNumber: null,
+      level: null,
+      notes: null,
+      companions: 0,
+      isPaid: false,
+      registeredAt: new Date(),
+    });
+
+    const err = await registerForEvent(1, {
+      firstName: "Jean",
+      lastName: "Dupont",
+    }).catch((e) => e);
+    expect(err.statusCode).toBe(409);
+  });
+
+  it("email absent → inscription OK (pas de doublon)", async () => {
+    const repo = await import("~/server/domains/events/repository");
+    const { registerForEvent } =
+      await import("~/server/domains/events/service");
+    const inserted = {
+      id: 10,
+      eventId: 1,
+      firstName: "Marie",
+      lastName: "Martin",
+      email: null,
+      phone: null,
+      licenceNumber: null,
+      level: null,
+      notes: null,
+      companions: 0,
+      isPaid: false,
+      registeredAt: new Date(),
+    };
+    vi.mocked(repo.getEventById).mockResolvedValue(baseEvent);
+    vi.mocked(repo.findRegistrationByName).mockResolvedValue(null);
+    vi.mocked(repo.insertRegistration).mockResolvedValue(inserted);
+
+    const result = await registerForEvent(1, {
+      firstName: "Marie",
+      lastName: "Martin",
+    });
+    expect(result.firstName).toBe("Marie");
+  });
+});
+
+describe("registerForEvent — capacité avec accompagnants", () => {
+  const limitedEvent = {
+    id: 2,
+    title: "Tournoi",
+    slug: "tournoi",
+    type: "tournament",
+    startDate: new Date(Date.now() + 86400_000),
+    endDate: null,
+    location: null,
+    description: null,
+    maxParticipants: 5,
+    isRegistrationOpen: true,
+    price: null,
+    contact: null,
+    imageUrl: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  it("inscription avec accompagnants quand capacité insuffisante → refus", async () => {
+    const repo = await import("~/server/domains/events/repository");
+    const { registerForEvent } =
+      await import("~/server/domains/events/service");
+    vi.mocked(repo.getEventById).mockResolvedValue(limitedEvent);
+    vi.mocked(repo.findRegistrationByName).mockResolvedValue(null);
+    vi.mocked(repo.countEventRegistrations).mockResolvedValue(4); // 4 inscrits, max 5
+
+    // 1 personne + 2 accompagnants = 3 slots nécessaires, seulement 1 disponible
+    const err = await registerForEvent(2, {
+      firstName: "Jean",
+      lastName: "Dupont",
+      companions: 2,
+    }).catch((e) => e);
+    expect(err.statusCode).toBe(400);
+  });
+
+  it("inscription solo quand 1 place restante → OK", async () => {
+    const repo = await import("~/server/domains/events/repository");
+    const { registerForEvent } =
+      await import("~/server/domains/events/service");
+    const inserted = {
+      id: 11,
+      eventId: 2,
+      firstName: "Jean",
+      lastName: "Dupont",
+      email: null,
+      phone: null,
+      licenceNumber: null,
+      level: null,
+      notes: null,
+      companions: 0,
+      isPaid: false,
+      registeredAt: new Date(),
+    };
+    vi.mocked(repo.getEventById).mockResolvedValue(limitedEvent);
+    vi.mocked(repo.findRegistrationByName).mockResolvedValue(null);
+    vi.mocked(repo.countEventRegistrations).mockResolvedValue(4); // 4 inscrits, 1 place
+    vi.mocked(repo.insertRegistration).mockResolvedValue(inserted);
+
+    const result = await registerForEvent(2, {
+      firstName: "Jean",
+      lastName: "Dupont",
+      companions: 0,
+    });
+    expect(result.id).toBe(11);
+  });
+
+  it("inscription avec accompagnants sans limite → OK", async () => {
+    const repo = await import("~/server/domains/events/repository");
+    const { registerForEvent } =
+      await import("~/server/domains/events/service");
+    const unlimitedEvent = { ...limitedEvent, maxParticipants: null };
+    const inserted = {
+      id: 12,
+      eventId: 2,
+      firstName: "Jean",
+      lastName: "Dupont",
+      email: null,
+      phone: null,
+      licenceNumber: null,
+      level: null,
+      notes: null,
+      companions: 5,
+      isPaid: false,
+      registeredAt: new Date(),
+    };
+    vi.mocked(repo.getEventById).mockResolvedValue(unlimitedEvent);
+    vi.mocked(repo.findRegistrationByName).mockResolvedValue(null);
+    vi.mocked(repo.insertRegistration).mockResolvedValue(inserted);
+
+    const result = await registerForEvent(2, {
+      firstName: "Jean",
+      lastName: "Dupont",
+      companions: 5,
+    });
+    expect(result.companions).toBe(5);
+  });
+});
+
+describe("patchRegistrationPayment", () => {
+  it("registration inexistante → 404", async () => {
+    const repo = await import("~/server/domains/events/repository");
+    const { patchRegistrationPayment } =
+      await import("~/server/domains/events/service");
+    vi.mocked(repo.patchRegistrationPayment).mockResolvedValue(null);
+
+    const err = await patchRegistrationPayment(999, { isPaid: true }).catch(
+      (e) => e,
+    );
+    expect(err.statusCode).toBe(404);
+  });
+
+  it("isPaid: true → mise à jour OK", async () => {
+    const repo = await import("~/server/domains/events/repository");
+    const { patchRegistrationPayment } =
+      await import("~/server/domains/events/service");
+    const updated = {
+      id: 5,
+      eventId: 1,
+      firstName: "Jean",
+      lastName: "Dupont",
+      email: null,
+      phone: null,
+      licenceNumber: null,
+      level: null,
+      notes: null,
+      companions: 0,
+      isPaid: true,
+      registeredAt: new Date(),
+    };
+    vi.mocked(repo.patchRegistrationPayment).mockResolvedValue(updated);
+
+    const result = await patchRegistrationPayment(5, { isPaid: true });
+    expect(result.isPaid).toBe(true);
   });
 });

@@ -63,7 +63,7 @@
     "vue-tsc": "^2.0.21"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
+    "@neondatabase/serverless": "^1.1.0",
     "@netlify/functions": "^5.1.5",
     "@netlify/neon": "^0.1.2",
     "@nuxt/image": "^2.0.0",
@@ -72,7 +72,7 @@
     "@vueuse/nuxt": "^13.9.0",
     "bcryptjs": "^3.0.3",
     "chart.js": "^4.5.0",
-    "drizzle-orm": "^0.45.1",
+    "drizzle-orm": "^0.45.2",
     "drizzle-zod": "^0.8.3",
     "fast-xml-parser": "^5.2.5",
     "googleapis": "^150.0.1",

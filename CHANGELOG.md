@@ -1,3 +1,9 @@
+## v1.8.0 (2026-06-15)
+
+### Feat
+
+- **pricing**: add includes list editor to pricing form
+
 ## v1.7.1 (2026-06-15)
 
 ### Fix

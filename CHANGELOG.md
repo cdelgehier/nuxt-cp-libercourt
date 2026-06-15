@@ -1,3 +1,9 @@
+## v1.7.1 (2026-06-15)
+
+### Fix
+
+- **pricing**: accept numbers for price fields in insert schema
+
 ## v1.7.0 (2026-03-31)
 
 ### Feat

@@ -141,6 +141,37 @@
                   class="w-full"
                 />
               </UFormField>
+              <div class="col-span-2 space-y-2">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Ce qui est inclus
+                </label>
+                <div
+                  v-for="(_, i) in form.includes"
+                  :key="i"
+                  class="flex gap-2"
+                >
+                  <UInput
+                    v-model="form.includes[i]"
+                    placeholder="Ex : Licence FFTT loisir..."
+                    class="flex-1"
+                  />
+                  <UButton
+                    icon="i-heroicons-trash"
+                    color="error"
+                    variant="ghost"
+                    size="sm"
+                    @click="form.includes.splice(i, 1)"
+                  />
+                </div>
+                <UButton
+                  icon="i-heroicons-plus"
+                  variant="outline"
+                  size="sm"
+                  @click="form.includes.push('')"
+                >
+                  Ajouter un élément
+                </UButton>
+              </div>
             </div>
             <UFormField label="Réduction" name="isReduction">
               <UCheckbox
@@ -247,6 +278,7 @@ const form = reactive({
   isReduction: false,
   reductionLabel: "",
   reductionAmount: 0 as number | undefined,
+  includes: [] as string[],
 });
 
 function resetForm() {
@@ -258,6 +290,7 @@ function resetForm() {
     isReduction: false,
     reductionLabel: "",
     reductionAmount: 0,
+    includes: [],
   });
 }
 
@@ -277,21 +310,23 @@ function openEdit(p: Record<string, unknown>) {
     isReduction: p.isReduction ?? false,
     reductionLabel: p.reductionLabel ?? "",
     reductionAmount: p.reductionAmount ?? 0,
+    includes: Array.isArray(p.includes) ? [...p.includes] : [],
   });
   modalOpen.value = true;
 }
 
 async function save() {
   saving.value = true;
+  const body = { ...form, includes: form.includes.filter((s) => s.trim()) };
   try {
     if (editing.value) {
       await $fetch(`/api/admin/pricing/${editing.value.id}`, {
         method: "PATCH",
-        body: form,
+        body,
       });
       toast.add({ title: "Tarif mis à jour", color: "success" });
     } else {
-      await $fetch("/api/admin/pricing", { method: "POST", body: form });
+      await $fetch("/api/admin/pricing", { method: "POST", body });
       toast.add({ title: "Tarif créé", color: "success" });
     }
     modalOpen.value = false;

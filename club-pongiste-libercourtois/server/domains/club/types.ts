@@ -24,7 +24,10 @@ export const selectFaqSchema = createSelectSchema(clubFaqs);
 export const insertScheduleSchema = createInsertSchema(clubSchedules);
 export const selectScheduleSchema = createSelectSchema(clubSchedules);
 
-export const insertPricingSchema = createInsertSchema(clubPricing);
+export const insertPricingSchema = createInsertSchema(clubPricing, {
+  price: z.coerce.string(),
+  reductionAmount: z.coerce.string().optional(),
+});
 export const selectPricingSchema = createSelectSchema(clubPricing);
 
 export const insertTeamMemberSchema = createInsertSchema(clubTeamMembers);

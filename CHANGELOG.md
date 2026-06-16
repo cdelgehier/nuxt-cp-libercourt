@@ -1,3 +1,9 @@
+## v1.8.1 (2026-06-16)
+
+### Fix
+
+- **config**: fix stale data after save due to double-layer cache
+
 ## v1.8.0 (2026-06-15)
 
 ### Feat

@@ -170,6 +170,7 @@ export default defineNuxtConfig({
       headers: {
         "Cache-Control": "public, max-age=0, must-revalidate",
         "Netlify-CDN-Cache-Control": "public, max-age=3600, durable",
+        "Netlify-Cache-Tag": "config",
       },
     },
     "/api/news": {

@@ -75,7 +75,7 @@
     "drizzle-orm": "^0.45.1",
     "drizzle-zod": "^0.8.3",
     "fast-xml-parser": "^5.2.5",
-    "googleapis": "^150.0.1",
+    "googleapis": "^171.4.0",
     "jsdom": "^26.1.0",
     "nuxt-oidc-auth": "1.0.0-beta.10",
     "pinia": "^3.0.4",

@@ -105,7 +105,7 @@ useSeoMeta({ title: "Admin — Configuration", robots: "noindex,nofollow" });
 
 const toast = useToast();
 
-const { data: config, pending } = await useFetch("/api/club/config");
+const { data: config, pending, refresh } = await useFetch("/api/club/config");
 
 const form = reactive({
   name: "",
@@ -156,6 +156,7 @@ async function save() {
   saving.value = true;
   try {
     await $fetch("/api/admin/config", { method: "PUT", body: form });
+    await refresh();
     toast.add({ title: "Configuration enregistrée", color: "success" });
   } catch {
     toast.add({ title: "Erreur lors de la sauvegarde", color: "error" });

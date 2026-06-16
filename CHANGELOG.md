@@ -1,3 +1,9 @@
+## v1.8.3 (2026-06-16)
+
+### Fix
+
+- **config**: purge CDN by path to handle entries cached without tags
+
 ## v1.8.2 (2026-06-16)
 
 ### Fix

@@ -1,9 +1,12 @@
 import { updateConfig } from "~~/server/domains/club/service";
-import { purgeTags } from "~~/server/utils/purgeCache";
+import { purgePaths, purgeTags } from "~~/server/utils/purgeCache";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const result = await updateConfig(body);
-  await purgeTags("config", "club");
+  await Promise.all([
+    purgeTags("config", "club"),
+    purgePaths("/api/club/config", "/club"),
+  ]);
   return result;
 });

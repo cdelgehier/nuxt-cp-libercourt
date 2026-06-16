@@ -1,3 +1,9 @@
+## v1.8.4 (2026-06-16)
+
+### Fix
+
+- **config**: update config.value from PUT response instead of re-fetching
+
 ## v1.8.3 (2026-06-16)
 
 ### Fix

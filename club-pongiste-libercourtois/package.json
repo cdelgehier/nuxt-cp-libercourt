@@ -69,7 +69,7 @@
     "@nuxt/image": "^2.0.0",
     "@nuxt/ui": "^4.6.0",
     "@pinia/nuxt": "^0.11.3",
-    "@vueuse/nuxt": "^13.9.0",
+    "@vueuse/nuxt": "^14.2.1",
     "bcryptjs": "^3.0.3",
     "chart.js": "^4.5.0",
     "drizzle-orm": "^0.45.1",

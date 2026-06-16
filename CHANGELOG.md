@@ -1,3 +1,9 @@
+## v1.8.2 (2026-06-16)
+
+### Fix
+
+- **config**: refresh form data after save to prevent stale overwrite
+
 ## v1.8.1 (2026-06-16)
 
 ### Fix

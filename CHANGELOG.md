@@ -1,3 +1,9 @@
+## v1.8.5 (2026-08-31)
+
+### Fix
+
+- update club schedules for 2026 season
+
 ## v1.8.4 (2026-06-16)
 
 ### Fix

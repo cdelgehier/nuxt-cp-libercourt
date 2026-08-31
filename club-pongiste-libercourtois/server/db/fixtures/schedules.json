@@ -11,20 +11,6 @@
             "level": "Tous niveaux",
             "type": "libre",
             "coach": "Libre"
-          },
-          {
-            "time": "18h00 - 19h00",
-            "category": "Training Compét' Jr Groupe 1",
-            "level": "Juniors compétition",
-            "type": "entrainement",
-            "coach": "Entraînement dirigé"
-          },
-          {
-            "time": "19h00 - 20h00",
-            "category": "Training Compét' Jr Groupe 2",
-            "level": "Juniors compétition",
-            "type": "entrainement",
-            "coach": "Entraînement dirigé"
           }
         ]
       },
@@ -38,24 +24,38 @@
             "level": "Tous niveaux",
             "type": "libre",
             "coach": "Libre"
+          },
+          {
+            "time": "18h00 - 20h00",
+            "category": "Entraînement compétition",
+            "level": "Plus de 20 ans",
+            "type": "entrainement",
+            "coach": "Entraînement dirigé"
           }
         ]
       },
       {
         "day": "Mercredi",
-        "hours": "17h30 - 20h00",
+        "hours": "17h30 - 20h30",
         "sessions": [
           {
+            "time": "17h30 - 20h30",
+            "category": "Jeu libre pour tous",
+            "level": "Tous niveaux",
+            "type": "libre",
+            "coach": "Libre"
+          },
+          {
             "time": "17h30 - 18h30",
-            "category": "Training Loisirs Baby",
-            "level": "Jeunes débutants",
+            "category": "Entraînement baby",
+            "level": "Baby",
             "type": "entrainement",
             "coach": "Entraînement dirigé"
           },
           {
-            "time": "18h30 - 20h00",
-            "category": "Training Loisirs Junior",
-            "level": "Juniors loisir",
+            "time": "18h00 - 20h00",
+            "category": "Entraînement compétition",
+            "level": "Junior",
             "type": "entrainement",
             "coach": "Entraînement dirigé"
           }
@@ -73,16 +73,9 @@
             "coach": "Libre"
           },
           {
-            "time": "18h00 - 19h00",
-            "category": "Training Compét' Jr Groupe A",
-            "level": "Juniors compétition",
-            "type": "entrainement",
-            "coach": "Entraînement dirigé"
-          },
-          {
-            "time": "19h00 - 20h00",
-            "category": "Training Compét' Jr Groupe B",
-            "level": "Juniors compétition",
+            "time": "18h00 - 20h00",
+            "category": "Entraînement compétition",
+            "level": "Junior",
             "type": "entrainement",
             "coach": "Entraînement dirigé"
           }
@@ -98,6 +91,13 @@
             "level": "Tous niveaux",
             "type": "libre",
             "coach": "Libre"
+          },
+          {
+            "time": "18h00 - 20h00",
+            "category": "Entraînement compétition",
+            "level": "Junior",
+            "type": "entrainement",
+            "coach": "Entraînement dirigé"
           }
         ]
       }

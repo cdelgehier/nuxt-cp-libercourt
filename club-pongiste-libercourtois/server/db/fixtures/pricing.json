@@ -7,13 +7,13 @@
         "price": 45,
         "includes": [
           "Accès au jeu libre tous les soirs de semaine dès 17h30 jusqu'à 20h30",
-          "Accès au cours loisirs le mercredi de 18h30 à 20h",
+          "Accès aux créneaux baby et entraînement selon l'âge et le niveau",
           "2 séances d'essai offertes",
           "Licence FFTT loisir"
         ],
         "details": {
           "access": "Jeu libre du lundi au vendredi 17h30-20h30",
-          "training": "Cours loisirs mercredi 18h30-20h00",
+          "training": "Créneaux encadrés selon l'âge et le niveau",
           "trial": "2 essais gratuits possibles"
         }
       },
@@ -23,14 +23,14 @@
         "price": 80,
         "includes": [
           "Tout ce qui est inclus dans la licence Loisir",
-          "Entraînements du lundi (groupe 1 à 18h / groupe 2 à 19h)",
-          "Entraînements du jeudi (groupe A à 18h / groupe B à 19h)",
+          "Entraînement compétition adultes le mardi de 18h à 20h",
+          "Entraînements compétition junior mercredi, jeudi et vendredi de 18h à 20h",
           "Participation aux compétitions officielles",
           "Licence FFTT compétition"
         ],
         "details": {
           "access": "Accès à tous les créneaux",
-          "training": "Entraînements dirigés lundi et jeudi",
+          "training": "Entraînements compétition mardi, mercredi, jeudi et vendredi",
           "requirements": "Arriver 15 minutes avant pour l'échauffement",
           "trial": "2 essais gratuits possibles"
         }

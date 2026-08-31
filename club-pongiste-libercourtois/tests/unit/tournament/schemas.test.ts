@@ -474,6 +474,65 @@ describe("updateSeriesInputSchema", () => {
 });
 
 // ---------------------------------------------------------------------------
+// bracketMode dans createSeriesInputSchema / updateSeriesInputSchema
+// ---------------------------------------------------------------------------
+
+describe("createSeriesInputSchema — bracketMode", () => {
+  it("vaut 'single' par défaut", () => {
+    const result = createSeriesInputSchema.parse({ name: "Simple Hommes" });
+    expect(result.bracketMode).toBe("single");
+  });
+
+  it("accepte 'single' explicite", () => {
+    const result = createSeriesInputSchema.parse({
+      name: "Simple Hommes",
+      bracketMode: "single",
+    });
+    expect(result.bracketMode).toBe("single");
+  });
+
+  it("accepte 'double'", () => {
+    const result = createSeriesInputSchema.parse({
+      name: "Double Élimination",
+      bracketMode: "double",
+    });
+    expect(result.bracketMode).toBe("double");
+  });
+
+  it("rejette une valeur inconnue", () => {
+    expect(() =>
+      createSeriesInputSchema.parse({
+        name: "Série test",
+        bracketMode: "triple",
+      }),
+    ).toThrow();
+  });
+});
+
+describe("updateSeriesInputSchema — bracketMode", () => {
+  it("accepte 'double' lors d'une mise à jour", () => {
+    const result = updateSeriesInputSchema.parse({ bracketMode: "double" });
+    expect(result.bracketMode).toBe("double");
+  });
+
+  it("accepte 'single' lors d'une mise à jour", () => {
+    const result = updateSeriesInputSchema.parse({ bracketMode: "single" });
+    expect(result.bracketMode).toBe("single");
+  });
+
+  it("bracketMode absent → undefined (champ optionnel)", () => {
+    const result = updateSeriesInputSchema.parse({ name: "Open" });
+    expect(result.bracketMode).toBeUndefined();
+  });
+
+  it("rejette une valeur invalide lors d'une mise à jour", () => {
+    expect(() =>
+      updateSeriesInputSchema.parse({ bracketMode: "quadruple" }),
+    ).toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // upsertRegistrationInputSchema
 // ---------------------------------------------------------------------------
 

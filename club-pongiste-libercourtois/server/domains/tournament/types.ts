@@ -90,6 +90,8 @@ export const AGE_CATEGORY_LABELS: Record<AgeCategory, string> = {
 export type SeriesStatus = TournamentSeries["status"];
 export type SeriesFormat = TournamentSeries["seriesFormat"];
 export type SeriesType = TournamentSeries["seriesType"];
+export type BracketMode = TournamentSeries["bracketMode"]; // "single" | "double"
+export type BracketSide = BracketMatch["bracketSide"]; // "winners" | "losers" | "grand_final"
 export type PaymentStatus = SeriesRegistration["paymentStatus"];
 export type AttendanceStatus = SeriesRegistration["attendanceStatus"];
 export type MatchStatus = BracketMatch["status"];
@@ -113,12 +115,25 @@ export interface BracketMatchWithPlayers extends BracketMatch {
 export interface BracketRound {
   round: number;
   label: string; // "1er tour", "Quarts", "Demies", "Finale"
+  side: BracketSide;
   matches: BracketMatchWithPlayers[];
+}
+
+export interface DoubleEliminationBracket {
+  /** Rounds du tableau des vainqueurs — triés premier tour → finale */
+  winnersRounds: BracketRound[];
+  /** Rounds du tableau des perdants — triés LB R1 → LB Finale */
+  losersRounds: BracketRound[];
+  /** Grande Finale (1 match unique) */
+  grandFinal: BracketRound;
 }
 
 export interface SeriesWithBracket extends TournamentSeries {
   registrations: SeriesRegistration[];
+  /** Utilisé pour le mode élimination simple */
   rounds: BracketRound[];
+  /** Présent uniquement si bracketMode === "double" */
+  deBracket?: DoubleEliminationBracket;
 }
 
 export interface TournamentWithSeries extends Tournament {
@@ -178,6 +193,7 @@ export const createSeriesInputSchema = z
       .string()
       .min(2, "Le nom doit contenir au moins 2 caractères")
       .max(100, "Le nom ne peut pas dépasser 100 caractères"),
+    bracketMode: z.enum(["single", "double"]).default("single"),
     seriesFormat: z.enum(["singles", "doubles"]).default("singles"),
     seriesType: z.enum(SERIES_TYPE_ENUM).default("standard"),
     ageCategories: z.array(z.enum(AGE_CATEGORIES)).default([]),
@@ -220,6 +236,7 @@ export const createSeriesInputSchema = z
 export const updateSeriesInputSchema = z
   .object({
     name: z.string().min(2).max(100).optional(),
+    bracketMode: z.enum(["single", "double"]).optional(),
     seriesFormat: z.enum(["singles", "doubles"]).optional(),
     seriesType: z.enum(SERIES_TYPE_ENUM).optional(),
     ageCategories: z.array(z.enum(AGE_CATEGORIES)).optional(),

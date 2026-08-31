@@ -53,6 +53,14 @@ export const matchStatusEnum = pgEnum("match_status", [
   "forfeit",
 ]);
 
+export const bracketModeEnum = pgEnum("bracket_mode", ["single", "double"]);
+
+export const bracketSideEnum = pgEnum("bracket_side", [
+  "winners", // Tableau des vainqueurs
+  "losers", // Tableau des perdants
+  "grand_final", // Grande Finale
+]);
+
 // ---------------------------------------------------------------------------
 // Tables
 // ---------------------------------------------------------------------------
@@ -91,6 +99,7 @@ export const tournamentSeries = pgTable("tournament_series", {
     .notNull()
     .references(() => tournaments.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
+  bracketMode: bracketModeEnum("bracket_mode").notNull().default("single"),
   seriesFormat: seriesFormatEnum("series_format").notNull().default("singles"),
   seriesType: seriesTypeEnum("series_type").notNull().default("standard"),
   ageCategories: text("age_categories").array().notNull().default([]),
@@ -166,6 +175,9 @@ export const bracketMatches = pgTable(
     // la contrainte FK est ajoutée manuellement dans la migration si besoin.
     nextMatchId: integer("next_match_id"),
     nextMatchSlot: integer("next_match_slot"), // 1 ou 2
+    bracketSide: bracketSideEnum("bracket_side").notNull().default("winners"),
+    loserNextMatchId: integer("loser_next_match_id"), // double élim : perdant → tableau des perdants
+    loserNextMatchSlot: integer("loser_next_match_slot"), // 1 ou 2
     enteredByJaId: integer("entered_by_ja_id").references(
       () => tournamentJaAccess.id,
       { onDelete: "set null" },
@@ -173,7 +185,14 @@ export const bracketMatches = pgTable(
     finishedAt: timestamp("finished_at"),
     createdAt: timestamp("created_at").defaultNow(),
   },
-  (table) => [unique().on(table.seriesId, table.round, table.matchNumber)],
+  (table) => [
+    unique().on(
+      table.seriesId,
+      table.bracketSide,
+      table.round,
+      table.matchNumber,
+    ),
+  ],
 );
 
 export const matchSets = pgTable("match_sets", {

@@ -2,8 +2,10 @@ import { ZodError } from "zod";
 import { describe, expect, it } from "vitest";
 import {
   buildBracket,
+  buildDoubleEliminationBracket,
   computeMatchWinner,
   generateSlug,
+  getLBRoundLabel,
   getRoundLabel,
   parseScoreString,
   seedPlayers,
@@ -353,5 +355,179 @@ describe("getRoundLabel", () => {
 
   it("returns a generic label for earlier rounds", () => {
     expect(getRoundLabel(4, 4)).toBe("1e tour");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getLBRoundLabel
+// ---------------------------------------------------------------------------
+
+describe("getLBRoundLabel", () => {
+  it("returns 'Finale LB' for the last round (index = total - 1)", () => {
+    expect(getLBRoundLabel(5, 6)).toBe("Finale LB");
+  });
+
+  it("returns 'Demi-finale LB' for the second-to-last round", () => {
+    expect(getLBRoundLabel(4, 6)).toBe("Demi-finale LB");
+  });
+
+  it("returns 'Quarts LB' for third-to-last round", () => {
+    expect(getLBRoundLabel(3, 6)).toBe("Quarts LB");
+  });
+
+  it("returns 'Tour 1 LB' for the first round (index 0)", () => {
+    expect(getLBRoundLabel(0, 6)).toBe("Tour 1 LB");
+  });
+
+  it("returns 'Tour 2 LB' for the second round (index 1)", () => {
+    expect(getLBRoundLabel(1, 6)).toBe("Tour 2 LB");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildDoubleEliminationBracket
+// ---------------------------------------------------------------------------
+
+describe("buildDoubleEliminationBracket", () => {
+  it("throws for fewer than 2 players", () => {
+    expect(() => buildDoubleEliminationBracket(1)).toThrow();
+  });
+
+  describe("4 players (bracketSize=4, k=2)", () => {
+    // WB: 3 matches (R2×2 + R1×1)
+    // LB: 2*(2-1) = 2 rounds → R2×1 (LB R1) + R1×1 (LB Final) = 2 matches
+    // GF: 1 match
+    // Total: 6 matches
+    it("produces the correct total match count", () => {
+      const { slots } = buildDoubleEliminationBracket(4);
+      expect(slots).toHaveLength(6);
+    });
+
+    it("has 3 WB matches", () => {
+      const { wbIndices } = buildDoubleEliminationBracket(4);
+      expect(wbIndices).toHaveLength(3);
+    });
+
+    it("has 2 LB matches", () => {
+      const { lbIndices } = buildDoubleEliminationBracket(4);
+      expect(lbIndices).toHaveLength(2);
+    });
+
+    it("has exactly 1 GF match", () => {
+      const { slots, gfIndex } = buildDoubleEliminationBracket(4);
+      expect(slots[gfIndex]!.side).toBe("grand_final");
+    });
+
+    it("GF match has nextMatchIndex = -1 (no next match)", () => {
+      const { slots, gfIndex } = buildDoubleEliminationBracket(4);
+      expect(slots[gfIndex]!.nextMatchIndex).toBe(-1);
+    });
+
+    it("WB Final points to GF as nextMatch (slot 1)", () => {
+      const { slots, wbIndices, gfIndex } = buildDoubleEliminationBracket(4);
+      const wbFinal = wbIndices.find((i) => slots[i]!.round === 1);
+      expect(wbFinal).toBeDefined();
+      expect(slots[wbFinal!]!.nextMatchIndex).toBe(gfIndex);
+      expect(slots[wbFinal!]!.nextMatchSlot).toBe(1);
+    });
+
+    it("LB Final points to GF as nextMatch (slot 2)", () => {
+      const { slots, lbIndices, gfIndex } = buildDoubleEliminationBracket(4);
+      const lbFinal = lbIndices.find((i) => slots[i]!.round === 1);
+      expect(lbFinal).toBeDefined();
+      expect(slots[lbFinal!]!.nextMatchIndex).toBe(gfIndex);
+      expect(slots[lbFinal!]!.nextMatchSlot).toBe(2);
+    });
+
+    it("all WB first-round matches have a loserNextMatchIndex pointing to LB", () => {
+      const { slots, wbIndices } = buildDoubleEliminationBracket(4);
+      const maxWBRound = Math.max(...wbIndices.map((i) => slots[i]!.round));
+      const wbFirstRound = wbIndices.filter(
+        (i) => slots[i]!.round === maxWBRound,
+      );
+      for (const idx of wbFirstRound) {
+        expect(slots[idx]!.loserNextMatchIndex).not.toBe(-1);
+        expect(slots[slots[idx]!.loserNextMatchIndex]!.side).toBe("losers");
+      }
+    });
+
+    it("WB Final loser goes to LB Final", () => {
+      const { slots, wbIndices, lbIndices } = buildDoubleEliminationBracket(4);
+      const wbFinal = wbIndices.find((i) => slots[i]!.round === 1)!;
+      const lbFinal = lbIndices.find((i) => slots[i]!.round === 1)!;
+      expect(slots[wbFinal]!.loserNextMatchIndex).toBe(lbFinal);
+    });
+  });
+
+  describe("8 players (bracketSize=8, k=3)", () => {
+    // WB: 7 matches | LB: 6 matches | GF: 1 → total 14
+    it("produces 14 total matches", () => {
+      const { slots } = buildDoubleEliminationBracket(8);
+      expect(slots).toHaveLength(14);
+    });
+
+    it("has 7 WB matches", () => {
+      const { wbIndices } = buildDoubleEliminationBracket(8);
+      expect(wbIndices).toHaveLength(7);
+    });
+
+    it("has 6 LB matches", () => {
+      const { lbIndices } = buildDoubleEliminationBracket(8);
+      expect(lbIndices).toHaveLength(6);
+    });
+
+    it("all WB slots have correct side = 'winners'", () => {
+      const { slots, wbIndices } = buildDoubleEliminationBracket(8);
+      for (const idx of wbIndices) {
+        expect(slots[idx]!.side).toBe("winners");
+      }
+    });
+
+    it("all LB slots have correct side = 'losers'", () => {
+      const { slots, lbIndices } = buildDoubleEliminationBracket(8);
+      for (const idx of lbIndices) {
+        expect(slots[idx]!.side).toBe("losers");
+      }
+    });
+
+    it("no LB slot has a loserNextMatchIndex (losers are eliminated)", () => {
+      const { slots, lbIndices } = buildDoubleEliminationBracket(8);
+      for (const idx of lbIndices) {
+        expect(slots[idx]!.loserNextMatchIndex).toBe(-1);
+      }
+    });
+
+    it("all WB loser links point to a valid LB slot (no dangling refs)", () => {
+      const { slots, wbIndices, lbIndices } = buildDoubleEliminationBracket(8);
+      const lbSet = new Set(lbIndices);
+      for (const idx of wbIndices) {
+        const loserIdx = slots[idx]!.loserNextMatchIndex;
+        if (loserIdx !== -1) {
+          expect(lbSet.has(loserIdx)).toBe(true);
+        }
+      }
+    });
+  });
+
+  describe("non-power-of-2 players (6 players → bracketSize=8)", () => {
+    it("generates the same total match count as 8 players", () => {
+      const { slots } = buildDoubleEliminationBracket(6);
+      expect(slots).toHaveLength(14);
+    });
+
+    it("all matchNumbers within a round are 1-based and unique", () => {
+      const { slots, wbIndices } = buildDoubleEliminationBracket(6);
+      const byRound = new Map<number, number[]>();
+      for (const idx of wbIndices) {
+        const s = slots[idx]!;
+        if (!byRound.has(s.round)) byRound.set(s.round, []);
+        byRound.get(s.round)!.push(s.matchNumber);
+      }
+      for (const [, nums] of byRound) {
+        const unique = new Set(nums);
+        expect(unique.size).toBe(nums.length);
+        expect(Math.min(...nums)).toBe(1);
+      }
+    });
   });
 });

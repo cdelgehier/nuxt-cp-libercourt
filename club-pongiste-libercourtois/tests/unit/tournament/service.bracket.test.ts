@@ -86,11 +86,14 @@ function makeInsertedMatches(count: number) {
     seriesId: 1,
     round: 1,
     matchNumber: i + 1,
+    bracketSide: "winners" as const,
     status: "pending",
     player1Id: null,
     player2Id: null,
     nextMatchId: null,
     nextMatchSlot: null,
+    loserNextMatchId: null,
+    loserNextMatchSlot: null,
     winnerId: null,
   }));
 }
@@ -311,6 +314,7 @@ describe("swapPlayersInBracket — échange dans le premier tour", () => {
         id: 10,
         round: 1,
         matchNumber: 1,
+        bracketSide: "winners" as const,
         player1Id: 1,
         player2Id: 2,
         status: "pending",
@@ -318,11 +322,14 @@ describe("swapPlayersInBracket — échange dans le premier tour", () => {
         sets: [],
         nextMatchId: null,
         nextMatchSlot: null,
+        loserNextMatchId: null,
+        loserNextMatchSlot: null,
       },
       {
         id: 11,
         round: 1,
         matchNumber: 2,
+        bracketSide: "winners" as const,
         player1Id: 3,
         player2Id: 4,
         status: "pending",
@@ -330,6 +337,8 @@ describe("swapPlayersInBracket — échange dans le premier tour", () => {
         sets: [],
         nextMatchId: null,
         nextMatchSlot: null,
+        loserNextMatchId: null,
+        loserNextMatchSlot: null,
       },
     ];
     mockGetMatchesBySeries.mockResolvedValue(matches);
@@ -352,6 +361,7 @@ describe("swapPlayersInBracket — échange dans le premier tour", () => {
         id: 10,
         round: 1,
         matchNumber: 1,
+        bracketSide: "winners" as const,
         player1Id: 1,
         player2Id: 2,
         status: "pending",
@@ -359,6 +369,8 @@ describe("swapPlayersInBracket — échange dans le premier tour", () => {
         sets: [],
         nextMatchId: null,
         nextMatchSlot: null,
+        loserNextMatchId: null,
+        loserNextMatchSlot: null,
       },
     ]);
 
@@ -385,6 +397,7 @@ describe("swapPlayersInBracket — BYE suit le joueur après échange", () => {
       id: 10,
       round: 1,
       matchNumber: 1,
+      bracketSide: "winners" as const,
       player1Id: 1,
       player2Id: null, // BYE
       status: "finished",
@@ -392,11 +405,14 @@ describe("swapPlayersInBracket — BYE suit le joueur après échange", () => {
       sets: [],
       nextMatchId: 20,
       nextMatchSlot: 1,
+      loserNextMatchId: null,
+      loserNextMatchSlot: null,
     };
     const fullMatch = {
       id: 11,
       round: 1,
       matchNumber: 2,
+      bracketSide: "winners" as const,
       player1Id: 2,
       player2Id: 3,
       status: "pending",
@@ -404,6 +420,8 @@ describe("swapPlayersInBracket — BYE suit le joueur après échange", () => {
       sets: [],
       nextMatchId: 20,
       nextMatchSlot: 2,
+      loserNextMatchId: null,
+      loserNextMatchSlot: null,
     };
 
     // First call: find slots; second call: état après le swap en DB
@@ -437,6 +455,7 @@ describe("swapPlayersInBracket — BYE suit le joueur après échange", () => {
       id: 10,
       round: 1,
       matchNumber: 1,
+      bracketSide: "winners" as const,
       player1Id: 1,
       player2Id: 2,
       status: "pending",
@@ -444,11 +463,14 @@ describe("swapPlayersInBracket — BYE suit le joueur après échange", () => {
       sets: [],
       nextMatchId: 20,
       nextMatchSlot: 1,
+      loserNextMatchId: null,
+      loserNextMatchSlot: null,
     };
     const byeMatch = {
       id: 11,
       round: 1,
       matchNumber: 2,
+      bracketSide: "winners" as const,
       player1Id: 3,
       player2Id: null,
       status: "finished",
@@ -456,6 +478,8 @@ describe("swapPlayersInBracket — BYE suit le joueur après échange", () => {
       sets: [],
       nextMatchId: 20,
       nextMatchSlot: 2,
+      loserNextMatchId: null,
+      loserNextMatchSlot: null,
     };
 
     mockGetMatchesBySeries

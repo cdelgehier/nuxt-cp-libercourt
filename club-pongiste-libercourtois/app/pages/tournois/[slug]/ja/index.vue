@@ -2,6 +2,7 @@
 import type {
   SeriesWithBracket,
   BracketMatchWithPlayers,
+  BracketRound,
   SeriesRegistration,
   TournamentWithSeries,
 } from "~~/server/domains/tournament/types";
@@ -251,9 +252,19 @@ async function afterScore() {
   if (selectedSeriesId.value) await loadSeries(selectedSeriesId.value);
 }
 
+// Flatten all rounds regardless of bracket mode (single or double elimination)
+const allRounds = computed<BracketRound[]>(() => {
+  if (!series.value) return [];
+  if (series.value.bracketMode === "double" && series.value.deBracket) {
+    const { winnersRounds, losersRounds, grandFinal } = series.value.deBracket;
+    return [...winnersRounds, ...losersRounds, grandFinal];
+  }
+  return series.value.rounds;
+});
+
 const pendingMatches = computed<BracketMatchWithPlayers[]>(() => {
   if (!series.value) return [];
-  return series.value.rounds
+  return allRounds.value
     .flatMap((r) => r.matches)
     .filter((m) => m.status === "pending" && m.player1 && m.player2);
 });
@@ -261,7 +272,7 @@ const pendingMatches = computed<BracketMatchWithPlayers[]>(() => {
 // Finished matches that can potentially be corrected (next match not yet finished)
 const correctableMatches = computed<BracketMatchWithPlayers[]>(() => {
   if (!series.value) return [];
-  const allMatches = series.value.rounds.flatMap((r) => r.matches);
+  const allMatches = allRounds.value.flatMap((r) => r.matches);
   const finishedById = new Map(
     allMatches
       .filter((m) => m.status === "finished" || m.status === "forfeit")
@@ -416,7 +427,7 @@ const statusColor: Record<string, string> = {
           </UButton>
           <UButton
             size="sm"
-            color="red"
+            color="error"
             variant="outline"
             icon="i-heroicons-trash"
             :loading="droppingBracket"
@@ -528,8 +539,12 @@ const statusColor: Record<string, string> = {
             Cliquez sur un joueur pour le sélectionner, puis sur un autre pour
             les échanger de position.
           </p>
+          <TournamentDoubleEliminationView
+            v-if="series.bracketMode === 'double' && series.deBracket"
+            :de-bracket="series.deBracket"
+          />
           <TournamentBracketEditor
-            v-if="currentSeries?.status === 'bracket_generated'"
+            v-else-if="currentSeries?.status === 'bracket_generated'"
             :rounds="series.rounds"
             :series-id="selectedSeriesId!"
             :slug="slug"
@@ -626,7 +641,11 @@ const statusColor: Record<string, string> = {
           >
             Tableau complet
           </h2>
-          <TournamentBracketView :rounds="series.rounds" />
+          <TournamentDoubleEliminationView
+            v-if="series.bracketMode === 'double' && series.deBracket"
+            :de-bracket="series.deBracket"
+          />
+          <TournamentBracketView v-else :rounds="series.rounds" />
         </div>
       </div>
     </template>

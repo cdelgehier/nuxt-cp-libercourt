@@ -398,6 +398,20 @@ export async function getMatchById(id: number) {
   return rows[0] ?? null;
 }
 
+/** Returns the match whose winner propagates to the given slot of targetMatchId. */
+export async function findMatchFeedingSlot(targetMatchId: number, slot: 1 | 2) {
+  const rows = await db
+    .select()
+    .from(bracketMatches)
+    .where(
+      and(
+        eq(bracketMatches.nextMatchId, targetMatchId),
+        eq(bracketMatches.nextMatchSlot, slot),
+      ),
+    );
+  return rows[0] ?? null;
+}
+
 export async function insertMatches(data: InsertBracketMatch[]) {
   if (data.length === 0) return [];
   return db.insert(bracketMatches).values(data).returning();

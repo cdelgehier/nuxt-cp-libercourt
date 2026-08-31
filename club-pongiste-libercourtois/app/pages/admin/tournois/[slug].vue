@@ -156,6 +156,7 @@ const editSeriesForm = reactive({
   name: "",
   seriesFormat: "singles" as "singles" | "doubles",
   seriesType: "standard" as string,
+  bracketMode: "single" as "single" | "double",
   ageCategories: [] as string[],
   femalesOnly: false,
   pointsLimitMin: undefined as number | undefined,
@@ -174,6 +175,7 @@ function openEditSeries() {
     name: s.name,
     seriesFormat: s.seriesFormat,
     seriesType: s.seriesType,
+    bracketMode: s.bracketMode,
     ageCategories: [...(s.ageCategories ?? [])],
     femalesOnly: s.femalesOnly,
     pointsLimitMin: s.pointsLimitMin ?? undefined,
@@ -218,6 +220,7 @@ const seriesForm = reactive({
   name: "",
   seriesFormat: "singles" as "singles" | "doubles",
   seriesType: "standard" as string,
+  bracketMode: "single" as "single" | "double",
   ageCategories: [] as string[],
   femalesOnly: false,
   pointsLimitMin: undefined as number | undefined,
@@ -640,8 +643,14 @@ async function deleteSeries() {
               Démarrer la série
             </UButton>
           </div>
+          <TournamentDoubleEliminationView
+            v-if="
+              seriesDetail.bracketMode === 'double' && seriesDetail.deBracket
+            "
+            :de-bracket="seriesDetail.deBracket"
+          />
           <TournamentBracketEditor
-            v-if="currentSeries.status === 'bracket_generated'"
+            v-else-if="currentSeries.status === 'bracket_generated'"
             :rounds="seriesDetail.rounds"
             :series-id="currentSeries.id"
             :slug="slug"
@@ -789,6 +798,20 @@ async function deleteSeries() {
               v-model.number="editSeriesForm.maxPlayers"
               type="number"
               min="2"
+            />
+          </UFormField>
+          <UFormField label="Mode d'élimination">
+            <USelect
+              v-model="editSeriesForm.bracketMode"
+              :disabled="
+                ['bracket_generated', 'in_progress', 'finished'].includes(
+                  currentSeries?.status ?? '',
+                )
+              "
+              :items="[
+                { label: 'Élimination simple', value: 'single' },
+                { label: 'Double élimination', value: 'double' },
+              ]"
             />
           </UFormField>
           <div class="grid grid-cols-2 gap-3">
@@ -941,6 +964,15 @@ async function deleteSeries() {
               v-model.number="seriesForm.maxPlayers"
               type="number"
               min="2"
+            />
+          </UFormField>
+          <UFormField label="Mode d'élimination">
+            <USelect
+              v-model="seriesForm.bracketMode"
+              :items="[
+                { label: 'Élimination simple', value: 'single' },
+                { label: 'Double élimination', value: 'double' },
+              ]"
             />
           </UFormField>
           <div class="grid grid-cols-2 gap-3">

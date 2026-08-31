@@ -2,9 +2,11 @@ import bcrypt from "bcryptjs";
 import * as repo from "./repository";
 import {
   buildBracket,
+  buildDoubleEliminationBracket,
   computeMatchWinner,
   createFirstRoundSlots,
   generateSlug,
+  getLBRoundLabel,
   getRoundLabel,
   seedPlayers,
   validateSet,
@@ -227,9 +229,55 @@ export async function getSeriesWithBracket(
   ); // descending: first round first
   const totalRounds = roundNumbers.length > 0 ? Math.max(...roundNumbers) : 0;
 
+  // Double elimination: split matches by bracket side and build structured DE bracket
+  if (series.bracketMode === "double") {
+    const winnersMatches = matches.filter((m) => m.bracketSide === "winners");
+    const losersMatches = matches.filter((m) => m.bracketSide === "losers");
+    const gfMatches = matches.filter((m) => m.bracketSide === "grand_final");
+
+    const winnersRoundNums = [
+      ...new Set(winnersMatches.map((m) => m.round)),
+    ].sort((a, b) => b - a);
+    const totalWBRounds =
+      winnersRoundNums.length > 0 ? Math.max(...winnersRoundNums) : 0;
+    const winnersRounds: BracketRound[] = winnersRoundNums.map((r) => ({
+      round: r,
+      label: getRoundLabel(r, totalWBRounds),
+      side: "winners" as const,
+      matches: winnersMatches.filter((m) => m.round === r),
+    }));
+
+    // LB rounds sorted ascending: highest round number first = LB R1, lowest = LB Final
+    const losersRoundNums = [
+      ...new Set(losersMatches.map((m) => m.round)),
+    ].sort((a, b) => b - a);
+    const totalLBRounds = losersRoundNums.length;
+    const losersRounds: BracketRound[] = losersRoundNums.map((r, i) => ({
+      round: r,
+      label: getLBRoundLabel(i, totalLBRounds),
+      side: "losers" as const,
+      matches: losersMatches.filter((m) => m.round === r),
+    }));
+
+    const grandFinal: BracketRound = {
+      round: 1,
+      label: "Grande Finale",
+      side: "grand_final" as const,
+      matches: gfMatches,
+    };
+
+    return {
+      ...series,
+      registrations,
+      rounds: [],
+      deBracket: { winnersRounds, losersRounds, grandFinal },
+    };
+  }
+
   const rounds: BracketRound[] = roundNumbers.map((r) => ({
     round: r,
     label: getRoundLabel(r, totalRounds),
+    side: "winners" as const,
     matches: matches.filter((m) => m.round === r),
   }));
 
@@ -436,6 +484,109 @@ export async function removeRegistration(id: number) {
 // Bracket
 // ---------------------------------------------------------------------------
 
+async function generateDoubleEliminationBracket(
+  seriesId: number,
+  activePlayers: Awaited<ReturnType<typeof repo.getActiveRegistrations>>,
+) {
+  const { slots, wbIndices, lbIndices, gfIndex } =
+    buildDoubleEliminationBracket(activePlayers.length);
+
+  // Delete any leftover matches
+  await repo.deleteMatchesBySeries(seriesId);
+
+  // Pass 1: insert all matches without next/loser links
+  const matchData: InsertBracketMatch[] = slots.map((slot) => ({
+    seriesId,
+    bracketSide: slot.side,
+    round: slot.round,
+    matchNumber: slot.matchNumber,
+    status: "pending" as const,
+  }));
+  const inserted = await repo.insertMatches(matchData);
+
+  // Pass 2: link nextMatchId (winner path) and loserNextMatchId (loser path)
+  for (let i = 0; i < slots.length; i++) {
+    const slot = slots[i]!;
+    const updates: Record<string, unknown> = {};
+
+    if (slot.nextMatchIndex !== -1) {
+      updates.nextMatchId = inserted[slot.nextMatchIndex]!.id;
+      updates.nextMatchSlot = slot.nextMatchSlot;
+    }
+    if (slot.loserNextMatchIndex !== -1) {
+      updates.loserNextMatchId = inserted[slot.loserNextMatchIndex]!.id;
+      updates.loserNextMatchSlot = slot.loserNextMatchSlot;
+    }
+    if (Object.keys(updates).length > 0) {
+      await repo.updateMatch(
+        inserted[i]!.id,
+        updates as Parameters<typeof repo.updateMatch>[1],
+      );
+    }
+  }
+
+  // Assign seeded players to WB first round
+  const seeded = seedPlayers(activePlayers);
+  const bracketSize = Math.pow(2, Math.ceil(Math.log2(seeded.length)));
+  const firstRoundSlots = createFirstRoundSlots(seeded, bracketSize);
+
+  // WB first round = highest round number among WB slots
+  const maxWBRound = Math.max(...wbIndices.map((i) => slots[i]!.round));
+  const wbFirstRound = wbIndices
+    .filter((i) => slots[i]!.round === maxWBRound)
+    .sort((a, b) => slots[a]!.matchNumber - slots[b]!.matchNumber);
+
+  for (let i = 0; i < wbFirstRound.length; i++) {
+    const slotIdx = wbFirstRound[i]!;
+    const p1 = firstRoundSlots[i * 2] ?? null;
+    const p2 = firstRoundSlots[i * 2 + 1] ?? null;
+    await repo.updateMatch(inserted[slotIdx]!.id, {
+      player1Id: p1?.id ?? null,
+      player2Id: p2?.id ?? null,
+    });
+  }
+
+  // Handle WB BYEs: p2 is null → auto-advance p1, but do NOT propagate loser
+  for (let i = 0; i < wbFirstRound.length; i++) {
+    const slotIdx = wbFirstRound[i]!;
+    const p1 = firstRoundSlots[i * 2] ?? null;
+    const p2 = firstRoundSlots[i * 2 + 1] ?? null;
+    if (p2 === null && p1 !== null) {
+      const slot = slots[slotIdx]!;
+      await repo.updateMatch(inserted[slotIdx]!.id, {
+        status: "finished",
+        winnerId: p1.id,
+        finishedAt: new Date(),
+      });
+      // Propagate winner to next WB match
+      if (slot.nextMatchIndex !== -1) {
+        const parentId = inserted[slot.nextMatchIndex]!.id;
+        const playerKey = slot.nextMatchSlot === 1 ? "player1Id" : "player2Id";
+        await repo.updateMatch(parentId, { [playerKey]: p1.id });
+      }
+      // No loser propagation for BYE matches (no real loser)
+    }
+  }
+
+  // Mark ghost LB Tour 1 matches: both WB R1 sources were BYEs → no loser will ever arrive.
+  // These are immediately finished with winnerId=null so cascade BYE detection can use them.
+  const lbFirstRoundNum = Math.max(...lbIndices.map((i) => slots[i]!.round));
+  for (const lbIdx of lbIndices) {
+    if (slots[lbIdx]!.round !== lbFirstRoundNum) continue;
+    const m = await repo.getMatchById(inserted[lbIdx]!.id);
+    if (!m?.player1Id && !m?.player2Id) {
+      await repo.updateMatch(inserted[lbIdx]!.id, {
+        status: "finished",
+        winnerId: null,
+        finishedAt: new Date(),
+      });
+    }
+  }
+
+  void gfIndex; // referenced structurally, populated at runtime
+  return repo.getMatchesBySeries(seriesId);
+}
+
 export async function generateBracket(seriesId: number) {
   const series = await repo.getSeriesById(seriesId);
   if (!series) {
@@ -459,6 +610,16 @@ export async function generateBracket(seriesId: number) {
       statusCode: 400,
       message: "Il faut au moins 2 joueurs présents pour générer le tableau",
     });
+  }
+
+  // Double elimination: delegate to dedicated function
+  if (series.bracketMode === "double") {
+    const result = await generateDoubleEliminationBracket(
+      seriesId,
+      activePlayers,
+    );
+    await repo.updateSeriesStatus(seriesId, "bracket_generated");
+    return result;
   }
 
   const seeded = seedPlayers(activePlayers);
@@ -582,8 +743,10 @@ export async function swapPlayersInBracket(seriesId: number, input: unknown) {
     swapPlayersInputSchema.parse(input);
 
   const matches = await repo.getMatchesBySeries(seriesId);
-  const maxRound = Math.max(...matches.map((m) => m.round));
-  const firstRoundMatches = matches.filter((m) => m.round === maxRound);
+  // In double elimination, only the Winners Bracket first round is swappable
+  const wbMatches = matches.filter((m) => m.bracketSide === "winners");
+  const maxRound = Math.max(...wbMatches.map((m) => m.round));
+  const firstRoundMatches = wbMatches.filter((m) => m.round === maxRound);
 
   // Find which match/slot each registration occupies
   type Slot = { matchId: number; slot: 1 | 2 };
@@ -706,6 +869,19 @@ export async function enterMatchScore(
       const playerKey = match.nextMatchSlot === 1 ? "player1Id" : "player2Id";
       await repo.updateMatch(match.nextMatchId, { [playerKey]: null });
     }
+    // Double elimination: also clear the loser slot in LB if it hasn't been played yet
+    if (match.loserNextMatchId) {
+      const lbMatch = await repo.getMatchById(match.loserNextMatchId);
+      if (
+        lbMatch &&
+        lbMatch.status !== "finished" &&
+        lbMatch.status !== "forfeit"
+      ) {
+        const loserKey =
+          match.loserNextMatchSlot === 1 ? "player1Id" : "player2Id";
+        await repo.updateMatch(match.loserNextMatchId, { [loserKey]: null });
+      }
+    }
     // Reset current match to pending so the rest of the flow works normally
     await repo.updateMatch(matchId, {
       status: "pending",
@@ -768,8 +944,9 @@ export async function enterMatchScore(
     finishedAt: new Date(),
   });
 
-  // Propagate winner to next match
+  // Propagate winner to next match, loser to Losers Bracket (double elim)
   await propagateWinner(matchId, winnerId);
+  await propagateLoser(matchId, winnerId);
   await checkSeriesCompletion(match.seriesId);
 
   return repo.getMatchesBySeries(match.seriesId);
@@ -829,6 +1006,7 @@ export async function enterForfeit(
   }
 
   await propagateWinner(matchId, winnerId);
+  await propagateLoser(matchId, winnerId);
   await checkSeriesCompletion(match.seriesId);
 }
 
@@ -842,6 +1020,48 @@ async function propagateWinner(matchId: number, winnerId: number) {
 
   const playerKey = match.nextMatchSlot === 1 ? "player1Id" : "player2Id";
   await repo.updateMatch(match.nextMatchId, { [playerKey]: winnerId });
+}
+
+/**
+ * Double elimination only — propagates the loser of a match to the Losers Bracket.
+ * BYE matches (player1 or player2 is null) never have a real loser, so nothing is propagated.
+ */
+async function propagateLoser(matchId: number, winnerId: number) {
+  const match = await repo.getMatchById(matchId);
+  if (!match?.loserNextMatchId) return;
+  // Guard: BYE matches have no real loser
+  if (!match.player1Id || !match.player2Id) return;
+
+  const loserId =
+    match.player1Id === winnerId ? match.player2Id : match.player1Id;
+  const playerKey = match.loserNextMatchSlot === 1 ? "player1Id" : "player2Id";
+  await repo.updateMatch(match.loserNextMatchId, { [playerKey]: loserId });
+
+  // Cascade BYE detection: if the other slot of the LB match is null and its
+  // source (the match whose winner fills that slot) is a ghost (finished, winnerId=null),
+  // the LB match has no real opponent → auto-advance the loser.
+  const otherSlot: 1 | 2 = match.loserNextMatchSlot === 1 ? 2 : 1;
+  const lbMatch = await repo.getMatchById(match.loserNextMatchId);
+  const otherSlotValue =
+    otherSlot === 1 ? lbMatch?.player1Id : lbMatch?.player2Id;
+  if (lbMatch && !otherSlotValue) {
+    const sourceOfOtherSlot = await repo.findMatchFeedingSlot(
+      match.loserNextMatchId,
+      otherSlot,
+    );
+    if (
+      sourceOfOtherSlot?.status === "finished" &&
+      sourceOfOtherSlot.winnerId === null
+    ) {
+      // Cascade BYE: auto-advance loserId through the LB match
+      await repo.updateMatch(match.loserNextMatchId, {
+        status: "finished",
+        winnerId: loserId,
+        finishedAt: new Date(),
+      });
+      await propagateWinner(match.loserNextMatchId, loserId!);
+    }
+  }
 }
 
 async function checkSeriesCompletion(seriesId: number) {

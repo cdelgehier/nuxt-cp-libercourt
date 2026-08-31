@@ -102,7 +102,13 @@ onUnmounted(() => pause());
       </div>
 
       <!-- Bracket -->
+      <TournamentDoubleEliminationView
+        v-if="series.bracketMode === 'double' && series.deBracket"
+        :de-bracket="series.deBracket"
+        :highlight="highlightIds.size > 0 ? highlightIds : null"
+      />
       <TournamentBracketView
+        v-else
         :rounds="series.rounds"
         :highlight="highlightIds.size > 0 ? highlightIds : null"
       />

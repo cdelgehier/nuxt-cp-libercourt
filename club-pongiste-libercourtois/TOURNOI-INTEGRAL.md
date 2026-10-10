@@ -60,16 +60,18 @@ pnpm db:migrate
 ## Validation reproductible
 
 ```sh
+pnpm typecheck
+pnpm lint:check
 pnpm test:unit
 pnpm build
-pnpm typecheck
 ```
 
-Le contrôle TypeScript conserve l’erreur préexistante de `server/utils/purgeCache.ts` (`paths`
-absent de `PurgeCacheOptions`). Le build passe. `style:check` ne peut pas s’exécuter : stylelint
-n’est pas installé dans ce projet.
+Le contrôle TypeScript, le lint et le build passent. La configuration du club purge uniquement les
+tags CDN `config` et `club`, pris en charge par le SDK Netlify. Trois tests de régression vérifient
+la purge ciblée, l’absence d’appel en local et la sauvegarde conservée si le CDN échoue.
+`style:check` ne peut pas s’exécuter : stylelint n’est pas installé dans ce projet.
 
-389 tests unitaires passent. Le contrôle HTTP local joue 76 matchs jusqu’aux 24 places uniques,
+392 tests unitaires passent. Le contrôle HTTP local joue 76 matchs jusqu’aux 24 places uniques,
 vérifie les lignes relationnelles et les deux destinations, les conflits de versions et l’accès
 JA/public. Les feuilles ont été contrôlées dans l’aperçu de l’application ; le dialogue système
 d’impression et une sortie sur imprimante restent à vérifier sur le poste du JA.

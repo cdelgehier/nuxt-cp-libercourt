@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { TournamentSeries } from "~~/server/domains/tournament/types";
+  import type { TournamentSeries } from '~~/server/domains/tournament/types'
 
-defineProps<{
-  series: Array<TournamentSeries & { registrationCount: number }>;
-  modelValue: number | null;
-}>();
+  defineProps<{
+    series: Array<TournamentSeries & { registrationCount: number }>
+    modelValue: number | null
+  }>()
 
-defineEmits<{ "update:modelValue": [id: number] }>();
+  defineEmits<{ 'update:modelValue': [id: number] }>()
 </script>
 
 <template>
@@ -17,7 +17,7 @@ defineEmits<{ "update:modelValue": [id: number] }>();
       class="text-left rounded-lg border-2 px-4 py-3 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
       :class="
         modelValue === s.id
-          ? 'border-primary-500 bg-primary-50 shadow-sm'
+          ? 'border-primary-500 bg-primary-50 text-gray-900 shadow-sm dark:bg-primary-950 dark:text-gray-100'
           : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
       "
       @click="$emit('update:modelValue', s.id)"
@@ -35,7 +35,7 @@ defineEmits<{ "update:modelValue": [id: number] }>();
       </div>
       <div class="text-sm text-gray-400">
         {{ s.registrationCount }}
-        {{ s.seriesFormat === "doubles" ? "paires" : "joueurs" }}
+        {{ s.seriesFormat === 'doubles' ? 'paires' : 'joueurs' }}
         <span v-if="s.femalesOnly"> · ♀</span>
       </div>
     </button>

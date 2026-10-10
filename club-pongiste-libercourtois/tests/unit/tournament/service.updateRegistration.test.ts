@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const mockGetRegistrationById = vi.fn();
-const mockUpdateRegistration = vi.fn();
-const mockGetSeriesById = vi.fn();
-const mockSyncSiblingRegistrations = vi.fn();
+const mockGetRegistrationById = vi.fn()
+const mockUpdateRegistration = vi.fn()
+const mockGetSeriesById = vi.fn()
+const mockSyncSiblingRegistrations = vi.fn()
 
-vi.mock("../../../server/domains/tournament/repository", () => ({
+vi.mock('../../../server/domains/tournament/repository', () => ({
   getRegistrationById: (...args: unknown[]) => mockGetRegistrationById(...args),
   updateRegistration: (...args: unknown[]) => mockUpdateRegistration(...args),
   getSeriesById: (...args: unknown[]) => mockGetSeriesById(...args),
@@ -40,81 +40,99 @@ vi.mock("../../../server/domains/tournament/repository", () => ({
   insertTournament: vi.fn(),
   updateTournament: vi.fn(),
   deleteTournament: vi.fn(),
-  deleteMatchesBySeries: vi.fn(),
-}));
+  deleteMatchesBySeries: vi.fn()
+}))
 
 vi.stubGlobal(
-  "createError",
+  'createError',
   ({ statusCode, message }: { statusCode: number; message: string }) => {
-    const err = new Error(message) as Error & { statusCode: number };
-    err.statusCode = statusCode;
-    return err;
-  },
-);
+    const err = new Error(message) as Error & { statusCode: number }
+    err.statusCode = statusCode
+    return err
+  }
+)
 
-const { updateRegistration } =
-  await import("../../../server/domains/tournament/service");
+const { updateRegistration } = await import(
+  '../../../server/domains/tournament/service'
+)
 
 const baseReg = {
   id: 5,
   seriesId: 1,
-  licenceNumber: "LIC001",
-  firstName: "Jean",
-  lastName: "DUPONT",
-};
+  licenceNumber: 'LIC001',
+  firstName: 'Jean',
+  lastName: 'DUPONT'
+}
 
-const singlesSeries = { id: 1, seriesFormat: "singles" };
-const doublesSeries = { id: 1, seriesFormat: "doubles" };
+const singlesSeries = { id: 1, seriesFormat: 'singles', status: 'registration' }
+const doublesSeries = { id: 1, seriesFormat: 'doubles', status: 'registration' }
 
 beforeEach(() => {
-  vi.clearAllMocks();
-  mockGetRegistrationById.mockResolvedValue(baseReg);
-  mockUpdateRegistration.mockResolvedValue({ ...baseReg });
-  mockGetSeriesById.mockResolvedValue(singlesSeries);
-  mockSyncSiblingRegistrations.mockResolvedValue(undefined);
-});
+  vi.clearAllMocks()
+  mockGetRegistrationById.mockResolvedValue(baseReg)
+  mockUpdateRegistration.mockResolvedValue({ ...baseReg })
+  mockGetSeriesById.mockResolvedValue(singlesSeries)
+  mockSyncSiblingRegistrations.mockResolvedValue(undefined)
+})
 
-describe("updateRegistration — sync isForfeit", () => {
-  it("propage isForfeit=true aux séries sœurs pour une série singles", async () => {
-    await updateRegistration(5, { isForfeit: true });
+describe('updateRegistration — sync isForfeit', () => {
+  it('conserve le forfait dans la série concernée', async () => {
+    await updateRegistration(5, { isForfeit: true })
+    expect(mockSyncSiblingRegistrations).not.toHaveBeenCalled()
+  })
 
-    expect(mockGetSeriesById).toHaveBeenCalledWith(1);
-    expect(mockSyncSiblingRegistrations).toHaveBeenCalledWith(
-      baseReg,
-      expect.objectContaining({ isForfeit: true }),
-    );
-  });
+  it('refuse les changements sportifs quand les poules sont générées', async () => {
+    mockGetSeriesById.mockResolvedValue({
+      ...singlesSeries,
+      status: 'bracket_generated'
+    })
+    await expect(
+      updateRegistration(5, { ranking: 1200 })
+    ).rejects.toMatchObject({ statusCode: 409 })
+    expect(mockUpdateRegistration).not.toHaveBeenCalled()
+  })
 
-  it("ne propage PAS isForfeit pour une série doubles", async () => {
-    mockGetSeriesById.mockResolvedValue(doublesSeries);
+  it('permet le paiement après le démarrage', async () => {
+    mockGetSeriesById.mockResolvedValue({
+      ...singlesSeries,
+      status: 'in_progress'
+    })
+    await updateRegistration(5, { paymentStatus: 'paid' })
+    expect(mockUpdateRegistration).toHaveBeenCalledWith(5, {
+      paymentStatus: 'paid'
+    })
+  })
 
-    await updateRegistration(5, { isForfeit: true });
+  it('ne propage PAS isForfeit pour une série doubles', async () => {
+    mockGetSeriesById.mockResolvedValue(doublesSeries)
+
+    await updateRegistration(5, { isForfeit: true })
 
     expect(mockSyncSiblingRegistrations).not.toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({ isForfeit: expect.anything() }),
-    );
-  });
+      expect.objectContaining({ isForfeit: expect.anything() })
+    )
+  })
 
-  it("propage attendanceStatus et paymentStatus sans consulter getSeriesById", async () => {
+  it('propage présence et paiement avant la génération', async () => {
     await updateRegistration(5, {
-      attendanceStatus: "present",
-      paymentStatus: "paid",
-    });
+      attendanceStatus: 'present',
+      paymentStatus: 'paid'
+    })
 
-    expect(mockGetSeriesById).not.toHaveBeenCalled();
+    expect(mockGetSeriesById).toHaveBeenCalledWith(1)
     expect(mockSyncSiblingRegistrations).toHaveBeenCalledWith(baseReg, {
-      attendanceStatus: "present",
-      paymentStatus: "paid",
-    });
-  });
+      attendanceStatus: 'present',
+      paymentStatus: 'paid'
+    })
+  })
 
   it("lève 404 si l'inscription n'existe pas", async () => {
-    mockGetRegistrationById.mockResolvedValue(null);
+    mockGetRegistrationById.mockResolvedValue(null)
 
     await expect(
-      updateRegistration(99, { isForfeit: true }),
-    ).rejects.toMatchObject({ statusCode: 404 });
-    expect(mockUpdateRegistration).not.toHaveBeenCalled();
-  });
-});
+      updateRegistration(99, { isForfeit: true })
+    ).rejects.toMatchObject({ statusCode: 404 })
+    expect(mockUpdateRegistration).not.toHaveBeenCalled()
+  })
+})

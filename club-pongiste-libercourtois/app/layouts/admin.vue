@@ -1,7 +1,9 @@
 <template>
   <div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
     <!-- Sidebar -->
-    <aside class="w-64 flex-shrink-0 bg-club-navy text-white flex flex-col">
+    <aside
+      class="hidden lg:flex w-60 flex-shrink-0 bg-club-navy text-white flex-col"
+    >
       <!-- Logo -->
       <div class="p-6 border-b border-white/10">
         <NuxtLink to="/" class="flex items-center gap-2">
@@ -20,7 +22,7 @@
           :class="[
             isActive(item.to)
               ? 'bg-club-green text-white'
-              : 'text-gray-300 hover:bg-white/10 hover:text-white',
+              : 'text-gray-300 hover:bg-white/10 hover:text-white'
           ]"
         >
           <UIcon :name="item.icon" class="w-5 h-5 flex-shrink-0" />
@@ -51,16 +53,41 @@
     <div class="flex-1 flex flex-col min-w-0">
       <!-- Top bar -->
       <header
-        class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between"
+        class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-4 flex items-center justify-between"
       >
-        <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <p class="text-lg font-semibold text-gray-900 dark:text-white">
           {{ pageTitle }}
-        </h1>
-        <div class="flex items-center gap-4" />
+        </p>
+        <div class="flex items-center gap-4">
+          <NuxtLink to="/" class="text-sm text-slate-500 hover:text-slate-900"
+            >Voir le site <span aria-hidden="true">↗</span></NuxtLink
+          >
+          <button class="lg:hidden text-sm text-slate-500" @click="logout">
+            Déconnexion
+          </button>
+        </div>
       </header>
+      <nav
+        class="lg:hidden flex gap-1 overflow-x-auto border-b border-slate-200 bg-white px-3 py-2"
+        aria-label="Administration"
+      >
+        <NuxtLink
+          v-for="item in navItems"
+          :key="item.to"
+          :to="item.to"
+          class="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm"
+          :class="
+            isActive(item.to)
+              ? 'bg-slate-900 text-white'
+              : 'text-slate-600 hover:bg-slate-100'
+          "
+        >
+          <UIcon :name="item.icon" class="size-4" />{{ item.label }}
+        </NuxtLink>
+      </nav>
 
       <!-- Page content -->
-      <main class="flex-1 p-6 overflow-auto">
+      <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
         <slot />
       </main>
     </div>
@@ -68,62 +95,70 @@
 </template>
 
 <script setup lang="ts">
-defineOptions({ name: "AdminLayout" });
+  defineOptions({ name: 'AdminLayout' })
 
-const route = useRoute();
-const { loggedIn, logout: oidcLogout } = useOidcAuth();
+  const route = useRoute()
+  const { loggedIn, logout: oidcLogout } = useOidcAuth()
 
-// Force light mode in admin (back-office doesn't need dark mode)
-const colorMode = useColorMode();
-const previousPreference = ref(colorMode.preference);
-onMounted(() => {
-  previousPreference.value = colorMode.preference;
-  colorMode.preference = "light";
-});
-onUnmounted(() => {
-  colorMode.preference = previousPreference.value;
-});
+  // Force light mode in admin (back-office doesn't need dark mode)
+  const colorMode = useColorMode()
+  const previousPreference = ref(colorMode.preference)
+  onMounted(() => {
+    previousPreference.value = colorMode.preference
+    colorMode.preference = 'light'
+  })
+  onUnmounted(() => {
+    colorMode.preference = previousPreference.value
+  })
 
-async function logout() {
-  if (loggedIn.value) {
-    await oidcLogout();
-  } else {
-    await $fetch("/api/auth/basic-logout", { method: "POST" });
-    await navigateTo("/admin/login");
+  async function logout() {
+    if (loggedIn.value) {
+      await oidcLogout()
+    } else {
+      await $fetch('/api/auth/basic-logout', { method: 'POST' })
+      await navigateTo('/admin/login')
+    }
   }
-}
 
-const navItems = [
-  { to: "/admin", label: "Tableau de bord", icon: "i-heroicons-home" },
-  { to: "/admin/tournois", label: "Tournois", icon: "i-heroicons-trophy" },
-  { to: "/admin/faq", label: "FAQ", icon: "i-heroicons-question-mark-circle" },
-  {
-    to: "/admin/events",
-    label: "Événements",
-    icon: "i-heroicons-calendar-days",
-  },
-  { to: "/admin/schedules", label: "Créneaux", icon: "i-heroicons-clock" },
-  { to: "/admin/pricing", label: "Tarifs", icon: "i-heroicons-currency-euro" },
-  { to: "/admin/sponsors", label: "Sponsors", icon: "i-heroicons-star" },
-  {
-    to: "/admin/team-members",
-    label: "Bureau",
-    icon: "i-heroicons-user-group",
-  },
-  {
-    to: "/admin/config",
-    label: "Configuration",
-    icon: "i-heroicons-cog-6-tooth",
-  },
-];
+  const navItems = [
+    { to: '/admin', label: 'Tableau de bord', icon: 'i-heroicons-home' },
+    { to: '/admin/tournois', label: 'Tournois', icon: 'i-heroicons-trophy' },
+    {
+      to: '/admin/faq',
+      label: 'FAQ',
+      icon: 'i-heroicons-question-mark-circle'
+    },
+    {
+      to: '/admin/events',
+      label: 'Événements',
+      icon: 'i-heroicons-calendar-days'
+    },
+    { to: '/admin/schedules', label: 'Créneaux', icon: 'i-heroicons-clock' },
+    {
+      to: '/admin/pricing',
+      label: 'Tarifs',
+      icon: 'i-heroicons-currency-euro'
+    },
+    { to: '/admin/sponsors', label: 'Sponsors', icon: 'i-heroicons-star' },
+    {
+      to: '/admin/team-members',
+      label: 'Bureau',
+      icon: 'i-heroicons-user-group'
+    },
+    {
+      to: '/admin/config',
+      label: 'Configuration',
+      icon: 'i-heroicons-cog-6-tooth'
+    }
+  ]
 
-const pageTitle = computed(() => {
-  const current = navItems.find((item) => item.to === route.path);
-  return current?.label ?? "Administration";
-});
+  const pageTitle = computed(() => {
+    const current = navItems.find(item => isActive(item.to))
+    return current?.label ?? 'Administration'
+  })
 
-function isActive(to: string): boolean {
-  if (to === "/admin") return route.path === "/admin";
-  return route.path.startsWith(to);
-}
+  function isActive(to: string): boolean {
+    if (to === '/admin') return route.path === '/admin'
+    return route.path.startsWith(to)
+  }
 </script>

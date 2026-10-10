@@ -1,3 +1,14 @@
+## v1.9.0 (2026-10-10)
+
+### Feat
+
+- **tournament**: add integral rankings, referee desk and local demo
+- **db**: reconcile Neon migrations and persist integral rankings
+
+### Fix
+
+- **cache**: use supported Netlify tags for club configuration
+
 ## v1.8.5 (2026-08-31)
 
 ### Fix

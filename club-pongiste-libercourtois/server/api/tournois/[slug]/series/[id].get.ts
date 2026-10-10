@@ -1,7 +1,4 @@
-import { getSeriesWithBracket } from "~~/server/domains/tournament/service";
-
-export default defineEventHandler(async (event) => {
-  const id = Number(getRouterParam(event, "id"));
-  if (!id) throw createError({ statusCode: 400, message: "ID invalide" });
-  return getSeriesWithBracket(id);
-});
+import { getSeriesById } from '~~/server/domains/tournament/repository'
+export default defineEventHandler(async function (event) {
+  return getSeriesById(Number(getRouterParam(event, 'id')))
+})

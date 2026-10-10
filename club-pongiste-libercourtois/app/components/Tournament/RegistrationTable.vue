@@ -1,130 +1,131 @@
 <script setup lang="ts">
-import type {
-  SeriesRegistration,
-  SeriesFormat,
-} from "~~/server/domains/tournament/types";
+  import type {
+    SeriesRegistration,
+    SeriesFormat
+  } from '~~/server/domains/tournament/types'
 
-const props = defineProps<{
-  registrations: SeriesRegistration[];
-  seriesFormat: SeriesFormat;
-  slug: string;
-  seriesId: number;
-  loading?: boolean;
-  apiBase?: string;
-}>();
+  const props = defineProps<{
+    registrations: SeriesRegistration[]
+    seriesFormat: SeriesFormat
+    slug: string
+    seriesId: number
+    loading?: boolean
+    apiBase?: string
+    rosterLocked?: boolean
+  }>()
 
-const base = computed(() => props.apiBase ?? `/api/admin/tournois`);
-const emit = defineEmits<{ refresh: [] }>();
-const toast = useToast();
+  const base = computed(() => props.apiBase ?? `/api/admin/tournois`)
+  const emit = defineEmits<{ refresh: [] }>()
+  const toast = useToast()
 
-// Sort state
-type SortKey = "name" | "club" | "pts" | "presence" | "payment";
-const sortKey = ref<SortKey | null>(null);
-const sortDir = ref<"asc" | "desc">("asc");
+  // Sort state
+  type SortKey = 'name' | 'club' | 'pts' | 'presence' | 'payment'
+  const sortKey = ref<SortKey | null>(null)
+  const sortDir = ref<'asc' | 'desc'>('asc')
 
-function toggleSort(key: SortKey) {
-  if (sortKey.value === key) {
-    sortDir.value = sortDir.value === "asc" ? "desc" : "asc";
-  } else {
-    sortKey.value = key;
-    sortDir.value = "asc";
-  }
-}
-
-const PRESENCE_ORDER: Record<string, number> = {
-  present: 0,
-  unknown: 1,
-  absent: 2,
-};
-const PAYMENT_ORDER: Record<string, number> = {
-  paid: 0,
-  unpaid: 1,
-  refunded: 2,
-};
-
-const sorted = computed(() => {
-  const list = [...props.registrations];
-  if (!sortKey.value) return list;
-  const key = sortKey.value;
-  return list.sort((a, b) => {
-    let va: string | number;
-    let vb: string | number;
-    if (key === "name") {
-      va = `${a.lastName} ${a.firstName}`.toLowerCase();
-      vb = `${b.lastName} ${b.firstName}`.toLowerCase();
-    } else if (key === "club") {
-      va = (a.club ?? "").toLowerCase();
-      vb = (b.club ?? "").toLowerCase();
-    } else if (key === "pts") {
-      va = a.ranking ?? 0;
-      vb = b.ranking ?? 0;
-    } else if (key === "presence") {
-      va = PRESENCE_ORDER[a.attendanceStatus ?? "unknown"] ?? 1;
-      vb = PRESENCE_ORDER[b.attendanceStatus ?? "unknown"] ?? 1;
+  function toggleSort(key: SortKey) {
+    if (sortKey.value === key) {
+      sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
     } else {
-      va = PAYMENT_ORDER[a.paymentStatus ?? "unpaid"] ?? 1;
-      vb = PAYMENT_ORDER[b.paymentStatus ?? "unpaid"] ?? 1;
+      sortKey.value = key
+      sortDir.value = 'asc'
     }
-    const cmp = va < vb ? -1 : va > vb ? 1 : 0;
-    return sortDir.value === "asc" ? cmp : -cmp;
-  });
-});
-
-async function patch(regId: number, body: Partial<SeriesRegistration>) {
-  try {
-    await $fetch(
-      `${base.value}/${props.slug}/series/${props.seriesId}/registrations/${regId}`,
-      { method: "PATCH", body },
-    );
-    emit("refresh");
-  } catch {
-    toast.add({ title: "Erreur de mise à jour", color: "error" });
   }
-}
 
-async function remove(regId: number) {
-  try {
-    await $fetch(
-      `${base.value}/${props.slug}/series/${props.seriesId}/registrations/${regId}`,
-      { method: "DELETE" },
-    );
-    emit("refresh");
-    toast.add({ title: "Inscription supprimée", color: "success" });
-  } catch {
-    toast.add({ title: "Erreur de suppression", color: "error" });
+  const PRESENCE_ORDER: Record<string, number> = {
+    present: 0,
+    unknown: 1,
+    absent: 2
   }
-}
-
-function playerName(r: SeriesRegistration): string {
-  let name = `${r.firstName} ${r.lastName}`;
-  if (props.seriesFormat === "doubles" && r.partnerFirstName) {
-    name += ` / ${r.partnerFirstName} ${r.partnerLastName}`;
+  const PAYMENT_ORDER: Record<string, number> = {
+    paid: 0,
+    unpaid: 1,
+    refunded: 2
   }
-  return name;
-}
 
-function pointsDisplay(r: SeriesRegistration): string {
-  if (props.seriesFormat !== "doubles")
-    return r.ranking != null ? String(r.ranking) : "—";
-  if (r.ranking == null && r.partnerRanking == null) return "—";
-  return String((r.ranking ?? 0) + (r.partnerRanking ?? 0));
-}
+  const sorted = computed(() => {
+    const list = [...props.registrations]
+    if (!sortKey.value) return list
+    const key = sortKey.value
+    return list.sort((a, b) => {
+      let va: string | number
+      let vb: string | number
+      if (key === 'name') {
+        va = `${a.lastName} ${a.firstName}`.toLowerCase()
+        vb = `${b.lastName} ${b.firstName}`.toLowerCase()
+      } else if (key === 'club') {
+        va = (a.club ?? '').toLowerCase()
+        vb = (b.club ?? '').toLowerCase()
+      } else if (key === 'pts') {
+        va = a.ranking ?? 0
+        vb = b.ranking ?? 0
+      } else if (key === 'presence') {
+        va = PRESENCE_ORDER[a.attendanceStatus ?? 'unknown'] ?? 1
+        vb = PRESENCE_ORDER[b.attendanceStatus ?? 'unknown'] ?? 1
+      } else {
+        va = PAYMENT_ORDER[a.paymentStatus ?? 'unpaid'] ?? 1
+        vb = PAYMENT_ORDER[b.paymentStatus ?? 'unpaid'] ?? 1
+      }
+      const cmp = va < vb ? -1 : va > vb ? 1 : 0
+      return sortDir.value === 'asc' ? cmp : -cmp
+    })
+  })
 
-function clubDisplay(r: SeriesRegistration): string {
-  if (props.seriesFormat !== "doubles") return r.club ?? "—";
-  if (!r.partnerClub || r.club === r.partnerClub) return r.club ?? "—";
-  return `${r.club ?? "?"} / ${r.partnerClub}`;
-}
+  async function patch(regId: number, body: Partial<SeriesRegistration>) {
+    try {
+      await $fetch(
+        `${base.value}/${props.slug}/series/${props.seriesId}/registrations/${regId}`,
+        { method: 'PATCH', body }
+      )
+      emit('refresh')
+    } catch {
+      toast.add({ title: 'Erreur de mise à jour', color: 'error' })
+    }
+  }
 
-function cycleAttendance(r: SeriesRegistration) {
-  const next =
-    r.attendanceStatus === "unknown"
-      ? "present"
-      : r.attendanceStatus === "present"
-        ? "absent"
-        : "unknown";
-  patch(r.id, { attendanceStatus: next });
-}
+  async function remove(regId: number) {
+    try {
+      await $fetch(
+        `${base.value}/${props.slug}/series/${props.seriesId}/registrations/${regId}`,
+        { method: 'DELETE' }
+      )
+      emit('refresh')
+      toast.add({ title: 'Inscription supprimée', color: 'success' })
+    } catch {
+      toast.add({ title: 'Erreur de suppression', color: 'error' })
+    }
+  }
+
+  function playerName(r: SeriesRegistration): string {
+    let name = `${r.firstName} ${r.lastName}`
+    if (props.seriesFormat === 'doubles' && r.partnerFirstName) {
+      name += ` / ${r.partnerFirstName} ${r.partnerLastName}`
+    }
+    return name
+  }
+
+  function pointsDisplay(r: SeriesRegistration): string {
+    if (props.seriesFormat !== 'doubles')
+      return r.ranking != null ? String(r.ranking) : '—'
+    if (r.ranking == null && r.partnerRanking == null) return '—'
+    return String((r.ranking ?? 0) + (r.partnerRanking ?? 0))
+  }
+
+  function clubDisplay(r: SeriesRegistration): string {
+    if (props.seriesFormat !== 'doubles') return r.club ?? '—'
+    if (!r.partnerClub || r.club === r.partnerClub) return r.club ?? '—'
+    return `${r.club ?? '?'} / ${r.partnerClub}`
+  }
+
+  function cycleAttendance(r: SeriesRegistration) {
+    const next =
+      r.attendanceStatus === 'unknown'
+        ? 'present'
+        : r.attendanceStatus === 'present'
+          ? 'absent'
+          : 'unknown'
+    patch(r.id, { attendanceStatus: next })
+  }
 </script>
 
 <template>
@@ -307,6 +308,7 @@ function cycleAttendance(r: SeriesRegistration) {
                       ? 'Absent → cliquer : reset'
                       : 'Inconnu → cliquer : présent'
                 "
+                :disabled="rosterLocked"
                 @click="cycleAttendance(r)"
               />
             </td>
@@ -325,7 +327,7 @@ function cycleAttendance(r: SeriesRegistration) {
                 @click="
                   patch(r.id, {
                     paymentStatus:
-                      r.paymentStatus === 'paid' ? 'unpaid' : 'paid',
+                      r.paymentStatus === 'paid' ? 'unpaid' : 'paid'
                   })
                 "
               />
@@ -334,6 +336,7 @@ function cycleAttendance(r: SeriesRegistration) {
             <td class="px-3 py-2.5 text-center">
               <USwitch
                 :model-value="r.isForfeit"
+                :disabled="rosterLocked"
                 size="xs"
                 @update:model-value="patch(r.id, { isForfeit: $event })"
               />
@@ -346,6 +349,7 @@ function cycleAttendance(r: SeriesRegistration) {
                 color="error"
                 icon="i-heroicons-trash"
                 title="Supprimer"
+                :disabled="rosterLocked"
                 @click="remove(r.id)"
               />
             </td>

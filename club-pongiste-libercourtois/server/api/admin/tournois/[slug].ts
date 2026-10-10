@@ -1,30 +1,31 @@
+import { defineTournamentHandler } from '~~/server/utils/tournament-handler'
 import {
   deleteTournament,
   getTournamentWithSeriesForAdmin,
-  updateTournament,
-} from "~~/server/domains/tournament/service";
-import * as repo from "~~/server/domains/tournament/repository";
+  updateTournament
+} from '~~/server/domains/tournament/service'
+import * as repo from '~~/server/domains/tournament/repository'
 
-export default defineEventHandler(async (event) => {
-  const slug = getRouterParam(event, "slug")!;
+export default defineTournamentHandler(async event => {
+  const slug = getRouterParam(event, 'slug')!
 
-  if (event.method === "GET") {
-    return getTournamentWithSeriesForAdmin(slug);
+  if (event.method === 'GET') {
+    return getTournamentWithSeriesForAdmin(slug)
   }
 
   // PATCH and DELETE need the tournament id
-  const tournament = await repo.getTournamentBySlug(slug);
+  const tournament = await repo.getTournamentBySlug(slug)
   if (!tournament) {
-    throw createError({ statusCode: 404, message: "Tournoi introuvable" });
+    throw createError({ statusCode: 404, message: 'Tournoi introuvable' })
   }
 
-  if (event.method === "PATCH" || event.method === "PUT") {
-    const body = await readBody(event);
-    return updateTournament(tournament.id, body);
+  if (event.method === 'PATCH' || event.method === 'PUT') {
+    const body = await readBody(event)
+    return updateTournament(tournament.id, body)
   }
 
-  if (event.method === "DELETE") {
-    await deleteTournament(tournament.id);
-    return { success: true };
+  if (event.method === 'DELETE') {
+    await deleteTournament(tournament.id)
+    return { success: true }
   }
-});
+})

@@ -1,58 +1,34 @@
 <script setup lang="ts">
-import type {
-  SeriesWithBracket,
-  SeriesRegistration,
-} from "~~/server/domains/tournament/types";
+  import type { SeriesWithBracket } from '~~/server/domains/tournament/types'
 
-const route = useRoute();
-const slug = route.params.slug as string;
-const id = Number(route.params.id);
+  const route = useRoute()
+  const slug = route.params.slug as string
+  const id = Number(route.params.id)
 
-const {
-  data: series,
-  pending,
-  refresh,
-} = await useFetch<SeriesWithBracket>(`/api/tournois/${slug}/series/${id}`);
+  const {
+    data: series,
+    pending,
+    refresh
+  } = await useFetch<SeriesWithBracket>(`/api/tournois/${slug}/series/${id}`)
 
-useSeoMeta({
-  title: computed(() =>
-    series.value ? `${series.value.name} — Tableau` : "Tableau",
-  ),
-});
+  useSeoMeta({
+    title: computed(() =>
+      series.value ? `${series.value.name} — Tableau` : 'Tableau'
+    )
+  })
 
-// Club filter
-const selectedClub = ref<string | null>(null);
+  // Polling every 30s while series is in progress
+  const { pause, resume } = useIntervalFn(() => {
+    if (series.value?.status === 'in_progress') refresh()
+  }, 30000)
 
-// Flatten all registrations from the series
-const allRegistrations = computed<SeriesRegistration[]>(
-  () => series.value?.registrations ?? [],
-);
+  watch(
+    () => series.value?.status,
+    s => (s === 'in_progress' ? resume() : pause()),
+    { immediate: true }
+  )
 
-// ID of registrations matching selected club
-const highlightIds = computed<Set<number>>(() => {
-  if (!selectedClub.value) return new Set();
-  return new Set(
-    allRegistrations.value
-      .filter(
-        (r) =>
-          r.club === selectedClub.value || r.partnerClub === selectedClub.value,
-      )
-      .map((r) => r.id),
-  );
-});
-
-// Polling every 30s while series is in progress
-const { pause, resume } = useIntervalFn(() => {
-  if (series.value?.status === "in_progress") refresh();
-}, 30000);
-
-watch(
-  () => series.value?.status,
-  (s) => (s === "in_progress" ? resume() : pause()),
-  { immediate: true },
-);
-
-onUnmounted(() => pause());
+  onUnmounted(() => pause())
 </script>
 
 <template>
@@ -84,27 +60,16 @@ onUnmounted(() => pause());
           />
         </div>
         <p class="mt-1 text-sm text-gray-500">
-          {{ series.seriesFormat === "doubles" ? "Double" : "Simple" }} · Best
+          {{ series.seriesFormat === 'doubles' ? 'Double' : 'Simple' }} · Best
           of {{ series.setsToWin * 2 - 1 }} ({{ series.pointsPerSet }} pts/set)
         </p>
       </div>
 
-      <!-- Club filter -->
-      <div
-        v-if="allRegistrations.length > 0"
-        class="mb-4 flex items-center gap-2"
-      >
-        <span class="text-sm text-gray-500">Filtrer :</span>
-        <TournamentClubFilter
-          v-model="selectedClub"
-          :registrations="allRegistrations"
-        />
-      </div>
-
-      <!-- Bracket -->
-      <TournamentBracketView
-        :rounds="series.rounds"
-        :highlight="highlightIds.size > 0 ? highlightIds : null"
+      <TournamentIntegralBoard
+        :slug="slug"
+        :series-id="id"
+        api-base="/api/tournois"
+        public-view
       />
     </template>
   </div>

@@ -1,5 +1,6 @@
-import { getAllTournamentsForAdmin } from "~~/server/domains/tournament/service";
+import { defineTournamentHandler } from '~~/server/utils/tournament-handler'
+import { getAllTournamentsForAdmin } from '~~/server/domains/tournament/service'
 
-export default defineEventHandler(async () => {
-  return getAllTournamentsForAdmin();
-});
+export default defineTournamentHandler(async () => {
+  return getAllTournamentsForAdmin()
+})

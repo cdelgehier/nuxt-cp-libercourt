@@ -1,19 +1,20 @@
-import { getUserSession } from "nuxt-oidc-auth/runtime/server/utils/session.js";
+import { getJaAccessById } from '~~/server/domains/tournament/repository'
+import { getUserSession } from 'nuxt-oidc-auth/runtime/server/utils/session.js'
 
 const SESSION_PASSWORD =
-  process.env.SESSION_SECRET ?? "fallback-change-me-in-production";
+  process.env.SESSION_SECRET ?? 'fallback-change-me-in-production'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   // Admin via OIDC
   try {
-    const oidc = await getUserSession(event);
+    const oidc = await getUserSession(event)
     if (oidc && Object.keys(oidc).length > 0) {
       return {
         jaAccessId: null,
-        jaName: "Administrateur",
+        jaName: 'Administrateur',
         tournamentId: null,
-        isAdmin: true,
-      };
+        isAdmin: true
+      }
     }
   } catch {
     /* not OIDC */
@@ -21,14 +22,14 @@ export default defineEventHandler(async (event) => {
 
   // Admin via basic auth
   try {
-    const session = await useSession(event, { password: SESSION_PASSWORD });
+    const session = await useSession(event, { password: SESSION_PASSWORD })
     if (session.data.user) {
       return {
         jaAccessId: null,
         jaName: String(session.data.user),
         tournamentId: null,
-        isAdmin: true,
-      };
+        isAdmin: true
+      }
     }
   } catch {
     /* not basic auth */
@@ -36,18 +37,24 @@ export default defineEventHandler(async (event) => {
 
   // JA session
   try {
-    const session = await useSession(event, { password: SESSION_PASSWORD });
+    const session = await useSession(event, { password: SESSION_PASSWORD })
     if (session.data.jaAccessId) {
+      const access = await getJaAccessById(Number(session.data.jaAccessId))
+      if (
+        !access?.isActive ||
+        access.tournamentId !== session.data.jaTournamentId
+      )
+        throw new Error('Accès JA désactivé')
       return {
         jaAccessId: session.data.jaAccessId as number,
         jaName: session.data.jaName as string,
         tournamentId: session.data.jaTournamentId as number,
-        isAdmin: false,
-      };
+        isAdmin: false
+      }
     }
   } catch {
     /* no session */
   }
 
-  throw createError({ statusCode: 401, message: "Non connecté" });
-});
+  throw createError({ statusCode: 401, message: 'Non connecté' })
+})

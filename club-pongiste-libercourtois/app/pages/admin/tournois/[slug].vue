@@ -1,400 +1,374 @@
 <script setup lang="ts">
-import {
-  updateTournamentInputSchema,
-  type TournamentWithSeries,
-  type TournamentJaAccess,
-  type TournamentSeries,
-  type SeriesRegistration,
-  type SeriesWithBracket,
-} from "~~/server/domains/tournament/types";
+  import {
+    updateTournamentInputSchema,
+    type TournamentWithSeries,
+    type TournamentJaAccess,
+    type TournamentSeries,
+    type SeriesRegistration,
+    type SeriesWithBracket
+  } from '~~/server/domains/tournament/types'
 
-definePageMeta({ layout: "admin", middleware: "admin" });
+  definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-const route = useRoute();
-const slug = route.params.slug as string;
-const toast = useToast();
+  const route = useRoute()
+  const slug = route.params.slug as string
+  const toast = useToast()
 
-const { data: tournament, refresh: refreshTournament } =
-  await useFetch<TournamentWithSeries>(`/api/admin/tournois/${slug}`);
+  const { data: tournament, refresh: refreshTournament } =
+    await useFetch<TournamentWithSeries>(`/api/admin/tournois/${slug}`)
 
-useSeoMeta({
-  title: computed(() =>
-    tournament.value ? `Admin — ${tournament.value.name}` : "Admin — Tournoi",
-  ),
-  robots: "noindex,nofollow",
-});
+  useSeoMeta({
+    title: computed(() =>
+      tournament.value ? `Admin — ${tournament.value.name}` : 'Admin — Tournoi'
+    ),
+    robots: 'noindex,nofollow'
+  })
 
-// ---------------------------------------------------------------------------
-// Tabs
-// ---------------------------------------------------------------------------
-const tabs = [
-  { label: "Général", value: "general" },
-  { label: "Accès JA", value: "ja" },
-  { label: "Séries", value: "series" },
-];
-const activeTab = ref("general");
+  // ---------------------------------------------------------------------------
+  // Tabs
+  // ---------------------------------------------------------------------------
+  const tabs = [
+    { label: 'Général', value: 'general' },
+    { label: 'Accès JA', value: 'ja' },
+    { label: 'Séries', value: 'series' }
+  ]
+  const activeTab = ref('general')
 
-// ---------------------------------------------------------------------------
-// Tab Général — edit tournament
-// ---------------------------------------------------------------------------
-const editForm = reactive({
-  name: "",
-  date: "",
-  dateEnd: "",
-  location: "",
-  locationLat: undefined as number | undefined,
-  locationLng: undefined as number | undefined,
-  description: "",
-  tableCount: 1,
-  isPublished: false,
-});
-const editErrors = reactive<Record<string, string>>({});
-const editSaving = ref(false);
+  // ---------------------------------------------------------------------------
+  // Tab Général — edit tournament
+  // ---------------------------------------------------------------------------
+  const editForm = reactive({
+    name: '',
+    date: '',
+    dateEnd: '',
+    location: '',
+    locationLat: undefined as number | undefined,
+    locationLng: undefined as number | undefined,
+    description: '',
+    tableCount: 1,
+    isPublished: false
+  })
+  const editErrors = reactive<Record<string, string>>({})
+  const editSaving = ref(false)
 
-watch(
-  () => tournament.value,
-  (t) => {
-    if (!t) return;
-    Object.assign(editForm, {
-      name: t.name,
-      date: t.date,
-      dateEnd: t.dateEnd ?? "",
-      location: t.location ?? "",
-      locationLat: t.locationLat ?? undefined,
-      locationLng: t.locationLng ?? undefined,
-      description: t.description ?? "",
-      tableCount: t.tableCount,
-      isPublished: t.isPublished,
-    });
-  },
-  { immediate: true },
-);
+  watch(
+    () => tournament.value,
+    t => {
+      if (!t) return
+      Object.assign(editForm, {
+        name: t.name,
+        date: t.date,
+        dateEnd: t.dateEnd ?? '',
+        location: t.location ?? '',
+        locationLat: t.locationLat ?? undefined,
+        locationLng: t.locationLng ?? undefined,
+        description: t.description ?? '',
+        tableCount: t.tableCount,
+        isPublished: t.isPublished
+      })
+    },
+    { immediate: true }
+  )
 
-const editSchema = updateTournamentInputSchema;
+  const editSchema = updateTournamentInputSchema
 
-async function saveGeneral() {
-  const result = editSchema.safeParse(editForm);
-  if (!result.success) {
-    result.error.issues.forEach((i) => {
-      editErrors[String(i.path[0])] = i.message;
-    });
-    return;
-  }
-  Object.keys(editErrors).forEach((k) => Reflect.deleteProperty(editErrors, k));
-  editSaving.value = true;
-  try {
-    await $fetch(`/api/admin/tournois/${slug}`, {
-      method: "PATCH",
-      body: editForm,
-    });
-    toast.add({ title: "Tournoi mis à jour", color: "success" });
-    await refreshTournament();
-  } catch {
-    toast.add({ title: "Erreur", color: "error" });
-  } finally {
-    editSaving.value = false;
-  }
-}
-
-async function deleteTournament() {
-  if (!confirm("Supprimer ce tournoi ? Cette action est irréversible.")) return;
-  try {
-    await $fetch(`/api/admin/tournois/${slug}`, { method: "DELETE" });
-    await navigateTo("/admin/tournois");
-  } catch {
-    toast.add({ title: "Erreur de suppression", color: "error" });
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Tab JA Access
-// ---------------------------------------------------------------------------
-const { data: jaAccesses, refresh: refreshJa } = await useFetch<
-  TournamentJaAccess[]
->(`/api/admin/tournois/${slug}/ja-access`);
-
-// ---------------------------------------------------------------------------
-// Tab Séries
-// ---------------------------------------------------------------------------
-const selectedSeriesId = ref<number | null>(null);
-const seriesTab = ref<"registrations" | "bracket">("registrations");
-const seriesDetail = ref<SeriesWithBracket | null>(null);
-const loadingSeriesDetail = ref(false);
-const registrations = ref<SeriesRegistration[]>([]);
-
-async function loadSeriesDetail(id: number) {
-  loadingSeriesDetail.value = true;
-  try {
-    seriesDetail.value = await $fetch<SeriesWithBracket>(
-      `/api/admin/tournois/${slug}/series/${id}`,
-    );
-    registrations.value = await $fetch<SeriesRegistration[]>(
-      `/api/admin/tournois/${slug}/series/${id}/registrations`,
-    );
-  } finally {
-    loadingSeriesDetail.value = false;
-  }
-}
-
-watch(selectedSeriesId, (id) => {
-  if (id) loadSeriesDetail(id);
-});
-watch(
-  () => tournament.value?.series,
-  (list) => {
-    if (list && list.length > 0 && !selectedSeriesId.value) {
-      selectedSeriesId.value = list[0]!.id;
+  async function saveGeneral() {
+    const result = editSchema.safeParse(editForm)
+    if (!result.success) {
+      result.error.issues.forEach(i => {
+        editErrors[String(i.path[0])] = i.message
+      })
+      return
     }
-  },
-  { immediate: true },
-);
-
-// Edit series modal
-const editSeriesModalOpen = ref(false);
-const editSeriesSaving = ref(false);
-const editSeriesForm = reactive({
-  name: "",
-  seriesFormat: "singles" as "singles" | "doubles",
-  seriesType: "standard" as string,
-  ageCategories: [] as string[],
-  femalesOnly: false,
-  pointsLimitMin: undefined as number | undefined,
-  pointsLimitMax: undefined as number | undefined,
-  maxPlayers: undefined as number | undefined,
-  setsToWin: 3,
-  pointsPerSet: 11,
-  seriesDate: "",
-  startTime: "",
-});
-
-function openEditSeries() {
-  const s = currentSeries.value;
-  if (!s) return;
-  Object.assign(editSeriesForm, {
-    name: s.name,
-    seriesFormat: s.seriesFormat,
-    seriesType: s.seriesType,
-    ageCategories: [...(s.ageCategories ?? [])],
-    femalesOnly: s.femalesOnly,
-    pointsLimitMin: s.pointsLimitMin ?? undefined,
-    pointsLimitMax: s.pointsLimitMax ?? undefined,
-    maxPlayers: s.maxPlayers ?? undefined,
-    setsToWin: s.setsToWin,
-    pointsPerSet: s.pointsPerSet,
-    seriesDate: s.seriesDate ?? "",
-    startTime: s.startTime ?? "",
-  });
-  editSeriesModalOpen.value = true;
-}
-
-async function saveEditSeries() {
-  if (!selectedSeriesId.value) return;
-  editSeriesSaving.value = true;
-  try {
-    await $fetch(
-      `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}`,
-      {
-        method: "PATCH",
-        body: editSeriesForm,
-      },
-    );
-    toast.add({ title: "Série mise à jour", color: "success" });
-    await refreshTournament();
-    editSeriesModalOpen.value = false;
-  } catch (e: unknown) {
-    const raw = (e as { data?: { message?: string } })?.data?.message;
-    const msg =
-      raw && raw.startsWith("[") ? "Vérifiez les champs" : (raw ?? "Erreur");
-    toast.add({ title: msg, color: "error" });
-  } finally {
-    editSeriesSaving.value = false;
+    Object.keys(editErrors).forEach(k => Reflect.deleteProperty(editErrors, k))
+    editSaving.value = true
+    try {
+      await $fetch(`/api/admin/tournois/${slug}`, {
+        method: 'PATCH',
+        body: editForm
+      })
+      toast.add({ title: 'Tournoi mis à jour', color: 'success' })
+      await refreshTournament()
+    } catch {
+      toast.add({ title: 'Erreur', color: 'error' })
+    } finally {
+      editSaving.value = false
+    }
   }
-}
 
-// Create series modal
-const seriesModalOpen = ref(false);
-const seriesSaving = ref(false);
-const seriesForm = reactive({
-  name: "",
-  seriesFormat: "singles" as "singles" | "doubles",
-  seriesType: "standard" as string,
-  ageCategories: [] as string[],
-  femalesOnly: false,
-  pointsLimitMin: undefined as number | undefined,
-  pointsLimitMax: undefined as number | undefined,
-  maxPlayers: undefined as number | undefined,
-  setsToWin: 3,
-  pointsPerSet: 11,
-  seriesDate: "",
-  startTime: "",
-});
-async function createSeries() {
-  if (!seriesForm.name || seriesForm.name.trim().length < 2) {
-    toast.add({
-      title: "Le nom de la série est requis (2 caractères minimum)",
-      color: "error",
-    });
-    return;
+  async function deleteTournament() {
+    if (!confirm('Supprimer ce tournoi ? Cette action est irréversible.'))
+      return
+    try {
+      await $fetch(`/api/admin/tournois/${slug}`, { method: 'DELETE' })
+      await navigateTo('/admin/tournois')
+    } catch {
+      toast.add({ title: 'Erreur de suppression', color: 'error' })
+    }
   }
-  seriesSaving.value = true;
-  try {
-    await $fetch(`/api/admin/tournois/${slug}/series`, {
-      method: "POST",
-      body: seriesForm,
-    });
-    toast.add({ title: "Série créée", color: "success" });
-    await refreshTournament();
-    seriesModalOpen.value = false;
-  } catch (e: unknown) {
-    const raw = (e as { data?: { message?: string } })?.data?.message;
-    // Zod errors come as JSON array — show a simple message instead
-    const msg =
-      raw && raw.startsWith("[")
-        ? "Vérifiez les champs du formulaire"
-        : (raw ?? "Erreur");
-    toast.add({ title: msg, color: "error" });
-  } finally {
-    seriesSaving.value = false;
-  }
-}
 
-async function generateBracket() {
-  if (!selectedSeriesId.value) return;
-  if (
-    !confirm(
-      'Générer le tableau ?\n\nLes inscriptions seront fermées — utilisez "Annuler le tableau" pour les rouvrir si nécessaire.',
-    )
+  // ---------------------------------------------------------------------------
+  // Tab JA Access
+  // ---------------------------------------------------------------------------
+  const { data: jaAccesses, refresh: refreshJa } = await useFetch<
+    TournamentJaAccess[]
+  >(`/api/admin/tournois/${slug}/ja-access`)
+
+  // ---------------------------------------------------------------------------
+  // Tab Séries
+  // ---------------------------------------------------------------------------
+  const selectedSeriesId = ref<number | null>(null)
+  const seriesTab = ref<'registrations' | 'bracket'>('registrations')
+  const seriesDetail = ref<SeriesWithBracket | null>(null)
+  const loadingSeriesDetail = ref(false)
+  const registrations = ref<SeriesRegistration[]>([])
+
+  async function loadSeriesDetail(id: number) {
+    loadingSeriesDetail.value = true
+    try {
+      seriesDetail.value = await $fetch<SeriesWithBracket>(
+        `/api/admin/tournois/${slug}/series/${id}`
+      )
+      registrations.value = await $fetch<SeriesRegistration[]>(
+        `/api/admin/tournois/${slug}/series/${id}/registrations`
+      )
+    } finally {
+      loadingSeriesDetail.value = false
+    }
+  }
+
+  watch(selectedSeriesId, id => {
+    if (id) loadSeriesDetail(id)
+  })
+  watch(
+    () => tournament.value?.series,
+    list => {
+      if (list && list.length > 0 && !selectedSeriesId.value) {
+        selectedSeriesId.value = list[0]!.id
+      }
+    },
+    { immediate: true }
   )
-    return;
-  try {
-    await $fetch(
-      `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}/bracket/generate`,
-      { method: "POST" },
-    );
-    toast.add({ title: "Tableau généré", color: "success" });
-    await loadSeriesDetail(selectedSeriesId.value);
-    await refreshTournament();
-    seriesTab.value = "bracket";
-  } catch (e: unknown) {
-    const msg =
-      (e as { data?: { message?: string } })?.data?.message ?? "Erreur";
-    toast.add({ title: msg, color: "error" });
-  }
-}
 
-async function regenerateBracket() {
-  if (!selectedSeriesId.value) return;
-  try {
-    await $fetch(
-      `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}/bracket/regenerate`,
-      { method: "POST" },
-    );
-    toast.add({ title: "Tableau régénéré", color: "success" });
-    await loadSeriesDetail(selectedSeriesId.value);
-    await refreshTournament();
-  } catch (e: unknown) {
-    const msg =
-      (e as { data?: { message?: string } })?.data?.message ?? "Erreur";
-    toast.add({ title: msg, color: "error" });
-  }
-}
+  // Edit series modal
+  const editSeriesModalOpen = ref(false)
+  const editSeriesSaving = ref(false)
+  const editSeriesForm = reactive({
+    name: '',
+    seriesFormat: 'singles' as 'singles' | 'doubles',
+    seriesType: 'standard' as string,
+    ageCategories: [] as string[],
+    femalesOnly: false,
+    pointsLimitMin: undefined as number | undefined,
+    pointsLimitMax: undefined as number | undefined,
+    maxPlayers: undefined as number | undefined,
+    setsToWin: 3,
+    pointsPerSet: 11,
+    seriesDate: '',
+    startTime: ''
+  })
 
-async function dropBracket() {
-  if (!selectedSeriesId.value) return;
-  if (!confirm("Supprimer le tableau ? Les inscriptions seront rouvertes."))
-    return;
-  try {
-    await $fetch(
-      `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}/bracket/drop`,
-      { method: "DELETE" },
-    );
-    toast.add({
-      title: "Tableau supprimé — inscriptions rouvertes",
-      color: "success",
-    });
-    await loadSeriesDetail(selectedSeriesId.value);
-    await refreshTournament();
-    seriesTab.value = "registrations";
-  } catch (e: unknown) {
-    const msg =
-      (e as { data?: { message?: string } })?.data?.message ?? "Erreur";
-    toast.add({ title: msg, color: "error" });
-  }
-}
-
-async function startSeries() {
-  if (!selectedSeriesId.value) return;
-  if (!confirm("Démarrer la série ? Les scores pourront être saisis.")) return;
-  try {
-    await $fetch(
-      `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}/start`,
-      { method: "POST" },
-    );
-    toast.add({ title: "Série démarrée", color: "success" });
-    await loadSeriesDetail(selectedSeriesId.value);
-    await refreshTournament();
-  } catch (e: unknown) {
-    const msg =
-      (e as { data?: { message?: string } })?.data?.message ?? "Erreur";
-    toast.add({ title: msg, color: "error" });
-  }
-}
-
-const isDev = import.meta.dev;
-const addRegistrationOpen = ref(false);
-const seeding = ref(false);
-
-async function devSeedSeries(count = 30) {
-  if (!selectedSeriesId.value) return;
-  seeding.value = true;
-  try {
-    const res = await $fetch<{ inserted: number }>("/api/dev/seed-series", {
-      method: "POST",
-      body: { seriesId: selectedSeriesId.value, count },
-    });
-    toast.add({
-      title: `${res.inserted} ${currentSeries.value?.seriesFormat === "doubles" ? "paires fictives ajoutées" : "joueurs fictifs ajoutés"}`,
-      color: "success",
-    });
-    await refreshRegistrations();
-  } catch {
-    toast.add({ title: "Erreur seed", color: "error" });
-  } finally {
-    seeding.value = false;
-  }
-}
-const currentSeries = computed<TournamentSeries | undefined>(() =>
-  tournament.value?.series.find((s) => s.id === selectedSeriesId.value),
-);
-
-async function refreshRegistrations() {
-  if (!selectedSeriesId.value) return;
-  registrations.value = await $fetch<SeriesRegistration[]>(
-    `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}/registrations`,
-  );
-}
-
-async function deleteSeries() {
-  if (!selectedSeriesId.value || !currentSeries.value) return;
-  if (
-    !confirm(
-      `Supprimer la série "${currentSeries.value.name}" ? Toutes les inscriptions et matchs seront supprimés.`,
-    )
+  watch(
+    () => editSeriesForm.seriesType,
+    function (type, old) {
+      if (!editSeriesModalOpen.value || type === old) return
+      if (type === 'speedy') {
+        editSeriesForm.pointsPerSet = 3
+        editSeriesForm.setsToWin = 1
+      }
+    },
+    { flush: 'sync' }
   )
-    return;
-  try {
-    await $fetch(
-      `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}`,
-      { method: "DELETE" },
-    );
-    selectedSeriesId.value = null;
-    await refreshTournament();
-  } catch (e: unknown) {
-    const msg =
-      (e as { data?: { message?: string } })?.data?.message ?? "Erreur";
-    toast.add({ title: msg, color: "error" });
+  function openEditSeries() {
+    const s = currentSeries.value
+    if (!s) return
+    Object.assign(editSeriesForm, {
+      name: s.name,
+      seriesFormat: s.seriesFormat,
+      seriesType: s.seriesType,
+      ageCategories: [...(s.ageCategories ?? [])],
+      femalesOnly: s.femalesOnly,
+      pointsLimitMin: s.pointsLimitMin ?? undefined,
+      pointsLimitMax: s.pointsLimitMax ?? undefined,
+      maxPlayers: s.maxPlayers ?? undefined,
+      setsToWin: s.setsToWin,
+      pointsPerSet: s.pointsPerSet,
+      seriesDate: s.seriesDate ?? '',
+      startTime: s.startTime ?? ''
+    })
+    editSeriesModalOpen.value = true
   }
-}
+
+  async function saveEditSeries() {
+    if (!selectedSeriesId.value) return
+    editSeriesSaving.value = true
+    try {
+      await $fetch(
+        `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}`,
+        {
+          method: 'PATCH',
+          body: editSeriesForm
+        }
+      )
+      toast.add({ title: 'Série mise à jour', color: 'success' })
+      await refreshTournament()
+      editSeriesModalOpen.value = false
+    } catch (e: unknown) {
+      const raw = (e as { data?: { message?: string } })?.data?.message
+      const msg =
+        raw && raw.startsWith('[') ? 'Vérifiez les champs' : (raw ?? 'Erreur')
+      toast.add({ title: msg, color: 'error' })
+    } finally {
+      editSeriesSaving.value = false
+    }
+  }
+
+  // Create series modal
+  const seriesModalOpen = ref(false)
+  const seriesSaving = ref(false)
+  const seriesForm = reactive({
+    name: '',
+    seriesFormat: 'singles' as 'singles' | 'doubles',
+    seriesType: 'standard' as string,
+    ageCategories: [] as string[],
+    femalesOnly: false,
+    pointsLimitMin: undefined as number | undefined,
+    pointsLimitMax: undefined as number | undefined,
+    maxPlayers: undefined as number | undefined,
+    setsToWin: 3,
+    pointsPerSet: 11,
+    seriesDate: '',
+    startTime: ''
+  })
+  async function createSeries() {
+    if (!seriesForm.name || seriesForm.name.trim().length < 2) {
+      toast.add({
+        title: 'Le nom de la série est requis (2 caractères minimum)',
+        color: 'error'
+      })
+      return
+    }
+    seriesSaving.value = true
+    try {
+      await $fetch(`/api/admin/tournois/${slug}/series`, {
+        method: 'POST',
+        body: seriesForm
+      })
+      toast.add({ title: 'Série créée', color: 'success' })
+      await refreshTournament()
+      seriesModalOpen.value = false
+    } catch (e: unknown) {
+      const raw = (e as { data?: { message?: string } })?.data?.message
+      // Zod errors come as JSON array — show a simple message instead
+      const msg =
+        raw && raw.startsWith('[')
+          ? 'Vérifiez les champs du formulaire'
+          : (raw ?? 'Erreur')
+      toast.add({ title: msg, color: 'error' })
+    } finally {
+      seriesSaving.value = false
+    }
+  }
+
+  watch(
+    () => seriesForm.seriesType,
+    function (type) {
+      if (type === 'speedy') {
+        seriesForm.pointsPerSet = 3
+        seriesForm.setsToWin = 1
+      }
+    }
+  )
+  async function generateBracket() {
+    if (!selectedSeriesId.value) return
+    if (
+      !confirm(
+        'Générer les poules ?\n\nLes inscriptions seront fermées — utilisez "Annuler les poules" pour les rouvrir si nécessaire.'
+      )
+    )
+      return
+    try {
+      const current = await $fetch<{ version: number }>(
+        `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}/integral`
+      )
+      await $fetch(
+        `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}/integral`,
+        {
+          method: 'POST',
+          body: { action: 'generate', version: current.version }
+        }
+      )
+      toast.add({ title: 'Poules générées', color: 'success' })
+      await loadSeriesDetail(selectedSeriesId.value)
+      await refreshTournament()
+      seriesTab.value = 'bracket'
+    } catch (e: unknown) {
+      const msg =
+        (e as { data?: { message?: string } })?.data?.message ?? 'Erreur'
+      toast.add({ title: msg, color: 'error' })
+    }
+  }
+
+  const isDev = import.meta.dev
+  const addRegistrationOpen = ref(false)
+  const seeding = ref(false)
+
+  async function devSeedSeries(count = 30) {
+    if (!selectedSeriesId.value) return
+    seeding.value = true
+    try {
+      const res = await $fetch<{ inserted: number }>('/api/dev/seed-series', {
+        method: 'POST',
+        body: { seriesId: selectedSeriesId.value, count }
+      })
+      toast.add({
+        title: `${res.inserted} ${currentSeries.value?.seriesFormat === 'doubles' ? 'paires fictives ajoutées' : 'joueurs fictifs ajoutés'}`,
+        color: 'success'
+      })
+      await refreshRegistrations()
+    } catch {
+      toast.add({ title: 'Erreur seed', color: 'error' })
+    } finally {
+      seeding.value = false
+    }
+  }
+  const currentSeries = computed<TournamentSeries | undefined>(() =>
+    tournament.value?.series.find(s => s.id === selectedSeriesId.value)
+  )
+
+  async function refreshSeriesState(): Promise<void> {
+    await refreshTournament()
+    await refreshRegistrations()
+  }
+
+  async function refreshRegistrations() {
+    if (!selectedSeriesId.value) return
+    registrations.value = await $fetch<SeriesRegistration[]>(
+      `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}/registrations`
+    )
+  }
+
+  async function deleteSeries() {
+    if (!selectedSeriesId.value || !currentSeries.value) return
+    if (
+      !confirm(
+        `Supprimer la série "${currentSeries.value.name}" ? Toutes les inscriptions et matchs seront supprimés.`
+      )
+    )
+      return
+    try {
+      await $fetch(
+        `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}`,
+        { method: 'DELETE' }
+      )
+      selectedSeriesId.value = null
+      await refreshTournament()
+    } catch (e: unknown) {
+      const msg =
+        (e as { data?: { message?: string } })?.data?.message ?? 'Erreur'
+      toast.add({ title: msg, color: 'error' })
+    }
+  }
 </script>
 
 <template>
@@ -508,7 +482,7 @@ async function deleteSeries() {
             </UBadge>
             <span class="text-sm text-gray-500">
               {{ registrations.length }} inscrit{{
-                registrations.length > 1 ? "s" : ""
+                registrations.length > 1 ? 's' : ''
               }}
             </span>
           </div>
@@ -574,10 +548,11 @@ async function deleteSeries() {
                 icon="i-heroicons-table-cells"
                 @click="generateBracket"
               >
-                Générer le tableau
+                Générer les poules
               </UButton>
             </div>
             <UButton
+              v-if="['draft', 'registration'].includes(currentSeries.status)"
               size="sm"
               variant="outline"
               icon="i-heroicons-user-plus"
@@ -596,13 +571,17 @@ async function deleteSeries() {
             >
               [DEV] +30
               {{
-                currentSeries?.seriesFormat === "doubles"
-                  ? "doubles"
-                  : "joueurs"
+                currentSeries?.seriesFormat === 'doubles'
+                  ? 'doubles'
+                  : 'joueurs'
               }}
             </UButton>
           </div>
           <TournamentRegistrationTable
+            :roster-locked="
+              !!currentSeries &&
+              !['draft', 'registration'].includes(currentSeries.status)
+            "
             :registrations="registrations"
             :series-format="currentSeries.seriesFormat"
             :slug="slug"
@@ -613,41 +592,13 @@ async function deleteSeries() {
 
         <!-- Bracket sub-tab -->
         <div v-if="seriesTab === 'bracket'" class="space-y-3">
-          <div class="flex gap-2 flex-wrap">
-            <UButton
-              v-if="currentSeries.status === 'bracket_generated'"
-              size="sm"
-              variant="outline"
-              @click="regenerateBracket"
-            >
-              Régénérer
-            </UButton>
-            <UButton
-              v-if="currentSeries.status === 'bracket_generated'"
-              size="sm"
-              color="red"
-              variant="outline"
-              icon="i-heroicons-trash"
-              @click="dropBracket"
-            >
-              Annuler le tableau
-            </UButton>
-            <UButton
-              v-if="currentSeries.status === 'bracket_generated'"
-              size="sm"
-              @click="startSeries"
-            >
-              Démarrer la série
-            </UButton>
-          </div>
-          <TournamentBracketEditor
-            v-if="currentSeries.status === 'bracket_generated'"
-            :rounds="seriesDetail.rounds"
-            :series-id="currentSeries.id"
+          <TournamentIntegralBoard
+            :key="currentSeries.id"
             :slug="slug"
-            @refresh="loadSeriesDetail(currentSeries.id)"
+            :series-id="currentSeries.id"
+            api-base="/api/admin/tournois"
+            @refresh="refreshSeriesState"
           />
-          <TournamentBracketView v-else :rounds="seriesDetail.rounds" />
         </div>
       </template>
     </div>
@@ -677,7 +628,7 @@ async function deleteSeries() {
                 v-model="editSeriesForm.seriesFormat"
                 :items="[
                   { label: 'Simple', value: 'singles' },
-                  { label: 'Double', value: 'doubles' },
+                  { label: 'Double', value: 'doubles' }
                 ]"
               />
             </UFormField>
@@ -689,8 +640,7 @@ async function deleteSeries() {
                   { label: 'Speedy', value: 'speedy' },
                   { label: 'Handicap', value: 'handicap' },
                   { label: 'Pts limités', value: 'points_limit' },
-                  { label: 'Double mixte', value: 'mixed_doubles' },
-                  { label: 'Coupe Davis', value: 'coupe_davis' },
+                  { label: 'Double mixte', value: 'mixed_doubles' }
                 ]"
               />
             </UFormField>
@@ -708,7 +658,7 @@ async function deleteSeries() {
                   { value: 'cadets', label: 'Cadets' },
                   { value: 'juniors', label: 'Juniors' },
                   { value: 'veterans', label: 'Vétérans' },
-                  { value: 'super_veterans', label: 'Super Vétérans' },
+                  { value: 'super_veterans', label: 'Super Vétérans' }
                 ]"
                 :key="cat.value"
                 class="flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm cursor-pointer select-none transition-colors"
@@ -727,7 +677,7 @@ async function deleteSeries() {
                     editSeriesForm.ageCategories.includes(cat.value)
                       ? editSeriesForm.ageCategories.splice(
                           editSeriesForm.ageCategories.indexOf(cat.value),
-                          1,
+                          1
                         )
                       : editSeriesForm.ageCategories.push(cat.value)
                   "
@@ -763,10 +713,7 @@ async function deleteSeries() {
               />
             </UFormField>
           </div>
-          <div
-            v-if="editSeriesForm.seriesType !== 'speedy'"
-            class="grid grid-cols-2 gap-3"
-          >
+          <div class="grid grid-cols-2 gap-3">
             <UFormField label="Sets à gagner">
               <UInput
                 v-model.number="editSeriesForm.setsToWin"
@@ -828,7 +775,7 @@ async function deleteSeries() {
                 v-model="seriesForm.seriesFormat"
                 :items="[
                   { label: 'Simple', value: 'singles' },
-                  { label: 'Double', value: 'doubles' },
+                  { label: 'Double', value: 'doubles' }
                 ]"
               />
             </UFormField>
@@ -840,8 +787,7 @@ async function deleteSeries() {
                   { label: 'Speedy', value: 'speedy' },
                   { label: 'Handicap', value: 'handicap' },
                   { label: 'Pts limités', value: 'points_limit' },
-                  { label: 'Double mixte', value: 'mixed_doubles' },
-                  { label: 'Coupe Davis', value: 'coupe_davis' },
+                  { label: 'Double mixte', value: 'mixed_doubles' }
                 ]"
               />
             </UFormField>
@@ -860,7 +806,7 @@ async function deleteSeries() {
                   { value: 'cadets', label: 'Cadets' },
                   { value: 'juniors', label: 'Juniors' },
                   { value: 'veterans', label: 'Vétérans' },
-                  { value: 'super_veterans', label: 'Super Vétérans' },
+                  { value: 'super_veterans', label: 'Super Vétérans' }
                 ]"
                 :key="cat.value"
                 class="flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm cursor-pointer select-none transition-colors"
@@ -879,7 +825,7 @@ async function deleteSeries() {
                     seriesForm.ageCategories.includes(cat.value)
                       ? seriesForm.ageCategories.splice(
                           seriesForm.ageCategories.indexOf(cat.value),
-                          1,
+                          1
                         )
                       : seriesForm.ageCategories.push(cat.value)
                   "
@@ -915,10 +861,7 @@ async function deleteSeries() {
               />
             </UFormField>
           </div>
-          <div
-            v-if="seriesForm.seriesType !== 'speedy'"
-            class="grid grid-cols-2 gap-3"
-          >
+          <div class="grid grid-cols-2 gap-3">
             <UFormField label="Sets à gagner">
               <UInput
                 v-model.number="seriesForm.setsToWin"

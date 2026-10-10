@@ -1,7 +1,7 @@
-import { generateBracket } from "~~/server/domains/tournament/service";
-
-export default defineEventHandler(async (event) => {
-  const id = Number(getRouterParam(event, "id"));
-  if (!id) throw createError({ statusCode: 400, message: "ID invalide" });
-  return generateBracket(id);
-});
+export default defineEventHandler(function () {
+  throw createError({
+    statusCode: 409,
+    message:
+      'Utilisez le poste du tournoi intégral (poules, barrages, classement).'
+  })
+})

@@ -2,6 +2,7 @@ import { and, asc, count, eq, inArray, ne } from 'drizzle-orm'
 import { tournamentStore as db } from '../../db/tournament-client'
 import {
   bracketMatches,
+  integralSeries,
   matchSets,
   seriesRegistrations,
   tournamentJaAccess,
@@ -65,6 +66,18 @@ export async function updateTournament(
 }
 
 export async function deleteTournament(id: number) {
+  // Remove match references before cascading through the registrations.
+  await db
+    .delete(integralSeries)
+    .where(
+      inArray(
+        integralSeries.seriesId,
+        db
+          .select({ id: tournamentSeries.id })
+          .from(tournamentSeries)
+          .where(eq(tournamentSeries.tournamentId, id))
+      )
+    )
   await db.delete(tournaments).where(eq(tournaments.id, id))
 }
 
@@ -164,6 +177,7 @@ export async function updateSeries(
 }
 
 export async function deleteSeries(id: number) {
+  await db.delete(integralSeries).where(eq(integralSeries.seriesId, id))
   await db.delete(tournamentSeries).where(eq(tournamentSeries.id, id))
 }
 

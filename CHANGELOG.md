@@ -1,3 +1,13 @@
+## v1.10.0 (2026-10-10)
+
+### Feat
+
+- **tournament**: modernize registration desk and restore local demo fill
+
+### Fix
+
+- **tournament**: clear integral matches before deleting tournaments
+
 ## v1.9.0 (2026-10-10)
 
 ### Feat

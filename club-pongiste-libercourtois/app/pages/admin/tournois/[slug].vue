@@ -28,11 +28,11 @@
   // Tabs
   // ---------------------------------------------------------------------------
   const tabs = [
-    { label: 'Général', value: 'general' },
-    { label: 'Accès JA', value: 'ja' },
-    { label: 'Séries', value: 'series' }
+    { label: 'Général', value: 'general', icon: 'i-heroicons-cog-6-tooth' },
+    { label: 'Accès JA', value: 'ja', icon: 'i-heroicons-key' },
+    { label: 'Séries', value: 'series', icon: 'i-heroicons-squares-2x2' }
   ]
-  const activeTab = ref('general')
+  const activeTab = ref('series')
 
   // ---------------------------------------------------------------------------
   // Tab Général — edit tournament
@@ -126,18 +126,30 @@
   async function loadSeriesDetail(id: number) {
     loadingSeriesDetail.value = true
     try {
-      seriesDetail.value = await $fetch<SeriesWithBracket>(
+      const detail = await $fetch<SeriesWithBracket>(
         `/api/admin/tournois/${slug}/series/${id}`
       )
-      registrations.value = await $fetch<SeriesRegistration[]>(
+      const entries = await $fetch<SeriesRegistration[]>(
         `/api/admin/tournois/${slug}/series/${id}/registrations`
       )
+      if (selectedSeriesId.value !== id) return
+      seriesDetail.value = detail
+      registrations.value = entries
+    } catch {
+      if (selectedSeriesId.value === id)
+        toast.add({
+          title: 'Chargement de la série impossible',
+          color: 'error'
+        })
     } finally {
-      loadingSeriesDetail.value = false
+      if (selectedSeriesId.value === id) loadingSeriesDetail.value = false
     }
   }
 
   watch(selectedSeriesId, id => {
+    seriesTab.value = 'registrations'
+    seriesDetail.value = null
+    registrations.value = []
     if (id) loadSeriesDetail(id)
   })
   watch(
@@ -149,6 +161,14 @@
     },
     { immediate: true }
   )
+
+  const activeParticipantCount = computed(function () {
+    return registrations.value.filter(function (registration) {
+      return (
+        registration.attendanceStatus === 'present' && !registration.isForfeit
+      )
+    }).length
+  })
 
   // Edit series modal
   const editSeriesModalOpen = ref(false)
@@ -250,12 +270,16 @@
     }
     seriesSaving.value = true
     try {
-      await $fetch(`/api/admin/tournois/${slug}/series`, {
-        method: 'POST',
-        body: seriesForm
-      })
+      const created = await $fetch<TournamentSeries>(
+        `/api/admin/tournois/${slug}/series`,
+        {
+          method: 'POST',
+          body: seriesForm
+        }
+      )
       toast.add({ title: 'Série créée', color: 'success' })
       await refreshTournament()
+      selectedSeriesId.value = created.id
       seriesModalOpen.value = false
     } catch (e: unknown) {
       const raw = (e as { data?: { message?: string } })?.data?.message
@@ -312,22 +336,27 @@
   const isDev = import.meta.dev
   const addRegistrationOpen = ref(false)
   const seeding = ref(false)
+  const demoCount = ref(24)
 
-  async function devSeedSeries(count = 30) {
+  async function devSeedSeries(count = 24) {
     if (!selectedSeriesId.value) return
     seeding.value = true
     try {
-      const res = await $fetch<{ inserted: number }>('/api/dev/seed-series', {
-        method: 'POST',
-        body: { seriesId: selectedSeriesId.value, count }
-      })
+      const res = await $fetch<{ inserted: number }>(
+        `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}/demo`,
+        {
+          method: 'POST',
+          body: { count }
+        }
+      )
       toast.add({
         title: `${res.inserted} ${currentSeries.value?.seriesFormat === 'doubles' ? 'paires fictives ajoutées' : 'joueurs fictifs ajoutés'}`,
         color: 'success'
       })
-      await refreshRegistrations()
-    } catch {
-      toast.add({ title: 'Erreur seed', color: 'error' })
+      await refreshSeriesState()
+    } catch (error: unknown) {
+      const message = (error as { data?: { message?: string } })?.data?.message
+      toast.add({ title: message ?? 'Remplissage impossible', color: 'error' })
     } finally {
       seeding.value = false
     }
@@ -342,10 +371,12 @@
   }
 
   async function refreshRegistrations() {
-    if (!selectedSeriesId.value) return
-    registrations.value = await $fetch<SeriesRegistration[]>(
-      `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}/registrations`
+    const id = selectedSeriesId.value
+    if (!id) return
+    const entries = await $fetch<SeriesRegistration[]>(
+      `/api/admin/tournois/${slug}/series/${id}/registrations`
     )
+    if (selectedSeriesId.value === id) registrations.value = entries
   }
 
   async function deleteSeries() {
@@ -372,63 +403,113 @@
 </script>
 
 <template>
-  <div v-if="tournament" class="space-y-6">
-    <!-- Header -->
-    <div class="flex items-start justify-between flex-wrap gap-3">
-      <div>
-        <NuxtLink
-          to="/admin/tournois"
-          class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-1"
-        >
-          <UIcon name="i-heroicons-arrow-left" class="w-4 h-4" />
-          Tous les tournois
-        </NuxtLink>
-        <h1 class="text-2xl font-bold">{{ tournament.name }}</h1>
-      </div>
-      <NuxtLink :to="`/tournois/${slug}/ja`" target="_blank">
-        <UButton
-          variant="outline"
-          color="neutral"
-          size="sm"
-          icon="i-heroicons-clipboard-document-check"
-        >
-          Interface JA
-        </UButton>
+  <div v-if="tournament" class="mx-auto max-w-7xl space-y-6">
+    <section
+      class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7 shadow-sm"
+    >
+      <NuxtLink
+        to="/admin/tournois"
+        class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900"
+      >
+        <UIcon name="i-heroicons-arrow-left" class="size-4" /> Tous les tournois
       </NuxtLink>
-    </div>
-
-    <!-- Tabs -->
-    <UTabs v-model="activeTab" :items="tabs" color="neutral" />
+      <div class="mt-4 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-3">
+            <h1
+              class="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900"
+            >
+              {{ tournament.name }}
+            </h1>
+            <UBadge
+              :color="tournament.isPublished ? 'success' : 'neutral'"
+              variant="subtle"
+              >{{ tournament.isPublished ? 'Publié' : 'Brouillon' }}</UBadge
+            >
+          </div>
+          <div
+            class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-500"
+          >
+            <span class="inline-flex items-center gap-1.5"
+              ><UIcon name="i-heroicons-calendar-days" class="size-4" />{{
+                formatDateRange(tournament.date, tournament.dateEnd)
+              }}</span
+            >
+            <span class="inline-flex items-center gap-1.5"
+              ><UIcon name="i-heroicons-table-cells" class="size-4" />{{
+                tournament.tableCount
+              }}
+              tables</span
+            >
+            <span class="inline-flex items-center gap-1.5"
+              ><UIcon name="i-heroicons-squares-2x2" class="size-4" />{{
+                tournament.series.length
+              }}
+              séries</span
+            >
+          </div>
+        </div>
+        <UButton
+          :to="`/tournois/${slug}/ja`"
+          target="_blank"
+          color="neutral"
+          variant="outline"
+          icon="i-heroicons-arrow-top-right-on-square"
+          >Ouvrir le poste JA</UButton
+        >
+      </div>
+    </section>
+    <UTabs
+      v-model="activeTab"
+      :items="tabs"
+      :content="false"
+      variant="link"
+      color="neutral"
+      :ui="{
+        list: 'w-full justify-start border-b border-slate-200',
+        trigger: 'flex-none px-4 py-3',
+        indicator: 'bg-club-green'
+      }"
+    />
 
     <!-- Tab: Général -->
-    <div v-if="activeTab === 'general'" class="space-y-4 max-w-lg">
+    <div
+      v-if="activeTab === 'general'"
+      class="grid grid-cols-1 gap-5 rounded-2xl border border-slate-200 bg-white p-6 sm:grid-cols-2 max-w-3xl"
+    >
       <UFormField label="Nom" :error="editErrors.name" required>
-        <UInput v-model="editForm.name" />
+        <UInput v-model="editForm.name" class="w-full" />
       </UFormField>
       <UFormField label="Date de début" :error="editErrors.date" required>
-        <UInput v-model="editForm.date" type="date" />
+        <UInput v-model="editForm.date" class="w-full" type="date" />
       </UFormField>
       <UFormField label="Date de fin (multi-jours)" :error="editErrors.dateEnd">
-        <UInput v-model="editForm.dateEnd" type="date" :min="editForm.date" />
+        <UInput
+          v-model="editForm.dateEnd"
+          class="w-full"
+          type="date"
+          :min="editForm.date"
+        />
       </UFormField>
       <UFormField label="Lieu">
-        <UInput v-model="editForm.location" />
+        <UInput v-model="editForm.location" class="w-full" />
       </UFormField>
       <UFormField label="Nombre de tables" :error="editErrors.tableCount">
         <UInput
           v-model.number="editForm.tableCount"
+          class="w-full"
           type="number"
           min="1"
           max="100"
         />
       </UFormField>
       <UFormField label="Description">
-        <UTextarea v-model="editForm.description" :rows="3" />
+        <UTextarea v-model="editForm.description" class="w-full" :rows="3" />
       </UFormField>
       <UFormField label="Publié">
         <USwitch v-model="editForm.isPublished" />
       </UFormField>
-      <div class="flex gap-2 pt-2">
+      <div class="flex flex-wrap gap-2 pt-2 sm:col-span-2">
         <UButton :loading="editSaving" @click="saveGeneral"
           >Enregistrer</UButton
         >
@@ -450,156 +531,217 @@
 
     <!-- Tab: Séries -->
     <div v-if="activeTab === 'series'" class="space-y-4">
-      <div class="flex items-start gap-2 flex-wrap">
-        <TournamentSeriesSelector
-          :series="tournament.series"
-          :model-value="selectedSeriesId"
-          class="flex-1"
-          @update:model-value="selectedSeriesId = $event"
-        />
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-semibold text-slate-900">
+            Séries du tournoi
+          </h2>
+          <p class="text-sm text-slate-500">
+            Inscriptions, pointage et progression sportive.
+          </p>
+        </div>
         <UButton icon="i-heroicons-plus" @click="seriesModalOpen = true">
           Nouvelle série
         </UButton>
       </div>
+      <TournamentSeriesSelector
+        :series="tournament.series"
+        :model-value="selectedSeriesId"
+        @update:model-value="selectedSeriesId = $event"
+      />
+      <div
+        v-if="!tournament.series.length"
+        class="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center"
+      >
+        <UIcon name="i-heroicons-squares-plus" class="size-9 text-slate-400" />
+        <h3 class="mt-3 font-semibold text-slate-900">Votre première série</h3>
+        <p class="mt-1 text-sm text-slate-500">
+          Choisissez le format et les règles, puis inscrivez les participants.
+        </p>
+        <UButton
+          class="mt-5"
+          icon="i-heroicons-plus"
+          @click="seriesModalOpen = true"
+          >Créer une série</UButton
+        >
+      </div>
 
       <!-- Series detail -->
-      <template v-if="currentSeries && seriesDetail">
-        <div class="flex items-center justify-between gap-3 flex-wrap">
-          <div class="flex items-center gap-3 flex-wrap">
-            <TournamentSeriesStatusBadge :status="currentSeries.status" />
-            <TournamentSeriesTypeBadge
-              :type="currentSeries.seriesType"
-              :points-limit-min="currentSeries.pointsLimitMin"
-              :points-limit-max="currentSeries.pointsLimitMax"
-            />
-            <UBadge
-              v-if="currentSeries.femalesOnly"
-              color="pink"
-              variant="solid"
-              size="sm"
-            >
-              ♀ Féminines
-            </UBadge>
-            <span class="text-sm text-gray-500">
-              {{ registrations.length }} inscrit{{
-                registrations.length > 1 ? 's' : ''
-              }}
-            </span>
-          </div>
-          <UButton
-            size="sm"
-            variant="ghost"
-            color="neutral"
-            icon="i-heroicons-pencil-square"
-            @click="openEditSeries"
-          >
-            Modifier
-          </UButton>
-          <UButton
-            v-if="
-              currentSeries.status === 'draft' ||
-              currentSeries.status === 'registration'
-            "
-            size="sm"
-            variant="ghost"
-            color="error"
-            icon="i-heroicons-trash"
-            @click="deleteSeries"
-          >
-            Supprimer la série
-          </UButton>
-        </div>
-
-        <!-- Sub-tabs: Inscriptions / Tableau -->
-        <div class="flex gap-2">
-          <UButton
-            size="sm"
-            :variant="seriesTab === 'registrations' ? 'solid' : 'outline'"
-            color="neutral"
-            @click="seriesTab = 'registrations'"
-          >
-            Inscriptions
-          </UButton>
-          <UButton
-            size="sm"
-            :variant="seriesTab === 'bracket' ? 'solid' : 'outline'"
-            color="neutral"
-            :disabled="
-              currentSeries.status === 'draft' ||
-              currentSeries.status === 'registration'
-            "
-            @click="seriesTab = 'bracket'"
-          >
-            Tableau
-          </UButton>
-        </div>
-
-        <!-- Registrations sub-tab -->
-        <div v-if="seriesTab === 'registrations'" class="space-y-3">
-          <div class="flex justify-between items-center">
-            <!-- Status transitions -->
-            <div class="flex gap-2 flex-wrap">
+      <div
+        v-if="loadingSeriesDetail"
+        class="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500"
+        role="status"
+      >
+        Chargement de la série…
+      </div>
+      <template v-else-if="currentSeries && seriesDetail">
+        <section
+          class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm"
+        >
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <h2 class="mb-2 text-xl font-semibold text-slate-900">
+                {{ currentSeries.name }}
+              </h2>
+              <div class="flex items-center gap-2 flex-wrap">
+                <TournamentSeriesStatusBadge :status="currentSeries.status" />
+                <TournamentSeriesTypeBadge
+                  :type="currentSeries.seriesType"
+                  :points-limit-min="currentSeries.pointsLimitMin"
+                  :points-limit-max="currentSeries.pointsLimitMax"
+                />
+                <UBadge
+                  v-if="currentSeries.femalesOnly"
+                  color="neutral"
+                  variant="solid"
+                  size="sm"
+                >
+                  ♀ Féminines
+                </UBadge>
+                <span class="text-sm text-gray-500">
+                  {{ registrations.length }} inscrit{{
+                    registrations.length > 1 ? 's' : ''
+                  }}
+                </span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <UButton
+                size="sm"
+                variant="ghost"
+                color="neutral"
+                icon="i-heroicons-pencil-square"
+                @click="openEditSeries"
+              >
+                Modifier
+              </UButton>
               <UButton
                 v-if="
                   currentSeries.status === 'draft' ||
                   currentSeries.status === 'registration'
                 "
                 size="sm"
-                icon="i-heroicons-table-cells"
-                @click="generateBracket"
+                variant="ghost"
+                color="error"
+                icon="i-heroicons-trash"
+                @click="deleteSeries"
               >
-                Générer les poules
+                Supprimer
               </UButton>
             </div>
+          </div>
+
+          <!-- Sub-tabs: Inscriptions / Tableau -->
+          <div class="mt-5 mb-5 flex gap-2 border-t border-slate-100 pt-4">
             <UButton
-              v-if="['draft', 'registration'].includes(currentSeries.status)"
               size="sm"
-              variant="outline"
-              icon="i-heroicons-user-plus"
-              @click="addRegistrationOpen = true"
+              :variant="seriesTab === 'registrations' ? 'solid' : 'outline'"
+              color="neutral"
+              @click="seriesTab = 'registrations'"
             >
-              Inscrire
+              Inscriptions
             </UButton>
             <UButton
-              v-if="isDev"
               size="sm"
-              color="orange"
-              variant="outline"
-              icon="i-heroicons-beaker"
-              :loading="seeding"
-              @click="devSeedSeries(30)"
+              :variant="seriesTab === 'bracket' ? 'solid' : 'outline'"
+              color="neutral"
+              :disabled="
+                currentSeries.status === 'draft' ||
+                currentSeries.status === 'registration'
+              "
+              @click="seriesTab = 'bracket'"
             >
-              [DEV] +30
-              {{
-                currentSeries?.seriesFormat === 'doubles'
-                  ? 'doubles'
-                  : 'joueurs'
-              }}
+              Poules et classement
             </UButton>
           </div>
-          <TournamentRegistrationTable
-            :roster-locked="
-              !!currentSeries &&
-              !['draft', 'registration'].includes(currentSeries.status)
-            "
-            :registrations="registrations"
-            :series-format="currentSeries.seriesFormat"
-            :slug="slug"
-            :series-id="currentSeries.id"
-            @refresh="refreshRegistrations"
-          />
-        </div>
 
-        <!-- Bracket sub-tab -->
-        <div v-if="seriesTab === 'bracket'" class="space-y-3">
-          <TournamentIntegralBoard
-            :key="currentSeries.id"
-            :slug="slug"
-            :series-id="currentSeries.id"
-            api-base="/api/admin/tournois"
-            @refresh="refreshSeriesState"
-          />
-        </div>
+          <!-- Registrations sub-tab -->
+          <div v-if="seriesTab === 'registrations'" class="space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <p class="text-sm text-slate-500">
+                Suivez la présence et les frais d’inscription.
+              </p>
+              <div class="flex flex-wrap items-center gap-2">
+                <UButton
+                  v-if="
+                    ['draft', 'registration'].includes(currentSeries.status)
+                  "
+                  size="sm"
+                  icon="i-heroicons-user-plus"
+                  @click="addRegistrationOpen = true"
+                  >Inscrire un joueur</UButton
+                >
+                <UButton
+                  v-if="
+                    ['draft', 'registration'].includes(currentSeries.status)
+                  "
+                  size="sm"
+                  variant="outline"
+                  color="neutral"
+                  icon="i-heroicons-table-cells"
+                  :disabled="activeParticipantCount < 2"
+                  @click="generateBracket"
+                  >Générer les poules</UButton
+                >
+              </div>
+            </div>
+            <div
+              v-if="
+                isDev &&
+                ['draft', 'registration'].includes(currentSeries.status)
+              "
+              class="flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-amber-300 bg-amber-50 p-3"
+            >
+              <UIcon name="i-heroicons-beaker" class="size-5 text-amber-700" />
+              <div class="mr-auto">
+                <p class="text-sm font-medium text-amber-900">
+                  Démonstration locale
+                </p>
+                <p class="text-xs text-amber-700">
+                  Participants fictifs, tous présents. Base locale uniquement.
+                </p>
+              </div>
+              <UInput
+                v-model.number="demoCount"
+                type="number"
+                min="2"
+                max="32"
+                aria-label="Nombre de participants fictifs"
+                class="w-20"
+              />
+              <UButton
+                color="warning"
+                variant="outline"
+                size="sm"
+                :loading="seeding"
+                @click="devSeedSeries(demoCount)"
+                >Remplir la série</UButton
+              >
+            </div>
+            <TournamentRegistrationTable
+              :roster-locked="
+                !!currentSeries &&
+                !['draft', 'registration'].includes(currentSeries.status)
+              "
+              :registrations="registrations"
+              :series-format="currentSeries.seriesFormat"
+              :slug="slug"
+              :series-id="currentSeries.id"
+              @refresh="refreshSeriesState"
+            />
+          </div>
+
+          <!-- Bracket sub-tab -->
+          <div v-if="seriesTab === 'bracket'" class="space-y-3">
+            <TournamentIntegralBoard
+              :key="currentSeries.id"
+              :slug="slug"
+              :series-id="currentSeries.id"
+              api-base="/api/admin/tournois"
+              @refresh="refreshSeriesState"
+            />
+          </div>
+        </section>
       </template>
     </div>
 
@@ -607,25 +749,31 @@
     <TournamentJaMultiSeriesRegistrationModal
       v-if="tournament"
       :open="addRegistrationOpen"
+      :initial-series-id="selectedSeriesId"
       :series="tournament.series"
       :slug="slug"
       api-base="/api/admin/tournois"
       @update:open="addRegistrationOpen = $event"
-      @refresh="refreshRegistrations"
+      @refresh="refreshSeriesState"
     />
 
     <!-- Edit series modal -->
-    <UModal v-model:open="editSeriesModalOpen">
-      <template #content>
-        <div class="p-6 space-y-4">
-          <h3 class="font-semibold text-lg">Modifier la série</h3>
+    <UModal
+      v-model:open="editSeriesModalOpen"
+      title="Modifier la série"
+      description="Format, règles et conditions d’inscription."
+      :ui="{ content: 'max-w-2xl rounded-2xl' }"
+    >
+      <template #body>
+        <div class="space-y-5">
           <UFormField label="Nom" required>
-            <UInput v-model="editSeriesForm.name" />
+            <UInput v-model="editSeriesForm.name" class="w-full" />
           </UFormField>
           <div class="grid grid-cols-2 gap-3">
             <UFormField label="Format">
               <USelect
                 v-model="editSeriesForm.seriesFormat"
+                class="w-full"
                 :items="[
                   { label: 'Simple', value: 'singles' },
                   { label: 'Double', value: 'doubles' }
@@ -635,6 +783,7 @@
             <UFormField label="Type">
               <USelect
                 v-model="editSeriesForm.seriesType"
+                class="w-full"
                 :items="[
                   { label: 'Standard', value: 'standard' },
                   { label: 'Speedy', value: 'speedy' },
@@ -647,7 +796,7 @@
           </div>
           <UFormField
             label="Catégories d'âge autorisées"
-            hint="Vide = ouvert à tous"
+            hint="Aucune sélection : ouvert à tous"
           >
             <div class="flex flex-wrap gap-2 mt-1">
               <label
@@ -664,7 +813,7 @@
                 class="flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm cursor-pointer select-none transition-colors"
                 :class="
                   editSeriesForm.ageCategories.includes(cat.value)
-                    ? 'bg-primary-600 text-white border-primary-600'
+                    ? 'bg-slate-900 text-white border-slate-900'
                     : 'bg-white text-gray-700 border-gray-300 hover:border-primary-400'
                 "
               >
@@ -701,6 +850,7 @@
             <UFormField label="Pts min">
               <UInput
                 v-model.number="editSeriesForm.pointsLimitMin"
+                class="w-full"
                 type="number"
                 min="0"
               />
@@ -708,71 +858,94 @@
             <UFormField label="Pts max">
               <UInput
                 v-model.number="editSeriesForm.pointsLimitMax"
+                class="w-full"
                 type="number"
                 min="0"
               />
             </UFormField>
           </div>
           <div class="grid grid-cols-2 gap-3">
-            <UFormField label="Sets à gagner">
+            <UFormField label="Manches gagnantes">
               <UInput
                 v-model.number="editSeriesForm.setsToWin"
+                class="w-full"
                 type="number"
                 min="1"
                 max="4"
               />
             </UFormField>
-            <UFormField label="Pts / set">
+            <UFormField label="Points par manche">
               <UInput
                 v-model.number="editSeriesForm.pointsPerSet"
+                class="w-full"
                 type="number"
                 min="3"
                 max="21"
               />
             </UFormField>
           </div>
-          <UFormField label="Max joueurs (optionnel)">
+          <UFormField label="Nombre maximal de participants">
             <UInput
               v-model.number="editSeriesForm.maxPlayers"
+              class="w-full"
               type="number"
               min="2"
             />
           </UFormField>
           <div class="grid grid-cols-2 gap-3">
             <UFormField label="Date de la série (optionnel)">
-              <UInput v-model="editSeriesForm.seriesDate" type="date" />
+              <UInput
+                v-model="editSeriesForm.seriesDate"
+                class="w-full"
+                type="date"
+              />
             </UFormField>
             <UFormField label="Heure de début (optionnel)">
-              <UInput v-model="editSeriesForm.startTime" type="time" />
+              <UInput
+                v-model="editSeriesForm.startTime"
+                class="w-full"
+                type="time"
+              />
             </UFormField>
           </div>
-          <div class="flex justify-end gap-2">
-            <UButton
-              variant="ghost"
-              color="neutral"
-              @click="editSeriesModalOpen = false"
-              >Annuler</UButton
-            >
-            <UButton :loading="editSeriesSaving" @click="saveEditSeries"
-              >Enregistrer</UButton
-            >
-          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <UButton
+            variant="ghost"
+            color="neutral"
+            @click="editSeriesModalOpen = false"
+            >Annuler</UButton
+          >
+          <UButton :loading="editSeriesSaving" @click="saveEditSeries"
+            >Enregistrer</UButton
+          >
         </div>
       </template>
     </UModal>
 
     <!-- Create series modal -->
-    <UModal v-model:open="seriesModalOpen">
-      <template #content>
-        <div class="p-6 space-y-4">
-          <h3 class="font-semibold text-lg">Nouvelle série</h3>
+    <UModal
+      v-model:open="seriesModalOpen"
+      title="Nouvelle série"
+      description="Format, règles et conditions d’inscription."
+      :ui="{ content: 'max-w-2xl rounded-2xl' }"
+    >
+      <template #body>
+        <div class="space-y-5">
           <UFormField label="Nom" required>
-            <UInput v-model="seriesForm.name" placeholder="Simple Hommes A" />
+            <UInput
+              v-model="seriesForm.name"
+              class="w-full"
+              placeholder="Simple Hommes A"
+            />
           </UFormField>
           <div class="grid grid-cols-2 gap-3">
             <UFormField label="Format">
               <USelect
                 v-model="seriesForm.seriesFormat"
+                class="w-full"
                 :items="[
                   { label: 'Simple', value: 'singles' },
                   { label: 'Double', value: 'doubles' }
@@ -782,6 +955,7 @@
             <UFormField label="Type">
               <USelect
                 v-model="seriesForm.seriesType"
+                class="w-full"
                 :items="[
                   { label: 'Standard', value: 'standard' },
                   { label: 'Speedy', value: 'speedy' },
@@ -795,7 +969,7 @@
           <!-- Age categories restriction (optional, multi-select) -->
           <UFormField
             label="Catégories d'âge autorisées"
-            hint="Vide = ouvert à tous"
+            hint="Aucune sélection : ouvert à tous"
           >
             <div class="flex flex-wrap gap-2 mt-1">
               <label
@@ -812,7 +986,7 @@
                 class="flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm cursor-pointer select-none transition-colors"
                 :class="
                   seriesForm.ageCategories.includes(cat.value)
-                    ? 'bg-primary-600 text-white border-primary-600'
+                    ? 'bg-slate-900 text-white border-slate-900'
                     : 'bg-white text-gray-700 border-gray-300 hover:border-primary-400'
                 "
               >
@@ -849,6 +1023,7 @@
             <UFormField label="Pts min">
               <UInput
                 v-model.number="seriesForm.pointsLimitMin"
+                class="w-full"
                 type="number"
                 min="0"
               />
@@ -856,55 +1031,67 @@
             <UFormField label="Pts max">
               <UInput
                 v-model.number="seriesForm.pointsLimitMax"
+                class="w-full"
                 type="number"
                 min="0"
               />
             </UFormField>
           </div>
           <div class="grid grid-cols-2 gap-3">
-            <UFormField label="Sets à gagner">
+            <UFormField label="Manches gagnantes">
               <UInput
                 v-model.number="seriesForm.setsToWin"
+                class="w-full"
                 type="number"
                 min="1"
                 max="4"
               />
             </UFormField>
-            <UFormField label="Pts / set">
+            <UFormField label="Points par manche">
               <UInput
                 v-model.number="seriesForm.pointsPerSet"
+                class="w-full"
                 type="number"
                 min="3"
                 max="21"
               />
             </UFormField>
           </div>
-          <UFormField label="Max joueurs (optionnel)">
+          <UFormField label="Nombre maximal de participants">
             <UInput
               v-model.number="seriesForm.maxPlayers"
+              class="w-full"
               type="number"
               min="2"
             />
           </UFormField>
           <div class="grid grid-cols-2 gap-3">
             <UFormField label="Date de la série (optionnel)">
-              <UInput v-model="seriesForm.seriesDate" type="date" />
+              <UInput
+                v-model="seriesForm.seriesDate"
+                class="w-full"
+                type="date"
+              />
             </UFormField>
             <UFormField label="Heure de début (optionnel)">
-              <UInput v-model="seriesForm.startTime" type="time" />
+              <UInput
+                v-model="seriesForm.startTime"
+                class="w-full"
+                type="time"
+              />
             </UFormField>
           </div>
-          <div class="flex justify-end gap-2">
-            <UButton
-              variant="ghost"
-              color="neutral"
-              @click="seriesModalOpen = false"
-              >Annuler</UButton
-            >
-            <UButton :loading="seriesSaving" @click="createSeries"
-              >Créer</UButton
-            >
-          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <UButton
+            variant="ghost"
+            color="neutral"
+            @click="seriesModalOpen = false"
+            >Annuler</UButton
+          >
+          <UButton :loading="seriesSaving" @click="createSeries">Créer</UButton>
         </div>
       </template>
     </UModal>

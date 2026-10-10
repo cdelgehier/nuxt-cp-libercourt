@@ -18,6 +18,22 @@
   const emit = defineEmits<{ refresh: [] }>()
   const toast = useToast()
 
+  const presentCount = computed(function () {
+    return props.registrations.filter(function (registration) {
+      return registration.attendanceStatus === 'present'
+    }).length
+  })
+  const absentCount = computed(function () {
+    return props.registrations.filter(function (registration) {
+      return registration.attendanceStatus === 'absent'
+    }).length
+  })
+  const unpaidCount = computed(function () {
+    return props.registrations.filter(function (registration) {
+      return registration.paymentStatus === 'unpaid'
+    }).length
+  })
+
   // Sort state
   type SortKey = 'name' | 'club' | 'pts' | 'presence' | 'payment'
   const sortKey = ref<SortKey | null>(null)
@@ -137,225 +153,279 @@
       v-else-if="registrations.length === 0"
       class="text-center text-gray-400 py-6"
     >
-      Aucun joueur inscrit
+      <UIcon name="i-heroicons-user-group" class="size-9 text-slate-300" />
+      <h3 class="mt-3 font-medium text-slate-900">
+        Aucun participant pour le moment
+      </h3>
+      <p class="mt-1 text-sm text-slate-500">
+        Inscrivez un joueur dans une ou plusieurs séries pour commencer.
+      </p>
     </div>
-    <div v-else class="overflow-x-auto rounded-lg border border-gray-200">
-      <table class="w-full text-sm">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th class="px-3 py-2.5 text-left">
-              <button
-                class="flex items-center gap-1 text-xs font-semibold text-gray-500 uppercase tracking-wide hover:text-gray-800 transition-colors"
-                @click="toggleSort('name')"
+    <div v-else>
+      <div class="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div class="rounded-xl bg-slate-50 px-4 py-3">
+          <p class="text-2xl font-semibold tabular-nums text-slate-900">
+            {{ registrations.length }}
+          </p>
+          <p class="text-xs text-slate-500">Inscrits</p>
+        </div>
+        <div class="rounded-xl bg-emerald-50 px-4 py-3">
+          <p class="text-2xl font-semibold tabular-nums text-emerald-700">
+            {{ presentCount }}
+          </p>
+          <p class="text-xs text-emerald-700">Présents</p>
+        </div>
+        <div class="rounded-xl bg-rose-50 px-4 py-3">
+          <p class="text-2xl font-semibold tabular-nums text-rose-700">
+            {{ absentCount }}
+          </p>
+          <p class="text-xs text-rose-700">Absents</p>
+        </div>
+        <div class="rounded-xl bg-amber-50 px-4 py-3">
+          <p class="text-2xl font-semibold tabular-nums text-amber-700">
+            {{ unpaidCount }}
+          </p>
+          <p class="text-xs text-amber-700">À régler</p>
+        </div>
+      </div>
+      <div v-if="rosterLocked" class="mb-3 text-sm text-slate-500">
+        Les poules sont générées. Le paiement reste modifiable ; les forfaits se
+        déclarent dans le poste JA.
+      </div>
+      <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+        <table class="w-full min-w-[640px] text-sm">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="px-3 py-2.5 text-left">
+                <button
+                  class="flex items-center gap-1 text-xs font-semibold text-gray-500 uppercase tracking-wide hover:text-gray-800 transition-colors"
+                  @click="toggleSort('name')"
+                >
+                  Joueur
+                  <UIcon
+                    v-if="sortKey === 'name'"
+                    :name="
+                      sortDir === 'asc'
+                        ? 'i-heroicons-chevron-up'
+                        : 'i-heroicons-chevron-down'
+                    "
+                    class="w-3 h-3"
+                  />
+                  <UIcon
+                    v-else
+                    name="i-heroicons-chevron-up-down"
+                    class="w-3 h-3 text-gray-300"
+                  />
+                </button>
+              </th>
+              <th class="px-3 py-2.5 text-left">
+                <button
+                  class="flex items-center gap-1 text-xs font-semibold text-gray-500 uppercase tracking-wide hover:text-gray-800 transition-colors"
+                  @click="toggleSort('club')"
+                >
+                  Club
+                  <UIcon
+                    v-if="sortKey === 'club'"
+                    :name="
+                      sortDir === 'asc'
+                        ? 'i-heroicons-chevron-up'
+                        : 'i-heroicons-chevron-down'
+                    "
+                    class="w-3 h-3"
+                  />
+                  <UIcon
+                    v-else
+                    name="i-heroicons-chevron-up-down"
+                    class="w-3 h-3 text-gray-300"
+                  />
+                </button>
+              </th>
+              <th class="px-3 py-2.5 text-left">
+                <button
+                  class="flex items-center gap-1 text-xs font-semibold text-gray-500 uppercase tracking-wide hover:text-gray-800 transition-colors"
+                  @click="toggleSort('pts')"
+                >
+                  Pts
+                  <UIcon
+                    v-if="sortKey === 'pts'"
+                    :name="
+                      sortDir === 'asc'
+                        ? 'i-heroicons-chevron-up'
+                        : 'i-heroicons-chevron-down'
+                    "
+                    class="w-3 h-3"
+                  />
+                  <UIcon
+                    v-else
+                    name="i-heroicons-chevron-up-down"
+                    class="w-3 h-3 text-gray-300"
+                  />
+                </button>
+              </th>
+              <th class="px-3 py-2.5 text-center">
+                <button
+                  class="flex items-center gap-1 mx-auto text-xs font-semibold text-gray-500 uppercase tracking-wide hover:text-gray-800 transition-colors"
+                  @click="toggleSort('presence')"
+                >
+                  Présence
+                  <UIcon
+                    v-if="sortKey === 'presence'"
+                    :name="
+                      sortDir === 'asc'
+                        ? 'i-heroicons-chevron-up'
+                        : 'i-heroicons-chevron-down'
+                    "
+                    class="w-3 h-3"
+                  />
+                  <UIcon
+                    v-else
+                    name="i-heroicons-chevron-up-down"
+                    class="w-3 h-3 text-gray-300"
+                  />
+                </button>
+              </th>
+              <th class="px-3 py-2.5 text-center">
+                <button
+                  class="flex items-center gap-1 mx-auto text-xs font-semibold text-gray-500 uppercase tracking-wide hover:text-gray-800 transition-colors"
+                  @click="toggleSort('payment')"
+                >
+                  Frais
+                  <UIcon
+                    v-if="sortKey === 'payment'"
+                    :name="
+                      sortDir === 'asc'
+                        ? 'i-heroicons-chevron-up'
+                        : 'i-heroicons-chevron-down'
+                    "
+                    class="w-3 h-3"
+                  />
+                  <UIcon
+                    v-else
+                    name="i-heroicons-chevron-up-down"
+                    class="w-3 h-3 text-gray-300"
+                  />
+                </button>
+              </th>
+              <th
+                class="px-3 py-2.5 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide"
               >
-                Joueur
-                <UIcon
-                  v-if="sortKey === 'name'"
-                  :name="
-                    sortDir === 'asc'
-                      ? 'i-heroicons-chevron-up'
-                      : 'i-heroicons-chevron-down'
-                  "
-                  class="w-3 h-3"
-                />
-                <UIcon
-                  v-else
-                  name="i-heroicons-chevron-up-down"
-                  class="w-3 h-3 text-gray-300"
-                />
-              </button>
-            </th>
-            <th class="px-3 py-2.5 text-left">
-              <button
-                class="flex items-center gap-1 text-xs font-semibold text-gray-500 uppercase tracking-wide hover:text-gray-800 transition-colors"
-                @click="toggleSort('club')"
-              >
-                Club
-                <UIcon
-                  v-if="sortKey === 'club'"
-                  :name="
-                    sortDir === 'asc'
-                      ? 'i-heroicons-chevron-up'
-                      : 'i-heroicons-chevron-down'
-                  "
-                  class="w-3 h-3"
-                />
-                <UIcon
-                  v-else
-                  name="i-heroicons-chevron-up-down"
-                  class="w-3 h-3 text-gray-300"
-                />
-              </button>
-            </th>
-            <th class="px-3 py-2.5 text-left">
-              <button
-                class="flex items-center gap-1 text-xs font-semibold text-gray-500 uppercase tracking-wide hover:text-gray-800 transition-colors"
-                @click="toggleSort('pts')"
-              >
-                Pts
-                <UIcon
-                  v-if="sortKey === 'pts'"
-                  :name="
-                    sortDir === 'asc'
-                      ? 'i-heroicons-chevron-up'
-                      : 'i-heroicons-chevron-down'
-                  "
-                  class="w-3 h-3"
-                />
-                <UIcon
-                  v-else
-                  name="i-heroicons-chevron-up-down"
-                  class="w-3 h-3 text-gray-300"
-                />
-              </button>
-            </th>
-            <th class="px-3 py-2.5 text-center">
-              <button
-                class="flex items-center gap-1 mx-auto text-xs font-semibold text-gray-500 uppercase tracking-wide hover:text-gray-800 transition-colors"
-                @click="toggleSort('presence')"
-              >
-                Présence
-                <UIcon
-                  v-if="sortKey === 'presence'"
-                  :name="
-                    sortDir === 'asc'
-                      ? 'i-heroicons-chevron-up'
-                      : 'i-heroicons-chevron-down'
-                  "
-                  class="w-3 h-3"
-                />
-                <UIcon
-                  v-else
-                  name="i-heroicons-chevron-up-down"
-                  class="w-3 h-3 text-gray-300"
-                />
-              </button>
-            </th>
-            <th class="px-3 py-2.5 text-center">
-              <button
-                class="flex items-center gap-1 mx-auto text-xs font-semibold text-gray-500 uppercase tracking-wide hover:text-gray-800 transition-colors"
-                @click="toggleSort('payment')"
-              >
-                Payé
-                <UIcon
-                  v-if="sortKey === 'payment'"
-                  :name="
-                    sortDir === 'asc'
-                      ? 'i-heroicons-chevron-up'
-                      : 'i-heroicons-chevron-down'
-                  "
-                  class="w-3 h-3"
-                />
-                <UIcon
-                  v-else
-                  name="i-heroicons-chevron-up-down"
-                  class="w-3 h-3 text-gray-300"
-                />
-              </button>
-            </th>
-            <th
-              class="px-3 py-2.5 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                Forfait
+              </th>
+              <th class="px-3 py-2.5 w-8" />
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr
+              v-for="r in sorted"
+              :key="r.id"
+              class="hover:bg-gray-50 transition-colors"
+              :class="r.isForfeit ? 'opacity-50' : ''"
             >
-              Forfait
-            </th>
-            <th class="px-3 py-2.5 w-8" />
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          <tr
-            v-for="r in sorted"
-            :key="r.id"
-            class="hover:bg-gray-50 transition-colors"
-            :class="r.isForfeit ? 'opacity-50' : ''"
-          >
-            <!-- Joueur -->
-            <td class="px-3 py-2.5 font-medium text-gray-900">
-              {{ playerName(r) }}
-            </td>
-            <!-- Club -->
-            <td class="px-3 py-2.5 text-gray-500 text-xs">
-              {{ clubDisplay(r) }}
-            </td>
-            <!-- Pts -->
-            <td
-              class="px-3 py-2.5 tabular-nums text-gray-600 font-mono text-xs"
-            >
-              {{ pointsDisplay(r) }}
-            </td>
-            <!-- Présence — cycle unknown → present → absent → unknown -->
-            <td class="px-3 py-2.5 text-center">
-              <UButton
-                size="xs"
-                variant="ghost"
-                :color="
-                  r.attendanceStatus === 'present'
-                    ? 'success'
-                    : r.attendanceStatus === 'absent'
-                      ? 'error'
-                      : 'neutral'
-                "
-                :icon="
-                  r.attendanceStatus === 'present'
-                    ? 'i-heroicons-check-circle'
-                    : r.attendanceStatus === 'absent'
-                      ? 'i-heroicons-x-circle'
-                      : 'i-heroicons-minus-circle'
-                "
-                :title="
-                  r.attendanceStatus === 'present'
-                    ? 'Présent → cliquer : absent'
-                    : r.attendanceStatus === 'absent'
-                      ? 'Absent → cliquer : reset'
-                      : 'Inconnu → cliquer : présent'
-                "
-                :disabled="rosterLocked"
-                @click="cycleAttendance(r)"
-              />
-            </td>
-            <!-- Payé -->
-            <td class="px-3 py-2.5 text-center">
-              <UButton
-                size="xs"
-                variant="ghost"
-                :color="r.paymentStatus === 'paid' ? 'success' : 'neutral'"
-                icon="i-heroicons-currency-euro"
-                :title="
-                  r.paymentStatus === 'paid'
-                    ? 'Payé → cliquer : annuler'
-                    : 'Non payé → cliquer : marquer payé'
-                "
-                @click="
-                  patch(r.id, {
-                    paymentStatus:
-                      r.paymentStatus === 'paid' ? 'unpaid' : 'paid'
-                  })
-                "
-              />
-            </td>
-            <!-- Forfait -->
-            <td class="px-3 py-2.5 text-center">
-              <USwitch
-                :model-value="r.isForfeit"
-                :disabled="rosterLocked"
-                size="xs"
-                @update:model-value="patch(r.id, { isForfeit: $event })"
-              />
-            </td>
-            <!-- Supprimer -->
-            <td class="px-3 py-2.5">
-              <UButton
-                size="xs"
-                variant="ghost"
-                color="error"
-                icon="i-heroicons-trash"
-                title="Supprimer"
-                :disabled="rosterLocked"
-                @click="remove(r.id)"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <!-- Joueur -->
+              <td class="px-3 py-2.5 font-medium text-gray-900">
+                {{ playerName(r) }}
+              </td>
+              <!-- Club -->
+              <td class="px-3 py-2.5 text-gray-500 text-xs">
+                {{ clubDisplay(r) }}
+              </td>
+              <!-- Pts -->
+              <td
+                class="px-3 py-2.5 tabular-nums text-gray-600 font-mono text-xs"
+              >
+                {{ pointsDisplay(r) }}
+              </td>
+              <!-- Présence — cycle unknown → present → absent → unknown -->
+              <td class="px-3 py-2.5 text-center">
+                <UButton
+                  size="xs"
+                  variant="soft"
+                  :color="
+                    r.attendanceStatus === 'present'
+                      ? 'success'
+                      : r.attendanceStatus === 'absent'
+                        ? 'error'
+                        : 'neutral'
+                  "
+                  :icon="
+                    r.attendanceStatus === 'present'
+                      ? 'i-heroicons-check-circle'
+                      : r.attendanceStatus === 'absent'
+                        ? 'i-heroicons-x-circle'
+                        : 'i-heroicons-minus-circle'
+                  "
+                  :title="
+                    r.attendanceStatus === 'present'
+                      ? 'Présent → cliquer : absent'
+                      : r.attendanceStatus === 'absent'
+                        ? 'Absent → cliquer : reset'
+                        : 'Inconnu → cliquer : présent'
+                  "
+                  :disabled="rosterLocked"
+                  @click="cycleAttendance(r)"
+                  >{{
+                    r.attendanceStatus === 'present'
+                      ? 'Présent'
+                      : r.attendanceStatus === 'absent'
+                        ? 'Absent'
+                        : 'À confirmer'
+                  }}</UButton
+                >
+              </td>
+              <!-- Payé -->
+              <td class="px-3 py-2.5 text-center">
+                <UButton
+                  size="xs"
+                  variant="soft"
+                  :color="r.paymentStatus === 'paid' ? 'success' : 'warning'"
+                  icon="i-heroicons-currency-euro"
+                  :title="
+                    r.paymentStatus === 'paid'
+                      ? 'Payé → cliquer : annuler'
+                      : 'Non payé → cliquer : marquer payé'
+                  "
+                  @click="
+                    patch(r.id, {
+                      paymentStatus:
+                        r.paymentStatus === 'paid' ? 'unpaid' : 'paid'
+                    })
+                  "
+                  >{{
+                    r.paymentStatus === 'paid'
+                      ? 'Payé'
+                      : r.paymentStatus === 'refunded'
+                        ? 'Remboursé'
+                        : 'À régler'
+                  }}</UButton
+                >
+              </td>
+              <!-- Forfait -->
+              <td class="px-3 py-2.5 text-center">
+                <USwitch
+                  :model-value="r.isForfeit"
+                  :aria-label="`Forfait de ${playerName(r)}`"
+                  :disabled="rosterLocked"
+                  size="xs"
+                  @update:model-value="patch(r.id, { isForfeit: $event })"
+                />
+              </td>
+              <!-- Supprimer -->
+              <td class="px-3 py-2.5">
+                <UButton
+                  size="xs"
+                  variant="ghost"
+                  color="error"
+                  icon="i-heroicons-trash"
+                  :aria-label="`Supprimer l’inscription de ${playerName(r)}`"
+                  title="Supprimer"
+                  :disabled="rosterLocked"
+                  @click="remove(r.id)"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>

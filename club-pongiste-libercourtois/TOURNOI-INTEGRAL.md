@@ -71,7 +71,7 @@ tags CDN `config` et `club`, pris en charge par le SDK Netlify. Trois tests de r
 la purge ciblée, l’absence d’appel en local et la sauvegarde conservée si le CDN échoue.
 `style:check` ne peut pas s’exécuter : stylelint n’est pas installé dans ce projet.
 
-392 tests unitaires passent. Le contrôle HTTP local joue 76 matchs jusqu’aux 24 places uniques,
+396 tests unitaires passent. Le contrôle HTTP local joue 76 matchs jusqu’aux 24 places uniques,
 vérifie les lignes relationnelles et les deux destinations, les conflits de versions et l’accès
 JA/public. Les feuilles ont été contrôlées dans l’aperçu de l’application ; le dialogue système
 d’impression et une sortie sur imprimante restent à vérifier sur le poste du JA.
@@ -96,3 +96,23 @@ processus détruit la base en mémoire.
 
 Les tests sportifs couvrent les effectifs 2–32, notamment 5, 7, 10, 23 et 24, ainsi que forfaits,
 égalités, corrections sur les deux chemins, Speedy, handicap et repos entre simples et doubles.
+
+Dans l’administration, « Inscrire un joueur » permet de cocher plusieurs séries ouvertes. La
+présence et le paiement se retrouvent dans les autres inscriptions du même joueur. Les boutons
+indiquent explicitement Présent, Absent, À confirmer, Payé ou À régler.
+
+En développement, une série ouverte propose « Démonstration locale → Remplir la série », avec 24
+participants par défaut et un choix de 2 à 32. Les joueurs sont fictifs, présents et ont des
+paiements variés ; les doubles et restrictions sont respectés. L’API exige un accès admin et une
+base PostgreSQL locale. Elle est indisponible en production et sur Neon. L’ancien endpoint public de
+remplissage est remplacé par cette action protégée.
+
+```sh
+DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:55432/postgres?sslmode=disable' \
+  E2E_ADMIN_PASSWORD='<mot de passe du serveur local>' \
+  pnpm exec tsx scripts/check-demo-series-api.ts
+```
+
+Ce contrôle utilise un tournoi temporaire et vérifie authentification, périmètre, compteurs,
+doubles, statuts partagés, refus après génération et annulation complète en cas de capacité
+dépassée. Il vérifie aussi la suppression du tournoi après génération, puis nettoie ses données.

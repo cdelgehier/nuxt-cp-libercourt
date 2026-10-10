@@ -1,0 +1,1 @@
+ALTER TABLE "integral_series" ALTER COLUMN "state" DROP NOT NULL;

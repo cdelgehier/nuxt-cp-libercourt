@@ -71,6 +71,41 @@
       "when": 1774943430198,
       "tag": "0009_next_ma_gnuci",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791665806394,
+      "tag": "0010_double_elimination",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791665823307,
+      "tag": "0011_careful_iron_lad",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791666976741,
+      "tag": "0012_modern_steel_serpent",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791667300973,
+      "tag": "0013_late_white_tiger",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1791668227456,
+      "tag": "0014_groovy_grey_gargoyle",
+      "breakpoints": true
     }
   ]
 }

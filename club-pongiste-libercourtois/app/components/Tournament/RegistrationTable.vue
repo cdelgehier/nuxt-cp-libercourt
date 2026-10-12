@@ -377,7 +377,7 @@
                 <UButton
                   size="xs"
                   variant="soft"
-                  :color="r.paymentStatus === 'paid' ? 'success' : 'warning'"
+                  :color="r.paymentStatus === 'paid' ? 'success' : 'neutral'"
                   icon="i-heroicons-currency-euro"
                   :title="
                     r.paymentStatus === 'paid'

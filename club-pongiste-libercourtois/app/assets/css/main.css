@@ -1,7 +1,7 @@
 /* Styles globaux pour le Club Pongiste Libercourtois */
 
-@import "tailwindcss";
-@import "@nuxt/ui";
+@import 'tailwindcss';
+@import '@nuxt/ui';
 
 @theme static {
   /* Club colors */
@@ -13,18 +13,18 @@
   --color-club-navy: #1e293b;
   --color-club-white: #ffffff;
 
-  /* Primary palette (yellow) */
-  --color-primary-50: #fefce8;
-  --color-primary-100: #fef9c3;
-  --color-primary-200: #fef08a;
-  --color-primary-300: #fde047;
-  --color-primary-400: #facc15;
-  --color-primary-500: #ffd700;
-  --color-primary-600: #ca8a04;
-  --color-primary-700: #a16207;
-  --color-primary-800: #854d0e;
-  --color-primary-900: #713f12;
-  --color-primary-950: #422006;
+  /* Primary commands use blue; club branding keeps its own palette. */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
 
   /* Secondary palette (teal) */
   --color-secondary-50: #e0f2f1;
@@ -51,8 +51,8 @@
   --color-accent-900: #560027;
 
   /* Fonts */
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-heading: "Inter", system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Inter', system-ui, sans-serif;
 
   /* Custom display font sizes */
   --text-display-xl: 4.5rem;
@@ -116,8 +116,8 @@
   --club-navy: #1e293b;
   --club-white: #ffffff;
 
-  /* Map Nuxt UI semantic color to our yellow palette */
-  --ui-primary: var(--color-primary-500);
+  /* Dark blue gives white button labels enough contrast. */
+  --ui-primary: var(--color-blue-700);
 
   /* Variables adaptatives pour les modes clair/sombre */
   --bg-primary: #f9fafb;
@@ -130,6 +130,7 @@
 }
 
 .dark {
+  --ui-primary: var(--color-blue-300);
   --bg-primary: #111827;
   --bg-secondary: #1f2937;
   --text-primary: #f9fafb;
@@ -141,7 +142,7 @@
 
 /* Base styles */
 html {
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   scroll-behavior: smooth;
 }
 
@@ -165,8 +166,8 @@ select {
 input:focus,
 textarea:focus,
 select:focus {
-  border-color: var(--club-yellow);
-  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+  border-color: var(--ui-primary);
+  box-shadow: 0 0 0 3px rgb(29 78 216 / 10%);
 }
 
 /* Club specific components */
@@ -527,7 +528,7 @@ select:focus {
 
 /* Focus styles for accessibility */
 *:focus {
-  outline: 2px solid var(--club-yellow);
+  outline: 2px solid var(--ui-primary);
   outline-offset: 2px;
 }
 

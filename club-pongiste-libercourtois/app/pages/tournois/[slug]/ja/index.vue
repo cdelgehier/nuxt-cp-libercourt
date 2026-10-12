@@ -23,11 +23,17 @@
 
   const seriesList = computed(() => tournament.value?.series ?? [])
   const selectedSeriesId = ref<number | null>(null)
-  const tournamentView = ref<'desk' | 'forecast'>('desk')
+  const tournamentView = ref<'desk' | 'registrations' | 'forecast'>('desk')
   const jaTab = ref<'registrations' | 'bracket'>('bracket')
   const registrations = ref<SeriesRegistration[]>([])
   const loadingReg = ref(false)
   const addRegOpen = ref(false)
+  async function openOverviewSeries(id: number): Promise<void> {
+    tournamentView.value = 'desk'
+    selectedSeriesId.value = id
+    await nextTick()
+    jaTab.value = 'registrations'
+  }
   const currentSeries = computed(
     () => seriesList.value.find(s => s.id === selectedSeriesId.value) ?? null
   )
@@ -153,6 +159,13 @@
         >Poste JA</UButton
       >
       <UButton
+        icon="i-heroicons-user-group"
+        color="neutral"
+        :variant="tournamentView === 'registrations' ? 'solid' : 'outline'"
+        @click="tournamentView = 'registrations'"
+        >Inscriptions du tournoi</UButton
+      >
+      <UButton
         icon="i-heroicons-calendar-days"
         color="neutral"
         :variant="tournamentView === 'forecast' ? 'solid' : 'outline'"
@@ -164,6 +177,13 @@
       v-if="tournamentView === 'forecast'"
       :slug="slug"
       api-base="/api/ja/tournois"
+    />
+    <TournamentRegistrationOverview
+      v-else-if="tournamentView === 'registrations'"
+      :slug="slug"
+      :tournament-name="tournament?.name ?? ''"
+      api-base="/api/ja/tournois"
+      @open-series="openOverviewSeries"
     />
 
     <div

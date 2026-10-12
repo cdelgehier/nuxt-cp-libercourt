@@ -1,0 +1,84 @@
+@page {
+  size: A4 landscape;
+  margin: 8mm;
+}
+
+body {
+  margin: 0;
+  color: #000;
+  background: #fff;
+  font:
+    9pt / 1.2 Arial,
+    sans-serif;
+}
+
+.registration-print {
+  display: block;
+}
+
+.registration-print-group {
+  break-after: page;
+}
+
+.registration-print-group:last-child {
+  break-after: auto;
+}
+
+h1 {
+  font-size: 13pt;
+  margin: 0 0 2mm;
+}
+
+p {
+  margin: 0 0 2mm;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+thead {
+  display: table-header-group;
+}
+
+tr {
+  break-inside: avoid;
+}
+
+th,
+td {
+  border: 0.2mm solid #777;
+  padding: 0.75mm 2mm;
+  overflow-wrap: anywhere;
+  vertical-align: middle;
+  text-align: left;
+}
+
+.registration-print-name {
+  width: 48mm;
+}
+
+.registration-print-club {
+  width: 36mm;
+}
+
+small {
+  display: block;
+  font-size: 8pt;
+  font-weight: normal;
+}
+
+.registration-print-status {
+  text-align: center;
+}
+
+.registration-print-mark {
+  display: inline-block;
+  margin: 0 1mm;
+  font-size: 10pt;
+  font-weight: bold;
+  line-height: 1;
+  vertical-align: middle;
+}

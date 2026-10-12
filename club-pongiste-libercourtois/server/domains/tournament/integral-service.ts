@@ -18,8 +18,8 @@ import {
   startMatch,
   swapPoolPlayers
 } from './integral'
-import type { IntegralState, Entrant } from './integral'
-import type { SeriesRegistration } from './types'
+import type { IntegralState } from './integral'
+import { registrationEntrant } from './registration-entrant'
 import { MatchStartError, matchStartBlock, startPool } from './pool-start'
 import { simulateDemoMatches } from './demo-results'
 import {
@@ -121,46 +121,6 @@ export const integralCommand = z.discriminatedUnion('action', [
     identity: z.string().min(1).max(100)
   })
 ])
-function identity(registration: SeriesRegistration, partner = false): string {
-  const override = partner
-    ? registration.partnerIdentity
-    : registration.playerIdentity
-  if (override) return override
-  const licence = partner
-    ? registration.partnerLicenceNumber
-    : registration.licenceNumber
-  if (licence?.trim()) return `licence:${licence.trim()}`
-  const first = partner
-      ? registration.partnerFirstName
-      : registration.firstName,
-    last = partner ? registration.partnerLastName : registration.lastName
-  const club = partner ? registration.partnerClub : registration.club
-  return `name:${[first, last, club]
-    .join(':')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim()}`
-}
-function toEntrant(registration: SeriesRegistration): Entrant {
-  const doubles = Boolean(registration.partnerLastName)
-  const ranking = doubles
-    ? registration.ranking === null || registration.partnerRanking === null
-      ? null
-      : registration.ranking + registration.partnerRanking
-    : registration.ranking
-  return {
-    id: registration.id,
-    ranking,
-    club: registration.club,
-    partnerClub: registration.partnerClub,
-    identities: doubles
-      ? [identity(registration), identity(registration, true)]
-      : [identity(registration)],
-    withdrawn: registration.isForfeit,
-    seed: 0
-  }
-}
 /** Read the snapshot and roster together, without exposing JA secrets. */
 export async function getIntegral(seriesId: number) {
   const [series] = await tournamentDb
@@ -262,7 +222,7 @@ export async function executeIntegral(seriesId: number, raw: unknown) {
       })
       let state: IntegralState
       try {
-        state = createIntegral(present.map(toEntrant), {
+        state = createIntegral(present.map(registrationEntrant), {
           pointsPerSet: series.pointsPerSet,
           setsToWin: series.setsToWin,
           handicap: series.seriesType === 'handicap'

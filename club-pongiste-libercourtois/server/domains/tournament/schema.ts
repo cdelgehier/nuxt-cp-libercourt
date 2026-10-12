@@ -1,4 +1,5 @@
 import type { IntegralState } from './integral'
+import type { ForecastConfig } from '../../../shared/tournament-forecast'
 import { sql } from 'drizzle-orm'
 import {
   jsonb,
@@ -87,6 +88,31 @@ export const tournaments = pgTable('tournaments', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow()
 })
+
+/** One independent set of planning assumptions per tournament. */
+export const tournamentForecasts = pgTable(
+  'tournament_forecasts',
+  {
+    tournamentId: integer('tournament_id')
+      .primaryKey()
+      .references(
+        function () {
+          return tournaments.id
+        },
+        { onDelete: 'cascade' }
+      ),
+    config: jsonb('config').$type<ForecastConfig>().notNull(),
+    version: integer('version').notNull().default(1),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow()
+  },
+  function (table) {
+    return [
+      check('tournament_forecasts_version_positive', sql`${table.version} > 0`)
+    ]
+  }
+)
 
 export const tournamentJaAccess = pgTable('tournament_ja_access', {
   id: serial('id').primaryKey(),

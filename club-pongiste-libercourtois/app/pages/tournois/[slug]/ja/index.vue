@@ -23,6 +23,7 @@
 
   const seriesList = computed(() => tournament.value?.series ?? [])
   const selectedSeriesId = ref<number | null>(null)
+  const tournamentView = ref<'desk' | 'forecast'>('desk')
   const jaTab = ref<'registrations' | 'bracket'>('bracket')
   const registrations = ref<SeriesRegistration[]>([])
   const loadingReg = ref(false)
@@ -144,7 +145,31 @@
       </UButton>
     </div>
 
-    <div v-if="seriesList.length === 0" class="text-center text-gray-400 py-20">
+    <div class="flex flex-wrap gap-2 mb-5">
+      <UButton
+        color="neutral"
+        :variant="tournamentView === 'desk' ? 'solid' : 'outline'"
+        @click="tournamentView = 'desk'"
+        >Poste JA</UButton
+      >
+      <UButton
+        icon="i-heroicons-calendar-days"
+        color="neutral"
+        :variant="tournamentView === 'forecast' ? 'solid' : 'outline'"
+        @click="tournamentView = 'forecast'"
+        >Prévision</UButton
+      >
+    </div>
+    <TournamentForecastBoard
+      v-if="tournamentView === 'forecast'"
+      :slug="slug"
+      api-base="/api/ja/tournois"
+    />
+
+    <div
+      v-else-if="seriesList.length === 0"
+      class="text-center text-gray-400 py-20"
+    >
       Aucune série pour ce tournoi.
     </div>
 

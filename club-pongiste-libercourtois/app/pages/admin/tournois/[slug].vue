@@ -31,7 +31,8 @@
   const tabs = [
     { label: 'Général', value: 'general', icon: 'i-heroicons-cog-6-tooth' },
     { label: 'Accès JA', value: 'ja', icon: 'i-heroicons-key' },
-    { label: 'Séries', value: 'series', icon: 'i-heroicons-squares-2x2' }
+    { label: 'Séries', value: 'series', icon: 'i-heroicons-squares-2x2' },
+    { label: 'Prévision', value: 'forecast', icon: 'i-heroicons-calendar-days' }
   ]
   const activeTab = ref('series')
 
@@ -489,7 +490,7 @@
       variant="link"
       color="neutral"
       :ui="{
-        list: 'w-full justify-start border-b border-slate-200',
+        list: 'w-full justify-start overflow-x-auto border-b border-slate-200',
         trigger: 'flex-none px-4 py-3',
         indicator: 'bg-club-green'
       }"
@@ -562,6 +563,8 @@
     </div>
 
     <!-- Tab: Séries -->
+    <TournamentForecastBoard v-if="activeTab === 'forecast'" :slug="slug" />
+
     <div v-if="activeTab === 'series'" class="space-y-4">
       <div class="flex items-center justify-between gap-4">
         <div>

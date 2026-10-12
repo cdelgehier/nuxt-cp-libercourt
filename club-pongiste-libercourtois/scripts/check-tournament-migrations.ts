@@ -34,7 +34,12 @@ async function check(): Promise<void> {
   }
   writeFileSync(join(directory, 'meta/_journal.json'), JSON.stringify(journal))
   await migrate(drizzle(fresh), { migrationsFolder: directory })
-  const current = { ...journal, entries: journal.entries.slice(0, -1) }
+  const current = {
+    ...journal,
+    entries: journal.entries.filter(function (entry: { idx: number }) {
+      return entry.idx < 16
+    })
+  }
   writeFileSync(join(directory, 'meta/_journal.json'), JSON.stringify(current))
   await migrate(drizzle(existing), { migrationsFolder: directory })
   await existing.exec(`
@@ -80,6 +85,31 @@ async function check(): Promise<void> {
         `INSERT INTO tournament_series (tournament_id, name, series_date, start_time) VALUES (100, 'Invalid', ${values})`
       )
     )
+  await existing.exec(
+    `INSERT INTO tournament_forecasts (tournament_id, config) VALUES (100, '{"days":[],"series":[]}');`
+  )
+  assert.equal(
+    (await existing.query('SELECT version FROM tournament_forecasts')).rows[0]!
+      .version,
+    1
+  )
+  await assert.rejects(
+    existing.exec(
+      `INSERT INTO tournament_forecasts (tournament_id, config) VALUES (100, '{}');`
+    )
+  )
+  await assert.rejects(
+    existing.exec(`UPDATE tournament_forecasts SET version = 0;`)
+  )
+  await existing.exec('DELETE FROM tournaments WHERE id=100')
+  assert.equal(
+    (
+      await existing.query(
+        'SELECT count(*)::int AS count FROM tournament_forecasts'
+      )
+    ).rows[0]!.count,
+    0
+  )
   const old = { ...journal, entries: journal.entries.slice(0, 9) }
   writeFileSync(join(directory, 'meta/_journal.json'), JSON.stringify(old))
 

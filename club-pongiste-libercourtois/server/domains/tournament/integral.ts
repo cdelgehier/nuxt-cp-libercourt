@@ -909,3 +909,42 @@ export function seriesEarliest(
     Math.max(instant, new Date(requested).getTime())
   ).toISOString()
 }
+
+/** Build a detached full tournament using seed order as the virtual result. */
+export function projectIntegral(count: number): IntegralState {
+  const state = createIntegral(
+    Array.from({ length: count }, function (_, index) {
+      return {
+        id: index + 1,
+        ranking: count - index,
+        club: null,
+        identities: [],
+        withdrawn: false,
+        seed: 0
+      }
+    }),
+    { pointsPerSet: 11, setsToWin: 1, handicap: false }
+  )
+  advancePhase(state)
+  while (state.phase !== 'finished') {
+    // Resolve a whole round before generating its child branches. This avoids
+    // copying a large state for every score while using the same sporting rules.
+    for (const match of state.matches) {
+      if (match.winner !== null) continue
+      const first = entrantById(state, match.player1!),
+        second = entrantById(state, match.player2!)
+      match.winner = first.seed < second.seed ? first.id : second.id
+      match.loser = match.winner === first.id ? second.id : first.id
+      match.status = 'finished'
+      match.sets = [
+        match.winner === first.id
+          ? { score1: 11, score2: 0 }
+          : { score1: 0, score2: 11 }
+      ]
+    }
+    if (state.phase === 'pools' || state.phase === 'playoffs')
+      advancePhase(state)
+    else settle(state)
+  }
+  return state
+}

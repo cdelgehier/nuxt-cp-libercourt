@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import {
     updateTournamentInputSchema,
+    seriesScheduleInputSchema,
     type TournamentWithSeries,
     type TournamentJaAccess,
     type TournamentSeries,
@@ -46,7 +47,8 @@
     locationLng: undefined as number | undefined,
     description: '',
     tableCount: 1,
-    isPublished: false
+    isPublished: false,
+    isDemo: false
   })
   const editErrors = reactive<Record<string, string>>({})
   const editSaving = ref(false)
@@ -64,7 +66,8 @@
         locationLng: t.locationLng ?? undefined,
         description: t.description ?? '',
         tableCount: t.tableCount,
-        isPublished: t.isPublished
+        isPublished: t.isPublished,
+        isDemo: t.isDemo
       })
     },
     { immediate: true }
@@ -146,8 +149,14 @@
     }
   }
 
-  watch(selectedSeriesId, id => {
-    seriesTab.value = 'registrations'
+  watch(selectedSeriesId, function (id) {
+    const selected = tournament.value?.series.find(function (series) {
+      return series.id === id
+    })
+    seriesTab.value =
+      selected && !['draft', 'registration'].includes(selected.status)
+        ? 'bracket'
+        : 'registrations'
     seriesDetail.value = null
     registrations.value = []
     if (id) loadSeriesDetail(id)
@@ -173,6 +182,7 @@
   // Edit series modal
   const editSeriesModalOpen = ref(false)
   const editSeriesSaving = ref(false)
+  const editSeriesErrors = reactive<Record<string, string>>({})
   const editSeriesForm = reactive({
     name: '',
     seriesFormat: 'singles' as 'singles' | 'doubles',
@@ -202,6 +212,8 @@
   function openEditSeries() {
     const s = currentSeries.value
     if (!s) return
+    for (const key of Object.keys(editSeriesErrors))
+      Reflect.deleteProperty(editSeriesErrors, key)
     Object.assign(editSeriesForm, {
       name: s.name,
       seriesFormat: s.seriesFormat,
@@ -213,14 +225,15 @@
       maxPlayers: s.maxPlayers ?? undefined,
       setsToWin: s.setsToWin,
       pointsPerSet: s.pointsPerSet,
-      seriesDate: s.seriesDate ?? '',
-      startTime: s.startTime ?? ''
+      seriesDate: s.seriesDate || tournament.value?.date || '',
+      startTime: s.startTime || '09:00'
     })
     editSeriesModalOpen.value = true
   }
 
   async function saveEditSeries() {
     if (!selectedSeriesId.value) return
+    if (!validateSeriesSchedule(editSeriesForm, editSeriesErrors)) return
     editSeriesSaving.value = true
     try {
       await $fetch(
@@ -246,6 +259,7 @@
   // Create series modal
   const seriesModalOpen = ref(false)
   const seriesSaving = ref(false)
+  const seriesErrors = reactive<Record<string, string>>({})
   const seriesForm = reactive({
     name: '',
     seriesFormat: 'singles' as 'singles' | 'doubles',
@@ -257,10 +271,31 @@
     maxPlayers: undefined as number | undefined,
     setsToWin: 3,
     pointsPerSet: 11,
-    seriesDate: '',
-    startTime: ''
+    seriesDate: tournament.value?.date ?? '',
+    startTime: '09:00'
   })
+  function openCreateSeries(): void {
+    for (const key of Object.keys(seriesErrors))
+      Reflect.deleteProperty(seriesErrors, key)
+    if (!seriesForm.seriesDate)
+      seriesForm.seriesDate = tournament.value?.date ?? ''
+    if (!seriesForm.startTime) seriesForm.startTime = '09:00'
+    seriesModalOpen.value = true
+  }
+  /** Explain missing or invalid schedule fields before sending a series edit. */
+  function validateSeriesSchedule(
+    input: unknown,
+    errors: Record<string, string>
+  ): boolean {
+    for (const key of Object.keys(errors)) Reflect.deleteProperty(errors, key)
+    const parsed = seriesScheduleInputSchema.safeParse(input)
+    if (parsed.success) return true
+    for (const issue of parsed.error.issues)
+      errors[String(issue.path[0])] ??= issue.message
+    return false
+  }
   async function createSeries() {
+    if (!validateSeriesSchedule(seriesForm, seriesErrors)) return
     if (!seriesForm.name || seriesForm.name.trim().length < 2) {
       toast.add({
         title: 'Le nom de la série est requis (2 caractères minimum)',
@@ -303,6 +338,7 @@
       }
     }
   )
+  const generatingPools = ref(false)
   async function generateBracket() {
     if (!selectedSeriesId.value) return
     if (
@@ -311,6 +347,7 @@
       )
     )
       return
+    generatingPools.value = true
     try {
       const current = await $fetch<{ version: number }>(
         `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}/integral`
@@ -330,37 +367,12 @@
       const msg =
         (e as { data?: { message?: string } })?.data?.message ?? 'Erreur'
       toast.add({ title: msg, color: 'error' })
-    }
-  }
-
-  const isDev = import.meta.dev
-  const addRegistrationOpen = ref(false)
-  const seeding = ref(false)
-  const demoCount = ref(24)
-
-  async function devSeedSeries(count = 24) {
-    if (!selectedSeriesId.value) return
-    seeding.value = true
-    try {
-      const res = await $fetch<{ inserted: number }>(
-        `/api/admin/tournois/${slug}/series/${selectedSeriesId.value}/demo`,
-        {
-          method: 'POST',
-          body: { count }
-        }
-      )
-      toast.add({
-        title: `${res.inserted} ${currentSeries.value?.seriesFormat === 'doubles' ? 'paires fictives ajoutées' : 'joueurs fictifs ajoutés'}`,
-        color: 'success'
-      })
-      await refreshSeriesState()
-    } catch (error: unknown) {
-      const message = (error as { data?: { message?: string } })?.data?.message
-      toast.add({ title: message ?? 'Remplissage impossible', color: 'error' })
     } finally {
-      seeding.value = false
+      generatingPools.value = false
     }
   }
+
+  const addRegistrationOpen = ref(false)
   const currentSeries = computed<TournamentSeries | undefined>(() =>
     tournament.value?.series.find(s => s.id === selectedSeriesId.value)
   )
@@ -368,6 +380,10 @@
   async function refreshSeriesState(): Promise<void> {
     await refreshTournament()
     await refreshRegistrations()
+  }
+
+  function returnToRegistrations(seriesId: number): void {
+    if (selectedSeriesId.value === seriesId) seriesTab.value = 'registrations'
   }
 
   async function refreshRegistrations() {
@@ -421,6 +437,13 @@
             >
               {{ tournament.name }}
             </h1>
+            <UBadge
+              v-if="tournament.isDemo"
+              color="info"
+              variant="subtle"
+              icon="i-heroicons-beaker"
+              >DEV · Démonstration</UBadge
+            >
             <UBadge
               :color="tournament.isPublished ? 'success' : 'neutral'"
               variant="subtle"
@@ -509,6 +532,15 @@
       <UFormField label="Publié">
         <USwitch v-model="editForm.isPublished" />
       </UFormField>
+      <UFormField
+        label="DEV · Tournoi de démonstration"
+        description="Autorise l’ajout de participants fictifs et la simulation de résultats, y compris sur le site en ligne."
+      >
+        <USwitch
+          v-model="editForm.isDemo"
+          aria-label="Tournoi de démonstration"
+        />
+      </UFormField>
       <div class="flex flex-wrap gap-2 pt-2 sm:col-span-2">
         <UButton :loading="editSaving" @click="saveGeneral"
           >Enregistrer</UButton
@@ -540,7 +572,7 @@
             Inscriptions, pointage et progression sportive.
           </p>
         </div>
-        <UButton icon="i-heroicons-plus" @click="seriesModalOpen = true">
+        <UButton icon="i-heroicons-plus" @click="openCreateSeries">
           Nouvelle série
         </UButton>
       </div>
@@ -558,10 +590,7 @@
         <p class="mt-1 text-sm text-slate-500">
           Choisissez le format et les règles, puis inscrivez les participants.
         </p>
-        <UButton
-          class="mt-5"
-          icon="i-heroicons-plus"
-          @click="seriesModalOpen = true"
+        <UButton class="mt-5" icon="i-heroicons-plus" @click="openCreateSeries"
           >Créer une série</UButton
         >
       </div>
@@ -631,6 +660,64 @@
             </div>
           </div>
 
+          <div
+            v-if="
+              seriesTab === 'registrations' ||
+              ['draft', 'registration'].includes(currentSeries.status)
+            "
+            class="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-blue-100 bg-blue-50/60 p-4"
+          >
+            <div>
+              <p class="font-semibold text-slate-900">
+                {{
+                  ['draft', 'registration'].includes(currentSeries.status)
+                    ? 'Inscrire, puis préparer les poules'
+                    : 'Piloter la série'
+                }}
+              </p>
+              <p class="mt-1 text-sm text-slate-600">
+                {{
+                  ['draft', 'registration'].includes(currentSeries.status)
+                    ? `${activeParticipantCount} participants disponibles · confirmez les présents avant de préparer les poules.`
+                    : 'Lancez les poules et retrouvez les rencontres depuis le poste du tournoi.'
+                }}
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <UButton
+                v-if="['draft', 'registration'].includes(currentSeries.status)"
+                icon="i-heroicons-user-plus"
+                size="lg"
+                @click="addRegistrationOpen = true"
+              >
+                Inscrire un joueur
+              </UButton>
+              <UButton
+                v-if="['draft', 'registration'].includes(currentSeries.status)"
+                icon="i-heroicons-table-cells"
+                size="lg"
+                variant="outline"
+                :disabled="activeParticipantCount < 2"
+                :loading="generatingPools"
+                @click="generateBracket"
+              >
+                Préparer les poules
+              </UButton>
+              <UButton
+                v-else-if="seriesTab === 'registrations'"
+                size="lg"
+                icon="i-heroicons-play"
+                @click="seriesTab = 'bracket'"
+              >
+                {{
+                  currentSeries.status === 'bracket_generated'
+                    ? 'Lancer les poules'
+                    : 'Ouvrir le poste du tournoi'
+                }}
+              </UButton>
+            </div>
+          </div>
+
           <!-- Sub-tabs: Inscriptions / Tableau -->
           <div class="mt-5 mb-5 flex gap-2 border-t border-slate-100 pt-4">
             <UButton
@@ -661,63 +748,17 @@
               <p class="text-sm text-slate-500">
                 Suivez la présence et les frais d’inscription.
               </p>
-              <div class="flex flex-wrap items-center gap-2">
-                <UButton
-                  v-if="
-                    ['draft', 'registration'].includes(currentSeries.status)
-                  "
-                  size="sm"
-                  icon="i-heroicons-user-plus"
-                  @click="addRegistrationOpen = true"
-                  >Inscrire un joueur</UButton
-                >
-                <UButton
-                  v-if="
-                    ['draft', 'registration'].includes(currentSeries.status)
-                  "
-                  size="sm"
-                  variant="outline"
-                  color="neutral"
-                  icon="i-heroicons-table-cells"
-                  :disabled="activeParticipantCount < 2"
-                  @click="generateBracket"
-                  >Générer les poules</UButton
-                >
-              </div>
             </div>
-            <div
+            <TournamentDemoRegistrations
               v-if="
-                isDev &&
+                tournament.isDemo &&
                 ['draft', 'registration'].includes(currentSeries.status)
               "
-              class="flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-amber-300 bg-amber-50 p-3"
-            >
-              <UIcon name="i-heroicons-beaker" class="size-5 text-amber-700" />
-              <div class="mr-auto">
-                <p class="text-sm font-medium text-amber-900">
-                  Démonstration locale
-                </p>
-                <p class="text-xs text-amber-700">
-                  Participants fictifs, tous présents. Base locale uniquement.
-                </p>
-              </div>
-              <UInput
-                v-model.number="demoCount"
-                type="number"
-                min="2"
-                max="32"
-                aria-label="Nombre de participants fictifs"
-                class="w-20"
-              />
-              <UButton
-                color="warning"
-                variant="outline"
-                size="sm"
-                :loading="seeding"
-                @click="devSeedSeries(demoCount)"
-                >Remplir la série</UButton
-              >
-            </div>
+              :slug="slug"
+              :series-id="currentSeries.id"
+              :doubles="currentSeries.seriesFormat === 'doubles'"
+              @refresh="refreshSeriesState"
+            />
             <TournamentRegistrationTable
               :roster-locked="
                 !!currentSeries &&
@@ -737,8 +778,10 @@
               :key="currentSeries.id"
               :slug="slug"
               :series-id="currentSeries.id"
+              :tournament-name="tournament?.name ?? ''"
               api-base="/api/admin/tournois"
               @refresh="refreshSeriesState"
+              @pools-cancelled="returnToRegistrations"
             />
           </div>
         </section>
@@ -893,18 +936,28 @@
             />
           </UFormField>
           <div class="grid grid-cols-2 gap-3">
-            <UFormField label="Date de la série (optionnel)">
+            <UFormField
+              label="Date de la série"
+              required
+              :error="editSeriesErrors.seriesDate"
+            >
               <UInput
                 v-model="editSeriesForm.seriesDate"
                 class="w-full"
                 type="date"
+                required
               />
             </UFormField>
-            <UFormField label="Heure de début (optionnel)">
+            <UFormField
+              label="Heure de début"
+              required
+              :error="editSeriesErrors.startTime"
+            >
               <UInput
                 v-model="editSeriesForm.startTime"
                 class="w-full"
                 type="time"
+                required
               />
             </UFormField>
           </div>
@@ -1066,18 +1119,28 @@
             />
           </UFormField>
           <div class="grid grid-cols-2 gap-3">
-            <UFormField label="Date de la série (optionnel)">
+            <UFormField
+              label="Date de la série"
+              required
+              :error="seriesErrors.seriesDate"
+            >
               <UInput
                 v-model="seriesForm.seriesDate"
                 class="w-full"
                 type="date"
+                required
               />
             </UFormField>
-            <UFormField label="Heure de début (optionnel)">
+            <UFormField
+              label="Heure de début"
+              required
+              :error="seriesErrors.startTime"
+            >
               <UInput
                 v-model="seriesForm.startTime"
                 class="w-full"
                 type="time"
+                required
               />
             </UFormField>
           </div>

@@ -1,43 +1,43 @@
 <script setup lang="ts">
-import type { EnrichedTournament } from "~~/server/domains/tournament/types";
+  import type { EnrichedTournament } from '~~/server/domains/tournament/types'
 
-useSeoMeta({ title: "Tournois — Club Pongiste Libercourtois" });
+  useSeoMeta({ title: 'Tournois — Club Pongiste Libercourtois' })
 
-const { data: tournaments, pending } =
-  await useFetch<EnrichedTournament[]>("/api/tournois");
+  const { data: tournaments, pending } =
+    await useFetch<EnrichedTournament[]>('/api/tournois')
 
-function formatDate(t: EnrichedTournament): string {
-  return formatDateRange(t.date, t.dateEnd);
-}
-
-function mapsUrl(t: EnrichedTournament): string {
-  if (t.locationLat && t.locationLng) {
-    return `https://www.google.com/maps?q=${t.locationLat},${t.locationLng}`;
+  function formatDate(t: EnrichedTournament): string {
+    return formatDateRange(t.date, t.dateEnd)
   }
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t.location ?? "")}`;
-}
 
-// Share modal
-const shareModalOpen = ref(false);
-const shareTournament = ref<EnrichedTournament | null>(null);
+  function mapsUrl(t: EnrichedTournament): string {
+    if (t.locationLat && t.locationLng) {
+      return `https://www.google.com/maps?q=${t.locationLat},${t.locationLng}`
+    }
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t.location ?? '')}`
+  }
 
-function openShare(t: EnrichedTournament, e: MouseEvent) {
-  e.preventDefault();
-  e.stopPropagation();
-  shareTournament.value = t;
-  shareModalOpen.value = true;
-}
+  // Share modal
+  const shareModalOpen = ref(false)
+  const shareTournament = ref<EnrichedTournament | null>(null)
 
-const shareUrl = computed(() => {
-  if (!shareTournament.value) return "";
-  return `${useRequestURL().origin}/tournois/${shareTournament.value.slug}`;
-});
+  function openShare(t: EnrichedTournament, e: MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    shareTournament.value = t
+    shareModalOpen.value = true
+  }
 
-const qrUrl = computed(() =>
-  shareUrl.value
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(shareUrl.value)}`
-    : "",
-);
+  const shareUrl = computed(() => {
+    if (!shareTournament.value) return ''
+    return `${useRequestURL().origin}/tournois/${shareTournament.value.slug}`
+  })
+
+  const qrUrl = computed(() =>
+    shareUrl.value
+      ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(shareUrl.value)}`
+      : ''
+  )
 </script>
 
 <template>
@@ -77,6 +77,9 @@ const qrUrl = computed(() =>
               >
                 {{ t.name }}
               </h2>
+              <UBadge v-if="t.isDemo" color="info" variant="subtle"
+                >DEV · Démonstration</UBadge
+              >
               <button
                 class="shrink-0 p-1 rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                 title="Partager"
@@ -114,14 +117,14 @@ const qrUrl = computed(() =>
                 name="i-heroicons-rectangle-stack"
                 class="w-4 h-4 text-gray-400 shrink-0"
               />
-              {{ t.seriesCount }} série{{ t.seriesCount > 1 ? "s" : "" }}
+              {{ t.seriesCount }} série{{ t.seriesCount > 1 ? 's' : '' }}
             </div>
             <div class="flex items-center gap-2">
               <UIcon
                 name="i-heroicons-table-cells"
                 class="w-4 h-4 text-gray-400 shrink-0"
               />
-              {{ t.tableCount }} table{{ t.tableCount > 1 ? "s" : "" }}
+              {{ t.tableCount }} table{{ t.tableCount > 1 ? 's' : '' }}
             </div>
             <div v-if="t.totalRegistrants > 0" class="flex items-center gap-2">
               <UIcon
@@ -129,7 +132,7 @@ const qrUrl = computed(() =>
                 class="w-4 h-4 text-gray-400 shrink-0"
               />
               {{ t.totalRegistrants }} inscrit{{
-                t.totalRegistrants > 1 ? "s" : ""
+                t.totalRegistrants > 1 ? 's' : ''
               }}
             </div>
           </div>

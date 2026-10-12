@@ -41,7 +41,8 @@
     locationLng: 3.017099247377654,
     description: '',
     tableCount: 1,
-    isPublished: false
+    isPublished: false,
+    isDemo: false
   } as const
 
   const form = reactive({ ...DEFAULT_FORM })
@@ -190,6 +191,14 @@
             t.name
           }}</NuxtLink>
         </h2>
+        <UBadge
+          v-if="t.isDemo"
+          class="mt-2 self-start"
+          color="info"
+          variant="subtle"
+          icon="i-heroicons-beaker"
+          >DEV · Démonstration</UBadge
+        >
         <div class="mt-3 space-y-2 text-sm text-slate-500">
           <p class="flex items-start gap-2">
             <UIcon
@@ -289,6 +298,15 @@
           </UFormField>
           <UFormField label="Publier immédiatement">
             <USwitch v-model="form.isPublished" />
+          </UFormField>
+          <UFormField
+            label="DEV · Tournoi de démonstration"
+            description="Permet de remplir les inscriptions et de simuler les résultats."
+          >
+            <USwitch
+              v-model="form.isDemo"
+              aria-label="Tournoi de démonstration"
+            />
           </UFormField>
         </div>
       </template>

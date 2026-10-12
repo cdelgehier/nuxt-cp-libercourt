@@ -20,18 +20,35 @@
   // Share modal
   const shareModalOpen = ref(false)
   const shareTournament = ref<EnrichedTournament | null>(null)
+  const shareCopied = ref(false)
+  const shareCopyError = ref(false)
+  const requestUrl = useRequestURL()
 
   function openShare(t: EnrichedTournament, e: MouseEvent) {
     e.preventDefault()
     e.stopPropagation()
+    shareCopied.value = false
+    shareCopyError.value = false
     shareTournament.value = t
     shareModalOpen.value = true
   }
 
   const shareUrl = computed(() => {
     if (!shareTournament.value) return ''
-    return `${useRequestURL().origin}/tournois/${shareTournament.value.slug}`
+    return `${requestUrl.origin}/tournois/${shareTournament.value.slug}`
   })
+
+  async function copyShareUrl() {
+    const url = shareUrl.value
+    shareCopied.value = false
+    shareCopyError.value = false
+    try {
+      await navigator.clipboard.writeText(url)
+      if (shareUrl.value === url) shareCopied.value = true
+    } catch {
+      if (shareUrl.value === url) shareCopyError.value = true
+    }
+  }
 
   const qrUrl = computed(() =>
     shareUrl.value
@@ -151,14 +168,23 @@
             alt="QR Code"
             class="w-[220px] h-[220px] rounded"
           />
-          <p class="text-sm text-gray-500 break-all max-w-xs">{{ shareUrl }}</p>
+          <p class="text-sm text-gray-500 break-all max-w-xs select-all">
+            {{ shareUrl }}
+          </p>
           <UButton
             variant="outline"
-            icon="i-heroicons-clipboard-document"
-            @click="navigator.clipboard.writeText(shareUrl)"
+            :icon="
+              shareCopied
+                ? 'i-heroicons-check'
+                : 'i-heroicons-clipboard-document'
+            "
+            @click="copyShareUrl"
           >
-            Copier le lien
+            {{ shareCopied ? 'Lien copié' : 'Copier le lien' }}
           </UButton>
+          <p v-if="shareCopyError" role="alert" class="text-sm text-error">
+            La copie a échoué. Sélectionnez le lien ci-dessus pour le copier.
+          </p>
         </div>
       </template>
     </UModal>

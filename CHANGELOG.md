@@ -1,3 +1,10 @@
+## v1.12.0 (2026-10-12)
+
+### Feat
+
+- **tournament**: add registration overview and landscape printing
+- **tournament**: add private forecasting agenda
+
 ## v1.11.1 (2026-10-12)
 
 ### Fix

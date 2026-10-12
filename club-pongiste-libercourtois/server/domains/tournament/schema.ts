@@ -1,9 +1,11 @@
 import type { IntegralState } from './integral'
+import { sql } from 'drizzle-orm'
 import {
   jsonb,
   boolean,
   doublePrecision,
   integer,
+  check,
   primaryKey,
   foreignKey,
   pgEnum,
@@ -80,6 +82,8 @@ export const tournaments = pgTable('tournaments', {
   description: text('description'),
   tableCount: integer('table_count').notNull().default(1),
   isPublished: boolean('is_published').notNull().default(false),
+  /** Demo tools are enabled per tournament, including on the production site. */
+  isDemo: boolean('is_demo').notNull().default(false),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow()
 })
@@ -96,29 +100,46 @@ export const tournamentJaAccess = pgTable('tournament_ja_access', {
   createdAt: timestamp('created_at').defaultNow()
 })
 
-export const tournamentSeries = pgTable('tournament_series', {
-  id: serial('id').primaryKey(),
-  tournamentId: integer('tournament_id')
-    .notNull()
-    .references(() => tournaments.id, { onDelete: 'cascade' }),
-  name: text('name').notNull(),
-  seriesFormat: seriesFormatEnum('series_format').notNull().default('singles'),
-  seriesType: seriesTypeEnum('series_type').notNull().default('standard'),
-  ageCategories: text('age_categories').array().notNull().default([]),
-  femalesOnly: boolean('females_only').notNull().default(false),
-  pointsLimitMin: integer('points_limit_min'), // pour series_type = 'points_limit'
-  pointsLimitMax: integer('points_limit_max'),
-  status: seriesStatusEnum('status').notNull().default('draft'),
-  maxPlayers: integer('max_players'), // null = illimité
-  bracketMode: bracketModeEnum('bracket_mode').notNull().default('single'),
-  setsToWin: integer('sets_to_win').notNull().default(3), // speedy → 1
-  pointsPerSet: integer('points_per_set').notNull().default(11), // speedy → 3
-  sortOrder: integer('sort_order').notNull().default(0),
-  seriesDate: text('series_date'), // YYYY-MM-DD, null = uses tournament date
-  startTime: text('start_time'), // HH:MM, null = no specific time
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow()
-})
+export const tournamentSeries = pgTable(
+  'tournament_series',
+  {
+    id: serial('id').primaryKey(),
+    tournamentId: integer('tournament_id')
+      .notNull()
+      .references(() => tournaments.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    seriesFormat: seriesFormatEnum('series_format')
+      .notNull()
+      .default('singles'),
+    seriesType: seriesTypeEnum('series_type').notNull().default('standard'),
+    ageCategories: text('age_categories').array().notNull().default([]),
+    femalesOnly: boolean('females_only').notNull().default(false),
+    pointsLimitMin: integer('points_limit_min'), // pour series_type = 'points_limit'
+    pointsLimitMax: integer('points_limit_max'),
+    status: seriesStatusEnum('status').notNull().default('draft'),
+    maxPlayers: integer('max_players'), // null = illimité
+    bracketMode: bracketModeEnum('bracket_mode').notNull().default('single'),
+    setsToWin: integer('sets_to_win').notNull().default(3), // speedy → 1
+    pointsPerSet: integer('points_per_set').notNull().default(11), // speedy → 3
+    sortOrder: integer('sort_order').notNull().default(0),
+    seriesDate: text('series_date').notNull(), // YYYY-MM-DD in Europe/Paris
+    startTime: text('start_time').notNull(), // HH:MM in Europe/Paris
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow()
+  },
+  function (table) {
+    return [
+      check(
+        'tournament_series_date_valid',
+        sql`${table.seriesDate} ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' AND ${table.seriesDate}::date IS NOT NULL`
+      ),
+      check(
+        'tournament_series_start_time_valid',
+        sql`${table.startTime} ~ '^([01][0-9]|2[0-3]):[0-5][0-9]$'`
+      )
+    ]
+  }
+)
 
 export const seriesRegistrations = pgTable('series_registrations', {
   id: serial('id').primaryKey(),

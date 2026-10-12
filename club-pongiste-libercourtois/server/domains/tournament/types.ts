@@ -133,6 +133,21 @@ const isoDate = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, 'Format attendu : YYYY-MM-DD')
 const isoDateOptional = z.preprocess(v => v || undefined, isoDate.optional())
+const seriesDate = z.iso.date({
+  error: 'La date de la série est obligatoire et doit être valide.'
+})
+const seriesStartTime = z
+  .string({ error: 'L’heure de début est obligatoire.' })
+  .min(1, 'L’heure de début est obligatoire.')
+  .regex(
+    /^([01]\d|2[0-3]):[0-5]\d$/,
+    'Indiquez une heure valide au format HH:MM.'
+  )
+
+export const seriesScheduleInputSchema = z.object({
+  seriesDate,
+  startTime: seriesStartTime
+})
 
 export const createTournamentInputSchema = z.object({
   name: z
@@ -157,10 +172,15 @@ export const createTournamentInputSchema = z.object({
     .min(1, 'Minimum 1 table')
     .max(100, 'Maximum 100 tables')
     .default(1),
-  isPublished: z.boolean().default(false)
+  isPublished: z.boolean().default(false),
+  isDemo: z.boolean().default(false)
 })
 
-export const updateTournamentInputSchema = createTournamentInputSchema.partial()
+export const updateTournamentInputSchema = createTournamentInputSchema
+  .partial()
+  .extend({
+    isDemo: z.boolean().optional()
+  })
 
 const SERIES_TYPE_ENUM = [
   'standard',
@@ -186,14 +206,8 @@ export const createSeriesInputSchema = z
     setsToWin: z.number().int().min(1).max(4).optional(),
     pointsPerSet: z.number().int().min(3).max(21).optional(),
     sortOrder: z.number().int().default(0),
-    seriesDate: isoDateOptional,
-    startTime: z.preprocess(
-      v => v || undefined,
-      z
-        .string()
-        .regex(/^\d{2}:\d{2}$/, 'Format attendu : HH:MM')
-        .optional()
-    )
+    seriesDate,
+    startTime: seriesStartTime
   })
   .refine(
     d =>
@@ -241,14 +255,8 @@ export const updateSeriesInputSchema = z
     setsToWin: z.number().int().min(1).max(4).optional(),
     pointsPerSet: z.number().int().min(3).max(21).optional(),
     sortOrder: z.number().int().optional(),
-    seriesDate: isoDateOptional,
-    startTime: z.preprocess(
-      v => v || undefined,
-      z
-        .string()
-        .regex(/^\d{2}:\d{2}$/, 'Format attendu : HH:MM')
-        .optional()
-    )
+    seriesDate: seriesDate.optional(),
+    startTime: seriesStartTime.optional()
   })
   .transform(d => {
     if (d.seriesType === 'speedy') {

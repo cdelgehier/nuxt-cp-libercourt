@@ -1,3 +1,5 @@
+export { planSchedule } from './planning'
+
 /** Sporting state of one full-placement series. Persisted as one atomic snapshot. */
 export interface Entrant {
   id: number
@@ -20,6 +22,8 @@ export interface FrozenRules extends Rules {
 export interface Pool {
   id: number
   players: number[]
+  /** Physical tables held for the whole pool, independent of its score sheets. */
+  tables?: number[]
 }
 export interface Source {
   entrant?: number
@@ -38,11 +42,13 @@ export interface IntegralMatch {
   player2: number | null
   winner: number | null
   loser: number | null
+  /** Pool games are open score sheets; physical play follows the table placards. */
   status: 'pending' | 'in_progress' | 'finished' | 'forfeit'
   sets: { score1: number; score2: number }[]
   forfeitPlayers?: number[]
   rules: FrozenRules | null
   table: number | null
+  /** For pool sheets, this is the shared forecast for launching the whole pool. */
   scheduledAt: string | null
   startedAt: string | null
   finishedAt: string | null
@@ -603,7 +609,8 @@ function resolveWithdrawals(state: IntegralState): boolean {
   let changed = false
   for (const match of state.matches) {
     if (
-      match.status !== 'pending' ||
+      (match.status !== 'pending' &&
+        !(match.phase === 'pools' && match.status === 'in_progress')) ||
       match.player1 === null ||
       match.player2 === null
     )
@@ -698,7 +705,7 @@ export function handicapStart(
 export function startMatch(
   state: IntegralState,
   id: number,
-  input: { table: number; startScores?: [number, number] },
+  input: { table?: number; startScores?: [number, number] } = {},
   now = new Date().toISOString()
 ): void {
   if (state.phase === 'ready' || state.phase === 'finished')
@@ -713,7 +720,11 @@ export function startMatch(
     match.player2 === null
   )
     throw new Error('Match indisponible.')
-  if (!Number.isInteger(input.table) || input.table < 1)
+  if (
+    (match.phase !== 'pools' && input.table === undefined) ||
+    (input.table !== undefined &&
+      (!Number.isInteger(input.table) || input.table < 1))
+  )
     throw new Error('Table invalide.')
   const first = entrantById(state, match.player1),
     second = entrantById(state, match.player2)
@@ -752,7 +763,7 @@ export function startMatch(
     throw new Error('L’avance est réservée au participant le moins classé.')
   match.rules = { ...state.rules, startScores: [...startScores] }
   match.status = 'in_progress'
-  match.table = input.table
+  match.table = input.table ?? null
   match.startedAt = now
 }
 function scoreWinner(
@@ -871,114 +882,13 @@ export function recordResult(
   settle(draft)
   Object.assign(state, draft)
 }
-interface ScheduleSeries {
-  state: IntegralState
-  earliest: string
-}
-interface Reservation {
-  table: number
-  start: number
-  end: number
-  identities: string[]
-}
-function matchIdentities(state: IntegralState, match: IntegralMatch): string[] {
-  return [match.player1, match.player2].flatMap(function (id) {
-    return id === null ? [] : entrantById(state, id).identities
-  })
-}
-/** Greedy planning across all series uses physical player identities, including partners. */
-export function planSchedule(
-  series: ScheduleSeries[],
-  tables: number,
-  duration = 30,
-  rest = 10,
-  now = Date.now()
-): void {
-  if (
-    !Number.isInteger(tables) ||
-    tables < 1 ||
-    !Number.isInteger(duration) ||
-    duration < 1 ||
-    !Number.isInteger(rest) ||
-    rest < 0
-  )
-    throw new Error('Paramètres du planning invalides.')
-  const reservations: Reservation[] = []
-  for (const item of series)
-    for (const match of item.state.matches) {
-      if (match.status === 'pending' || match.status === 'forfeit') continue
-      const start = new Date(
-        match.startedAt ?? match.scheduledAt ?? now
-      ).getTime()
-      const end =
-        match.status === 'finished'
-          ? new Date(match.finishedAt ?? start + duration * 60000).getTime()
-          : Math.max(start + duration * 60000, now + duration * 60000)
-      reservations.push({
-        table: match.table ?? 1,
-        start,
-        end,
-        identities: matchIdentities(item.state, match)
-      })
-    }
-  for (const item of series) {
-    item.state.planning = { duration, rest }
-    for (const match of item.state.matches) {
-      if (
-        match.status !== 'pending' ||
-        match.player1 === null ||
-        match.player2 === null
-      )
-        continue
-      const identities = matchIdentities(item.state, match)
-      let bestStart = Infinity,
-        bestTable = 1
-      for (let table = 1; table <= tables; table++) {
-        let start = new Date(item.earliest).getTime()
-        if (!Number.isFinite(start))
-          throw new Error('Date de planning invalide.')
-        let conflict = true
-        while (conflict) {
-          conflict = false
-          for (const reservation of reservations) {
-            const shared = identities.some(function (identity) {
-              return reservation.identities.includes(identity)
-            })
-            const gap = shared ? rest * 60000 : 0
-            if (
-              (shared || table === reservation.table) &&
-              start < reservation.end + gap &&
-              start + duration * 60000 > reservation.start - gap
-            ) {
-              start = reservation.end + gap
-              conflict = true
-            }
-          }
-        }
-        if (start < bestStart) {
-          bestStart = start
-          bestTable = table
-        }
-      }
-      match.table = bestTable
-      match.scheduledAt = new Date(bestStart).toISOString()
-      reservations.push({
-        table: bestTable,
-        start: bestStart,
-        end: bestStart + duration * 60000,
-        identities
-      })
-    }
-  }
-}
-
 /** Series dates are club-local dates, independent of the server timezone. */
 export function seriesEarliest(
   date: string,
-  time: string | null,
+  time: string,
   requested: string
 ): string {
-  const wall = new Date(`${date}T${time ?? '00:00'}:00Z`).getTime()
+  const wall = new Date(`${date}T${time}:00Z`).getTime()
   if (!Number.isFinite(wall)) throw new Error('Date de série invalide.')
   let instant = wall
   const formatter = new Intl.DateTimeFormat('sv-SE', {

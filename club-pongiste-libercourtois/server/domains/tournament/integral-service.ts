@@ -1,4 +1,5 @@
 import { and, eq, sql } from 'drizzle-orm'
+import { isDeepStrictEqual } from 'node:util'
 import { z } from 'zod'
 import { tournamentDb } from '../../db/tournament-client'
 import { persistIntegralRows } from '../../db/integral-persistence'
@@ -19,8 +20,31 @@ import {
 } from './integral'
 import type { IntegralState, Entrant } from './integral'
 import type { SeriesRegistration } from './types'
+import { MatchStartError, matchStartBlock, startPool } from './pool-start'
+import { simulateDemoMatches } from './demo-results'
+import {
+  matchTableNumbers,
+  poolTableAssignments,
+  reservePoolTables
+} from './pool-tables'
 
 export const integralCommand = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('reserve-pool-tables'),
+    version: z.number().int().nonnegative(),
+    poolId: z.number().int().positive(),
+    tables: z.array(z.number().int().positive()).max(2)
+  }),
+  z.object({
+    action: z.literal('demo-match'),
+    version: z.number().int().nonnegative(),
+    matchId: z.number().int().positive()
+  }),
+  z.object({
+    action: z.literal('demo-pool'),
+    version: z.number().int().nonnegative(),
+    poolId: z.number().int().positive()
+  }),
   z.object({
     action: z.literal('generate'),
     version: z.number().int().nonnegative()
@@ -46,9 +70,27 @@ export const integralCommand = z.discriminatedUnion('action', [
     action: z.literal('start'),
     version: z.number().int().nonnegative(),
     matchId: z.number().int().positive(),
-    table: z.number().int().positive(),
+    table: z.number().int().positive().optional(),
+    confirmShortRest: z.boolean().default(false),
+    confirmPlayerConflict: z.boolean().default(false),
     startScores: z
       .tuple([z.number().int().nonnegative(), z.number().int().nonnegative()])
+      .optional()
+  }),
+  z.object({
+    action: z.literal('start-pool'),
+    version: z.number().int().nonnegative(),
+    poolId: z.number().int().positive(),
+    confirmShortRest: z.boolean().default(false),
+    confirmPlayerConflict: z.boolean().default(false),
+    advances: z
+      .record(
+        z.string(),
+        z.tuple([
+          z.number().int().nonnegative(),
+          z.number().int().nonnegative()
+        ])
+      )
       .optional()
   }),
   z.object({
@@ -135,9 +177,15 @@ export async function getIntegral(seriesId: number) {
     .select()
     .from(seriesRegistrations)
     .where(eq(seriesRegistrations.seriesId, seriesId))
+  const [tournament] = await tournamentDb
+    .select({ tableCount: tournaments.tableCount, isDemo: tournaments.isDemo })
+    .from(tournaments)
+    .where(eq(tournaments.id, series.tournamentId))
   return {
     series,
     registrations,
+    tableCount: tournament!.tableCount,
+    isDemo: tournament!.isDemo,
     version: snapshot?.version ?? 0,
     state: snapshot?.state ?? null
   }
@@ -178,6 +226,22 @@ export async function executeIntegral(seriesId: number, raw: unknown) {
         statusCode: 409,
         message: 'Les résultats ont changé. Actualisez avant de recommencer.'
       })
+    const [tournament] = await tx
+      .select({
+        isDemo: tournaments.isDemo,
+        tableCount: tournaments.tableCount,
+        date: tournaments.date
+      })
+      .from(tournaments)
+      .where(eq(tournaments.id, series.tournamentId))
+    if (
+      ['demo-match', 'demo-pool'].includes(command.action) &&
+      !tournament?.isDemo
+    )
+      throw createError({
+        statusCode: 403,
+        message: 'Les simulations sont réservées aux tournois de démonstration.'
+      })
     if (command.action === 'generate') {
       if (
         !['draft', 'registration', 'bracket_generated'].includes(
@@ -211,6 +275,76 @@ export async function executeIntegral(seriesId: number, raw: unknown) {
               ? error.message
               : 'Composition des poules invalide.'
         })
+      }
+      const others = await tx
+        .select()
+        .from(integralSeries)
+        .innerJoin(
+          tournamentSeries,
+          eq(integralSeries.seriesId, tournamentSeries.id)
+        )
+        .where(
+          and(
+            eq(tournamentSeries.tournamentId, series.tournamentId),
+            sql`${tournamentSeries.id} <> ${seriesId}`
+          )
+        )
+        .orderBy(tournamentSeries.sortOrder, tournamentSeries.id)
+      const requested = new Date().toISOString()
+      const previous = new Map(
+        others.map(function (row) {
+          return [
+            row.integral_series.seriesId,
+            structuredClone(row.integral_series.state)
+          ]
+        })
+      )
+      const states = others
+        .filter(function (row) {
+          return row.integral_series.state !== null
+        })
+        .map(function (row) {
+          return {
+            state: row.integral_series.state!,
+            earliest: seriesEarliest(
+              row.tournament_series.seriesDate,
+              row.tournament_series.startTime,
+              requested
+            )
+          }
+        })
+      states.push({
+        state,
+        earliest: seriesEarliest(series.seriesDate, series.startTime, requested)
+      })
+      planSchedule(
+        states,
+        tournament!.tableCount,
+        snapshot?.state?.planning?.duration ?? 30,
+        snapshot?.state?.planning?.rest ?? 10
+      )
+      for (const row of others) {
+        if (
+          !row.integral_series.state ||
+          isDeepStrictEqual(
+            previous.get(row.integral_series.seriesId),
+            row.integral_series.state
+          )
+        )
+          continue
+        await tx
+          .update(integralSeries)
+          .set({
+            state: row.integral_series.state,
+            version: row.integral_series.version + 1,
+            updatedAt: new Date()
+          })
+          .where(eq(integralSeries.seriesId, row.integral_series.seriesId))
+        await persistIntegralRows(
+          tx,
+          row.integral_series.seriesId,
+          row.integral_series.state
+        )
       }
       await tx
         .insert(integralSeries)
@@ -258,17 +392,35 @@ export async function executeIntegral(seriesId: number, raw: unknown) {
       return
     }
     try {
+      if (command.action === 'demo-match')
+        simulateDemoMatches(
+          state,
+          { matchId: command.matchId },
+          tournament!.tableCount
+        )
+      if (command.action === 'demo-pool')
+        simulateDemoMatches(
+          state,
+          { poolId: command.poolId },
+          tournament!.tableCount
+        )
       if (command.action === 'swap')
         swapPoolPlayers(state, command.first, command.second)
       if (command.action === 'advance')
         advancePhase(state, { poolOrders: command.poolOrders })
-      if (command.action === 'start') {
+      const needsTableAvailability = [
+        'start',
+        'start-pool',
+        'reserve-pool-tables'
+      ].includes(command.action)
+      const tournamentStates: IntegralState[] = [state]
+      let tableCount = 0
+      if (needsTableAvailability) {
         const [tournament] = await tx
-          .select()
+          .select({ tableCount: tournaments.tableCount })
           .from(tournaments)
           .where(eq(tournaments.id, series.tournamentId))
-        if (command.table > tournament!.tableCount)
-          throw new Error('Cette table n’existe pas.')
+        tableCount = tournament!.tableCount
         const others = await tx
           .select()
           .from(integralSeries)
@@ -277,60 +429,51 @@ export async function executeIntegral(seriesId: number, raw: unknown) {
             eq(integralSeries.seriesId, tournamentSeries.id)
           )
           .where(eq(tournamentSeries.tournamentId, series.tournamentId))
+        for (const other of others)
+          if (
+            other.integral_series.seriesId !== seriesId &&
+            other.integral_series.state
+          )
+            tournamentStates.push(other.integral_series.state)
+      }
+      if (command.action === 'reserve-pool-tables')
+        reservePoolTables(
+          state,
+          command.poolId,
+          command.tables,
+          tableCount,
+          tournamentStates
+        )
+      if (command.action === 'start-pool')
+        startPool(
+          state,
+          command.poolId,
+          tournamentStates,
+          command.advances,
+          new Date().toISOString(),
+          command.confirmShortRest,
+          command.confirmPlayerConflict
+        )
+      if (command.action === 'start') {
+        if (command.table !== undefined && command.table > tableCount)
+          throw new Error('Cette table n’existe pas.')
         const match = state.matches.find(function (entry) {
           return entry.id === command.matchId
         })
-        const identities = state.entrants
-          .filter(function (entry) {
-            return entry.id === match?.player1 || entry.id === match?.player2
-          })
-          .flatMap(function (entry) {
-            return entry.identities
-          })
-        for (const other of others)
-          for (const playing of other.integral_series.state?.matches ?? [])
-            if (
-              playing.status === 'finished' ||
-              playing.status === 'in_progress'
-            ) {
-              const shared = other.integral_series.state!.entrants.some(
-                function (entry) {
-                  return (
-                    (entry.id === playing.player1 ||
-                      entry.id === playing.player2) &&
-                    entry.identities.some(function (id) {
-                      return identities.includes(id)
-                    })
-                  )
-                }
-              )
-              const rest = state.planning?.rest ?? 10
-              if (
-                shared &&
-                playing.status === 'finished' &&
-                playing.finishedAt &&
-                Date.now() <
-                  new Date(playing.finishedAt).getTime() + rest * 60000
-              )
-                throw new Error(
-                  `Le joueur doit encore se reposer (${rest} minutes entre les matchs).`
-                )
-              if (playing.status !== 'in_progress') continue
-              if (playing.table === command.table)
-                throw new Error('La table est déjà occupée.')
-              if (
-                other.integral_series.state!.entrants.some(function (entry) {
-                  return (
-                    (entry.id === playing.player1 ||
-                      entry.id === playing.player2) &&
-                    entry.identities.some(function (id) {
-                      return identities.includes(id)
-                    })
-                  )
-                })
-              )
-                throw new Error('Un joueur dispute déjà un autre match.')
-            }
+        if (!match || match.status !== 'pending')
+          throw new Error('Match indisponible.')
+        if (match.phase !== 'pools' && command.table === undefined)
+          throw new Error('Table invalide.')
+        const blocked = matchStartBlock(
+          state,
+          match,
+          command.table,
+          tournamentStates,
+          Date.now(),
+          command.confirmShortRest,
+          command.confirmPlayerConflict
+        )
+        if (blocked) throw blocked
         startMatch(state, command.matchId, {
           table: command.table,
           startScores: command.startScores
@@ -382,7 +525,10 @@ export async function executeIntegral(seriesId: number, raw: unknown) {
     } catch (error) {
       throw createError({
         statusCode: 400,
-        message: error instanceof Error ? error.message : 'Action invalide'
+        message: error instanceof Error ? error.message : 'Action invalide',
+        ...(error instanceof MatchStartError
+          ? { data: { code: error.code } }
+          : {})
       })
     }
     await tx
@@ -433,6 +579,7 @@ export async function getTournamentSchedule(tournamentId: number) {
       eq(integralSeries.seriesId, tournamentSeries.id)
     )
     .where(eq(tournamentSeries.tournamentId, tournamentId))
+    .orderBy(tournamentSeries.sortOrder, tournamentSeries.id)
   const registrations = await tournamentDb
     .select({ registration: seriesRegistrations })
     .from(seriesRegistrations)
@@ -469,16 +616,29 @@ export async function getTournamentSchedule(tournamentId: number) {
           player1Club: clubs.get(match.player1 ?? 0) ?? '',
           player2Club: clubs.get(match.player2 ?? 0) ?? '',
           table: match.table,
+          tables: matchTableNumbers(row.integral_series.state!, match),
           scheduledAt: match.scheduledAt,
           startedAt: match.startedAt,
-          status: match.status
+          status: match.status,
+          durationMinutes: row.integral_series.state?.planning?.duration ?? 30,
+          winnerSide:
+            match.winner === null
+              ? null
+              : match.winner === match.player1
+                ? 1
+                : 2,
+          score: match.sets
+            .map(function (set) {
+              return `${set.score1}–${set.score2}`
+            })
+            .join(' / ')
         }
       })
     })
     .sort(function (a, b) {
       return (
-        (a.scheduledAt ?? a.startedAt ?? '9999').localeCompare(
-          b.scheduledAt ?? b.startedAt ?? '9999'
+        (a.startedAt ?? a.scheduledAt ?? '9999').localeCompare(
+          b.startedAt ?? b.scheduledAt ?? '9999'
         ) ||
         a.seriesId - b.seriesId ||
         a.id - b.id
@@ -489,7 +649,24 @@ export async function getTournamentSchedule(tournamentId: number) {
     if (row.integral_series.state)
       versions[String(row.integral_series.seriesId)] =
         row.integral_series.version
-  return { matches, versions }
+  const pools = rows.flatMap(function (row) {
+    const state = row.integral_series.state
+    if (!state) return []
+    return poolTableAssignments(state).map(function (assignment) {
+      const pool = state.pools.find(function (entry) {
+        return entry.id === assignment.poolId
+      })!
+      return {
+        seriesId: row.tournament_series.id,
+        seriesName: row.tournament_series.name,
+        ...assignment,
+        playerNames: pool.players.map(function (id) {
+          return names.get(id) ?? 'À déterminer'
+        })
+      }
+    })
+  })
+  return { matches, pools, versions }
 }
 /** Plan ready matches in all series, keeping started and finished games fixed. */
 export async function scheduleTournament(tournamentId: number, raw: unknown) {
@@ -514,6 +691,7 @@ export async function scheduleTournament(tournamentId: number, raw: unknown) {
         eq(integralSeries.seriesId, tournamentSeries.id)
       )
       .where(eq(tournamentSeries.tournamentId, tournamentId))
+      .orderBy(tournamentSeries.sortOrder, tournamentSeries.id)
     const states: { state: IntegralState; earliest: string }[] = []
     for (const row of rows) {
       if (!row.integral_series.state) continue
@@ -528,7 +706,7 @@ export async function scheduleTournament(tournamentId: number, raw: unknown) {
       states.push({
         state: row.integral_series.state,
         earliest: seriesEarliest(
-          row.tournament_series.seriesDate ?? tournament!.date,
+          row.tournament_series.seriesDate,
           row.tournament_series.startTime,
           input.startAt
         )

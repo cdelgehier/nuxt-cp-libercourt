@@ -36,12 +36,15 @@ async function request(
 const tournament = await request('/api/admin/tournois', 'POST', {
   name: `Contrôle démo ${Date.now()}`,
   date: '2026-10-11',
-  isPublished: false
+  isPublished: false,
+  isDemo: true
 })
 const base = `/api/admin/tournois/${tournament.slug}`
 try {
   const singles = await request(`${base}/series`, 'POST', {
     name: 'Simple local',
+    seriesDate: tournament.date,
+    startTime: '09:00',
     maxPlayers: 24
   })
   const path = `${base}/series/${singles.id}`
@@ -67,6 +70,8 @@ try {
   )
   const capacity = await request(`${base}/series`, 'POST', {
     name: 'Capacité limitée',
+    seriesDate: tournament.date,
+    startTime: '09:00',
     maxPlayers: 3
   })
   const capacityPath = `${base}/series/${capacity.id}`
@@ -76,6 +81,8 @@ try {
 
   const doubles = await request(`${base}/series`, 'POST', {
     name: 'Doubles limités',
+    seriesDate: tournament.date,
+    startTime: '11:00',
     seriesType: 'points_limit',
     seriesFormat: 'doubles',
     pointsLimitMin: 1100,

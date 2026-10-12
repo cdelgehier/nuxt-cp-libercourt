@@ -14,28 +14,10 @@ const singles = {
   pointsLimitMax: null
 } as const
 
-describe('local demonstration registrations', function () {
-  it('allows only development with a loopback database', function () {
-    expect(
-      canFillDemoSeries(
-        true,
-        'postgresql://postgres:postgres@127.0.0.1:55432/postgres'
-      )
-    ).toBe(true)
-    expect(
-      canFillDemoSeries(true, 'postgresql://postgres:postgres@localhost/test')
-    ).toBe(true)
-    expect(
-      canFillDemoSeries(false, 'postgresql://postgres:postgres@localhost/test')
-    ).toBe(false)
-    expect(
-      canFillDemoSeries(
-        true,
-        'postgresql://postgres:postgres@example.neon.tech/test'
-      )
-    ).toBe(false)
-    expect(canFillDemoSeries(true, undefined)).toBe(false)
-    expect(canFillDemoSeries(true, 'invalid')).toBe(false)
+describe('demonstration registrations', function () {
+  it('allows marked demo tournaments regardless of the application environment', function () {
+    expect(canFillDemoSeries(true)).toBe(true)
+    expect(canFillDemoSeries(false)).toBe(false)
   })
 
   it('creates 24 present players with distinct shared identities and varied payments', function () {

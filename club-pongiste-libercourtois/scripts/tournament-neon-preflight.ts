@@ -24,11 +24,12 @@ try {
     ['event_registrations', 'email', 'text', true],
     ['series_registrations', 'player_gender', 'text', true],
     ['tournament_series', 'females_only', 'bool', false],
-    ['tournament_series', 'series_date', 'text', true],
-    ['tournament_series', 'start_time', 'text', true],
+    ['tournament_series', 'series_date', 'text', false],
+    ['tournament_series', 'start_time', 'text', false],
     ['tournaments', 'location_lat', 'float8', true],
     ['tournaments', 'location_lng', 'float8', true],
     ['tournaments', 'date_end', 'text', true],
+    ['tournaments', 'is_demo', 'bool', false],
     ['tournament_series', 'bracket_mode', 'bracket_mode', false],
     ['bracket_matches', 'bracket_side', 'bracket_side', false],
     ['bracket_matches', 'loser_next_match_id', 'int4', true],
@@ -49,6 +50,7 @@ try {
     ['event_registrations', 'companions', '0'],
     ['event_registrations', 'is_paid', 'false'],
     ['tournament_series', 'females_only', 'false'],
+    ['tournaments', 'is_demo', 'false'],
     ['tournament_series', 'bracket_mode', "'single'::bracket_mode"],
     ['bracket_matches', 'bracket_side', "'winners'::bracket_side"]
   ]
@@ -80,6 +82,21 @@ try {
     'UNIQUE (series_id, bracket_side, round, match_number)'
   )
     throw new Error('Match uniqueness mismatch')
+  const scheduleConstraints = await client.query(
+    "select conname from pg_constraint where conrelid='tournament_series'::regclass and conname in ('tournament_series_date_valid','tournament_series_start_time_valid') order by conname"
+  )
+  if (
+    JSON.stringify(
+      scheduleConstraints.rows.map(function (row) {
+        return row.conname
+      })
+    ) !==
+    JSON.stringify([
+      'tournament_series_date_valid',
+      'tournament_series_start_time_valid'
+    ])
+  )
+    throw new Error('Required series schedule constraints are missing')
   const counts = await client.query(
     'select (select count(*) from tournaments)::int as tournaments,(select count(*) from tournament_series)::int as series,(select count(*) from bracket_matches)::int as matches'
   )

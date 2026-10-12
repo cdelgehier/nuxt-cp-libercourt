@@ -45,6 +45,7 @@ const [tournament] = await db
   .values({
     name: 'Tournoi intégral de démonstration',
     slug: 'demo-integral',
+    isDemo: true,
     date: '2026-10-10',
     tableCount: 8,
     isPublished: true
@@ -55,6 +56,8 @@ const [series] = await db
   .values({
     tournamentId: tournament!.id,
     name: 'Intégral — 24 joueurs',
+    seriesDate: tournament!.date,
+    startTime: '09:00',
     status: 'registration',
     setsToWin: 1
   })
@@ -77,6 +80,8 @@ const [doubles] = await db
   .values({
     tournamentId: tournament!.id,
     name: 'Doubles avec handicap',
+    seriesDate: tournament!.date,
+    startTime: '11:00',
     seriesFormat: 'doubles',
     seriesType: 'handicap',
     status: 'registration',
@@ -114,9 +119,12 @@ const [privateTournament] = await db
     tableCount: 2
   })
   .returning()
-await db
-  .insert(schema.tournamentSeries)
-  .values({ tournamentId: privateTournament!.id, name: 'Série privée' })
+await db.insert(schema.tournamentSeries).values({
+  tournamentId: privateTournament!.id,
+  name: 'Série privée',
+  seriesDate: privateTournament!.date,
+  startTime: '09:00'
+})
 const server = new PGLiteSocketServer({
   db: database,
   maxConnections: 10,

@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import type { TournamentWithSeries } from "~~/server/domains/tournament/types";
+  import type { TournamentWithSeries } from '~~/server/domains/tournament/types'
 
-const route = useRoute();
-const slug = route.params.slug as string;
+  const route = useRoute()
+  const slug = route.params.slug as string
 
-const { data: tournament, pending } = await useFetch<TournamentWithSeries>(
-  `/api/tournois/${slug}`,
-);
+  const { data: tournament, pending } = await useFetch<TournamentWithSeries>(
+    `/api/tournois/${slug}`
+  )
 
-useSeoMeta({
-  title: computed(() =>
-    tournament.value ? `${tournament.value.name} — Tournois` : "Tournoi",
-  ),
-});
+  useSeoMeta({
+    title: computed(() =>
+      tournament.value ? `${tournament.value.name} — Tournois` : 'Tournoi'
+    )
+  })
 
-function formatDate(d: string, end?: string | null): string {
-  return formatDateRange(d, end);
-}
+  function formatDate(d: string, end?: string | null): string {
+    return formatDateRange(d, end)
+  }
 </script>
 
 <template>
@@ -41,6 +41,14 @@ function formatDate(d: string, end?: string | null): string {
         <h1 class="text-3xl font-bold text-club-navy dark:text-gray-100">
           {{ tournament.name }}
         </h1>
+        <UBadge
+          v-if="tournament.isDemo"
+          class="mt-2"
+          color="info"
+          variant="subtle"
+          icon="i-heroicons-beaker"
+          >DEV · Démonstration</UBadge
+        >
         <div
           class="flex flex-wrap gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400"
         >
@@ -55,7 +63,7 @@ function formatDate(d: string, end?: string | null): string {
           <span class="flex items-center gap-1">
             <UIcon name="i-heroicons-table-cells" class="w-4 h-4" />
             {{ tournament.tableCount }} table{{
-              tournament.tableCount > 1 ? "s" : ""
+              tournament.tableCount > 1 ? 's' : ''
             }}
           </span>
         </div>

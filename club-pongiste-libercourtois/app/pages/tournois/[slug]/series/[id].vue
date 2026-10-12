@@ -33,7 +33,7 @@
 
 <template>
   <div class="max-w-screen-xl mx-auto px-4 py-8">
-    <div v-if="pending">
+    <div v-if="pending && !series">
       <USkeleton class="h-8 w-64 mb-4" />
       <USkeleton class="h-64 rounded-xl" />
     </div>

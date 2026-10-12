@@ -61,6 +61,10 @@
     await refreshRegistrations()
   }
 
+  function returnToRegistrations(seriesId: number): void {
+    if (selectedSeriesId.value === seriesId) jaTab.value = 'registrations'
+  }
+
   async function refreshRegistrations() {
     if (selectedSeriesId.value) await loadRegistrations(selectedSeriesId.value)
   }
@@ -113,6 +117,14 @@
         <h1 class="text-xl font-bold text-gray-900">
           {{ tournament?.name ?? 'Interface Juge Arbitre' }}
         </h1>
+        <UBadge
+          v-if="tournament?.isDemo"
+          class="mt-2"
+          color="info"
+          variant="subtle"
+          icon="i-heroicons-beaker"
+          >DEV · Démonstration</UBadge
+        >
         <p class="text-sm text-gray-500 mt-0.5">
           JA : <strong>{{ me?.jaName }}</strong>
         </p>
@@ -184,6 +196,20 @@
           >Inscrire</UButton
         >
       </div>
+      <TournamentDemoRegistrations
+        v-if="
+          jaTab === 'registrations' &&
+          tournament?.isDemo &&
+          currentSeries &&
+          ['draft', 'registration'].includes(currentSeries.status)
+        "
+        class="mb-4"
+        :slug="slug"
+        :series-id="currentSeries.id"
+        :doubles="currentSeries.seriesFormat === 'doubles'"
+        api-base="/api/ja/tournois"
+        @refresh="refreshSeriesState"
+      />
       <TournamentRegistrationTable
         v-if="jaTab === 'registrations'"
         :roster-locked="
@@ -203,7 +229,9 @@
         :key="selectedSeriesId"
         :slug="slug"
         :series-id="selectedSeriesId"
+        :tournament-name="tournament?.name ?? ''"
         @refresh="refreshSeriesState"
+        @pools-cancelled="returnToRegistrations"
       />
     </template>
 

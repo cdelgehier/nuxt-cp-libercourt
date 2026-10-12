@@ -241,7 +241,17 @@ export async function createSeries(tournamentId: number, input: unknown) {
   if (!tournament) {
     throw createError({ statusCode: 404, message: 'Tournoi introuvable' })
   }
-  const data = createSeriesInputSchema.parse(input)
+  const parsed = createSeriesInputSchema.safeParse(input)
+  if (!parsed.success)
+    throw createError({
+      statusCode: 400,
+      message: parsed.error.issues
+        .map(function (issue) {
+          return issue.message
+        })
+        .join(' ')
+    })
+  const data = parsed.data
   return repo.insertSeries({ ...data, tournamentId })
 }
 
@@ -256,7 +266,17 @@ export async function updateSeries(id: number, input: unknown) {
       message: 'Impossible de modifier une série en cours ou terminée'
     })
   }
-  const data = updateSeriesInputSchema.parse(input)
+  const parsed = updateSeriesInputSchema.safeParse(input)
+  if (!parsed.success)
+    throw createError({
+      statusCode: 400,
+      message: parsed.error.issues
+        .map(function (issue) {
+          return issue.message
+        })
+        .join(' ')
+    })
+  const data = parsed.data
   if (
     series.status === 'bracket_generated' &&
     Object.keys(data).some(

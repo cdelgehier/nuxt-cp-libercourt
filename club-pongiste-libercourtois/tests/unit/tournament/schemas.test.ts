@@ -122,6 +122,20 @@ describe('createTournamentInputSchema', () => {
     expect(result.name).toBe('Open Libercourtois 2025')
     expect(result.tableCount).toBe(1) // default
     expect(result.isPublished).toBe(false) // default
+    expect(result.isDemo).toBe(false)
+  })
+
+  it('accepts demo tournaments and rejects non-boolean flags', function () {
+    expect(
+      createTournamentInputSchema.parse({ ...validTournament, isDemo: true })
+        .isDemo
+    ).toBe(true)
+    expect(function () {
+      createTournamentInputSchema.parse({ ...validTournament, isDemo: 'true' })
+    }).toThrow()
+    expect(
+      updateTournamentInputSchema.parse({ name: 'Nouveau nom' })
+    ).not.toHaveProperty('isDemo')
   })
 
   it('accepte tous les champs optionnels', () => {
@@ -244,7 +258,29 @@ describe('updateTournamentInputSchema', () => {
 // ---------------------------------------------------------------------------
 
 describe('createSeriesInputSchema', () => {
-  const validSeries = { name: 'Simple Hommes A' }
+  const validSeries = {
+    name: 'Simple Hommes A',
+    seriesDate: '2025-06-15',
+    startTime: '09:00'
+  }
+
+  it.each([undefined, null, '', '24:00', '12:60', '9:00'])(
+    'requires a real start time: %s',
+    function (startTime) {
+      expect(function () {
+        createSeriesInputSchema.parse({ ...validSeries, startTime })
+      }).toThrow()
+    }
+  )
+
+  it.each([undefined, null, '', '2026-02-30'])(
+    'requires a real series date: %s',
+    function (seriesDate) {
+      expect(function () {
+        createSeriesInputSchema.parse({ ...validSeries, seriesDate })
+      }).toThrow()
+    }
+  )
 
   it('accepte une série standard minimale', () => {
     const result = createSeriesInputSchema.parse(validSeries)
@@ -256,6 +292,7 @@ describe('createSeriesInputSchema', () => {
 
   it('conserve les réglages personnalisés de speedy', () => {
     const result = createSeriesInputSchema.parse({
+      ...validSeries,
       name: 'Série Speedy',
       seriesType: 'speedy',
       setsToWin: 3,
@@ -267,6 +304,7 @@ describe('createSeriesInputSchema', () => {
 
   it('accepte points_limit avec borne min', () => {
     const result = createSeriesInputSchema.parse({
+      ...validSeries,
       name: 'Moins de 500 pts',
       seriesType: 'points_limit',
       pointsLimitMax: 500
@@ -276,6 +314,7 @@ describe('createSeriesInputSchema', () => {
 
   it('accepte points_limit avec borne max', () => {
     const result = createSeriesInputSchema.parse({
+      ...validSeries,
       name: '500-1000 pts',
       seriesType: 'points_limit',
       pointsLimitMin: 500,
@@ -287,6 +326,7 @@ describe('createSeriesInputSchema', () => {
   it('rejette points_limit sans aucune borne', () => {
     expect(() =>
       createSeriesInputSchema.parse({
+        ...validSeries,
         name: 'Série pts',
         seriesType: 'points_limit'
       })
@@ -295,13 +335,17 @@ describe('createSeriesInputSchema', () => {
 
   it('rejette setsToWin > 4', () => {
     expect(() =>
-      createSeriesInputSchema.parse({ name: 'A', setsToWin: 5 })
+      createSeriesInputSchema.parse({ ...validSeries, name: 'A', setsToWin: 5 })
     ).toThrow()
   })
 
   it('rejette pointsPerSet < 3', () => {
     expect(() =>
-      createSeriesInputSchema.parse({ name: 'A', pointsPerSet: 2 })
+      createSeriesInputSchema.parse({
+        ...validSeries,
+        name: 'A',
+        pointsPerSet: 2
+      })
     ).toThrow()
   })
 
@@ -310,8 +354,13 @@ describe('createSeriesInputSchema', () => {
     seriesType => {
       const input =
         seriesType === 'points_limit'
-          ? { name: 'Série test', seriesType, pointsLimitMax: 500 }
-          : { name: 'Série test', seriesType }
+          ? {
+              ...validSeries,
+              name: 'Série test',
+              seriesType,
+              pointsLimitMax: 500
+            }
+          : { ...validSeries, name: 'Série test', seriesType }
       const result = createSeriesInputSchema.parse(input)
       expect(result.seriesType).toBe(seriesType)
     }
@@ -328,13 +377,18 @@ describe('createSeriesInputSchema', () => {
     "rejette le type obsolète/inconnu '%s' (les catégories d'âge passent par ageCategories[])",
     seriesType => {
       expect(() =>
-        createSeriesInputSchema.parse({ name: 'Série test', seriesType })
+        createSeriesInputSchema.parse({
+          ...validSeries,
+          name: 'Série test',
+          seriesType
+        })
       ).toThrow()
     }
   )
 
   it('accepte ageCategories avec des catégories valides', () => {
     const result = createSeriesInputSchema.parse({
+      ...validSeries,
       name: 'Poussin / Minimes',
       ageCategories: ['poussin', 'benjamin', 'minimes']
     })
@@ -342,13 +396,17 @@ describe('createSeriesInputSchema', () => {
   })
 
   it('ageCategories vide par défaut', () => {
-    const result = createSeriesInputSchema.parse({ name: 'Open' })
+    const result = createSeriesInputSchema.parse({
+      ...validSeries,
+      name: 'Open'
+    })
     expect(result.ageCategories).toEqual([])
   })
 
   it('rejette une ageCategory invalide', () => {
     expect(() =>
       createSeriesInputSchema.parse({
+        ...validSeries,
         name: 'Série test',
         ageCategories: ['poussin', 'invalid_cat']
       })
@@ -358,6 +416,7 @@ describe('createSeriesInputSchema', () => {
   it('rejette Coupe Davis pour les nouvelles séries', () => {
     expect(() =>
       createSeriesInputSchema.parse({
+        ...validSeries,
         name: 'Coupe Davis',
         seriesType: 'coupe_davis'
       })
@@ -366,6 +425,7 @@ describe('createSeriesInputSchema', () => {
 
   it("force seriesFormat='doubles' pour mixed_doubles", () => {
     const result = createSeriesInputSchema.parse({
+      ...validSeries,
       name: 'Double Mixte',
       seriesType: 'mixed_doubles'
     })
@@ -374,6 +434,7 @@ describe('createSeriesInputSchema', () => {
 
   it("force seriesFormat='doubles' même si singles fourni pour mixed_doubles", () => {
     const result = createSeriesInputSchema.parse({
+      ...validSeries,
       name: 'Double Mixte',
       seriesType: 'mixed_doubles',
       seriesFormat: 'singles' // overridden by transform
@@ -383,23 +444,17 @@ describe('createSeriesInputSchema', () => {
 
   it('accepte une seriesDate valide au format YYYY-MM-DD', () => {
     const result = createSeriesInputSchema.parse({
+      ...validSeries,
       name: 'Simple Hommes',
       seriesDate: '2025-06-15'
     })
     expect(result.seriesDate).toBe('2025-06-15')
   })
 
-  it('accepte une seriesDate vide (chaîne vide → undefined)', () => {
-    const result = createSeriesInputSchema.parse({
-      name: 'Simple Hommes',
-      seriesDate: ''
-    })
-    expect(result.seriesDate).toBeUndefined()
-  })
-
   it('rejette une seriesDate mal formatée', () => {
     expect(() =>
       createSeriesInputSchema.parse({
+        ...validSeries,
         name: 'Simple Hommes',
         seriesDate: '15/06/2025'
       })
@@ -408,23 +463,17 @@ describe('createSeriesInputSchema', () => {
 
   it('accepte un startTime valide au format HH:MM', () => {
     const result = createSeriesInputSchema.parse({
+      ...validSeries,
       name: 'Simple Hommes',
       startTime: '09:30'
     })
     expect(result.startTime).toBe('09:30')
   })
 
-  it('accepte un startTime vide (chaîne vide → undefined)', () => {
-    const result = createSeriesInputSchema.parse({
-      name: 'Simple Hommes',
-      startTime: ''
-    })
-    expect(result.startTime).toBeUndefined()
-  })
-
   it('rejette un startTime mal formaté', () => {
     expect(() =>
       createSeriesInputSchema.parse({
+        ...validSeries,
         name: 'Simple Hommes',
         startTime: '9h30'
       })
@@ -459,14 +508,22 @@ describe('updateSeriesInputSchema', () => {
     expect(result.startTime).toBe('14:00')
   })
 
-  it("accepte seriesDate et startTime vides → undefined lors d'une mise à jour", () => {
-    const result = updateSeriesInputSchema.parse({
-      seriesDate: '',
-      startTime: ''
-    })
-    expect(result.seriesDate).toBeUndefined()
-    expect(result.startTime).toBeUndefined()
-  })
+  it.each([
+    { seriesDate: '' },
+    { seriesDate: null },
+    { seriesDate: '2026-02-30' },
+    { startTime: '' },
+    { startTime: null },
+    { startTime: '24:00' },
+    { startTime: '12:60' }
+  ])(
+    'rejects erasing or invalidating the series schedule: %s',
+    function (input) {
+      expect(function () {
+        updateSeriesInputSchema.parse(input)
+      }).toThrow()
+    }
+  )
 })
 
 // ---------------------------------------------------------------------------

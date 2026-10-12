@@ -11,21 +11,9 @@ type DemoSeries = Pick<
   | 'pointsLimitMax'
 >
 
-/** Demo writes are allowed only in development on a local PostgreSQL database. */
-export function canFillDemoSeries(
-  development: boolean,
-  connection?: string
-): boolean {
-  if (!development || !connection) return false
-  try {
-    const url = new URL(connection)
-    return (
-      ['postgres:', 'postgresql:'].includes(url.protocol) &&
-      ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)
-    )
-  } catch {
-    return false
-  }
+/** The stored tournament flag controls demo writes in every environment. */
+export function canFillDemoSeries(isDemo: boolean): boolean {
+  return isDemo === true
 }
 
 /** Build fictitious players without an external service or real licence numbers. */

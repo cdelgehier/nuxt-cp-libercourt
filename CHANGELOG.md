@@ -1,3 +1,15 @@
+## v1.11.0 (2026-10-12)
+
+### Feat
+
+- **tournament**: streamline referee views and printable match sheets
+- **tournament**: add demo tools, pool planning and table reservations
+
+### Fix
+
+- **ui**: improve tournament controls contrast and scrolling
+- **tooling**: use Nuxt formatting config in pre-commit
+
 ## v1.10.0 (2026-10-10)
 
 ### Feat

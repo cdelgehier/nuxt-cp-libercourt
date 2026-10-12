@@ -1,3 +1,9 @@
+## v1.11.1 (2026-10-12)
+
+### Fix
+
+- **tournament**: restore share link clipboard copy
+
 ## v1.11.0 (2026-10-12)
 
 ### Feat

@@ -31,6 +31,11 @@
   const tabs = [
     { label: 'Général', value: 'general', icon: 'i-heroicons-cog-6-tooth' },
     { label: 'Accès JA', value: 'ja', icon: 'i-heroicons-key' },
+    {
+      label: 'Inscriptions',
+      value: 'registrations',
+      icon: 'i-heroicons-user-group'
+    },
     { label: 'Séries', value: 'series', icon: 'i-heroicons-squares-2x2' },
     { label: 'Prévision', value: 'forecast', icon: 'i-heroicons-calendar-days' }
   ]
@@ -126,6 +131,13 @@
   const seriesDetail = ref<SeriesWithBracket | null>(null)
   const loadingSeriesDetail = ref(false)
   const registrations = ref<SeriesRegistration[]>([])
+
+  async function openOverviewSeries(id: number): Promise<void> {
+    activeTab.value = 'series'
+    selectedSeriesId.value = id
+    await nextTick()
+    seriesTab.value = 'registrations'
+  }
 
   async function loadSeriesDetail(id: number) {
     loadingSeriesDetail.value = true
@@ -564,6 +576,12 @@
 
     <!-- Tab: Séries -->
     <TournamentForecastBoard v-if="activeTab === 'forecast'" :slug="slug" />
+    <TournamentRegistrationOverview
+      v-if="activeTab === 'registrations'"
+      :slug="slug"
+      :tournament-name="tournament.name"
+      @open-series="openOverviewSeries"
+    />
 
     <div v-if="activeTab === 'series'" class="space-y-4">
       <div class="flex items-center justify-between gap-4">

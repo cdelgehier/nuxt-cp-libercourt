@@ -169,8 +169,12 @@
             <div class="space-y-4 adaptive-text">
               <p>
                 Ce site utilise uniquement des cookies techniques nécessaires au
-                bon fonctionnement du site. Aucun cookie de traçage ou
-                publicitaire n'est utilisé.
+                bon fonctionnement du site. La mesure d'audience utilise Umami
+                auto-hébergé, sans cookie. Aucun cookie publicitaire n'est
+                utilisé. Les détails figurent dans notre
+                <NuxtLink to="/politique-confidentialite" class="underline">
+                  politique de confidentialité </NuxtLink
+                >.
               </p>
               <p>
                 Vous pouvez paramétrer votre navigateur pour refuser les

@@ -353,10 +353,18 @@
                 </li>
               </ul>
               <p class="mt-4">
-                Aucun cookie de traçage publicitaire ou d'analyse
-                comportementale n'est utilisé. Vous pouvez configurer votre
-                navigateur pour bloquer les cookies, mais cela peut affecter
-                certaines fonctionnalités.
+                Nous utilisons Umami, auto-hébergé, pour mesurer les visites des
+                pages publiques et les clics sur les liens de contact, sans
+                cookie publicitaire ni cookie de mesure d'audience. Les
+                paramètres des URL sont exclus de cette mesure. Les espaces
+                d'administration, les interfaces de juge-arbitre et les
+                formulaires d'inscription ne sont pas suivis.
+              </p>
+              <p>
+                Aucun contenu saisi dans les formulaires n'est envoyé à Umami et
+                les sessions ne sont pas enregistrées. Vous pouvez activer « Ne
+                pas me pister » (Do Not Track) dans votre navigateur pour
+                désactiver cette mesure d'audience.
               </p>
             </div>
           </div>

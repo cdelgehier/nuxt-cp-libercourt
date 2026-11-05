@@ -43,6 +43,7 @@
                 />
                 <a
                   :href="`mailto:${data.club.email}`"
+                  data-umami-event="contact-email"
                   class="hover:text-club-green transition-colors"
                 >
                   {{ data.club.email }}
@@ -52,6 +53,7 @@
                 <UIcon name="i-heroicons-phone" class="mr-2 text-club-green" />
                 <a
                   :href="`tel:${data.club.phone}`"
+                  data-umami-event="contact-phone"
                   class="hover:text-club-green transition-colors"
                 >
                   {{ data.club.phone }}

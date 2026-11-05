@@ -29,7 +29,7 @@
             <div class="space-y-4 adaptive-text">
               <p>
                 Le
-                {{ clubConfig?.name || "Club Pongiste Libercourtois" }}
+                {{ clubConfig?.name || 'Club Pongiste Libercourtois' }}
                 s'engage à protéger votre vie privée et vos données
                 personnelles. Cette politique de confidentialité explique
                 comment nous collectons, utilisons et protégeons vos
@@ -54,22 +54,22 @@
             <div class="space-y-4 adaptive-text">
               <div>
                 <strong>Responsable :</strong>
-                {{ clubConfig?.name || "Club Pongiste Libercourtois" }}<br />
+                {{ clubConfig?.name || 'Club Pongiste Libercourtois' }}<br />
                 <strong>Adresse :</strong>
-                {{ clubConfig?.complexe || "Complexe Sportif Léo Lagrange" }},
-                {{ clubConfig?.postalCode || "62820" }}
-                {{ clubConfig?.city || "Libercourt" }}<br />
+                {{ clubConfig?.complexe || 'Complexe Sportif Léo Lagrange' }},
+                {{ clubConfig?.postalCode || '62820' }}
+                {{ clubConfig?.city || 'Libercourt' }}<br />
                 <strong>Email :</strong>
                 <a
                   :href="`mailto:${clubConfig?.email || 'cplibercourt@gmail.com'}`"
                   class="text-teal-700 underline"
-                  >{{ clubConfig?.email || "cplibercourt@gmail.com" }}</a
+                  >{{ clubConfig?.email || 'cplibercourt@gmail.com' }}</a
                 ><br />
                 <strong>Téléphone :</strong>
                 <a
                   :href="`tel:${clubConfig?.phone || '06 60 05 12 41'}`"
                   class="text-teal-700 underline"
-                  >{{ clubConfig?.phone || "06 60 05 12 41" }}</a
+                  >{{ clubConfig?.phone || '06 60 05 12 41' }}</a
                 >
               </div>
             </div>
@@ -353,10 +353,18 @@
                 </li>
               </ul>
               <p class="mt-4">
-                Aucun cookie de traçage publicitaire ou d'analyse
-                comportementale n'est utilisé. Vous pouvez configurer votre
-                navigateur pour bloquer les cookies, mais cela peut affecter
-                certaines fonctionnalités.
+                Nous utilisons Umami, auto-hébergé, pour mesurer les visites des
+                pages publiques et les clics sur les liens de contact, sans
+                cookie publicitaire ni cookie de mesure d'audience. Les
+                paramètres des URL sont exclus de cette mesure. Les espaces
+                d'administration, les interfaces de juge-arbitre et les
+                formulaires d'inscription ne sont pas suivis.
+              </p>
+              <p>
+                Aucun contenu saisi dans les formulaires n'est envoyé à Umami et
+                les sessions ne sont pas enregistrées. Vous pouvez activer « Ne
+                pas me pister » (Do Not Track) dans votre navigateur pour
+                désactiver cette mesure d'audience.
               </p>
             </div>
           </div>
@@ -447,7 +455,7 @@
         <!-- Date de mise à jour -->
         <div class="text-center adaptive-text text-sm">
           <p>
-            Dernière mise à jour : {{ new Date().toLocaleDateString("fr-FR") }}
+            Dernière mise à jour : {{ new Date().toLocaleDateString('fr-FR') }}
           </p>
         </div>
       </div>
@@ -456,15 +464,15 @@
 </template>
 
 <script setup>
-// Meta tags for SEO optimization
-useSeoMeta({
-  title: "Politique de Confidentialité - Club Pongiste Libercourtois",
-  description:
-    "Politique de confidentialité et protection des données personnelles du Club Pongiste Libercourtois. Conforme RGPD.",
-  keywords:
-    "politique confidentialité, RGPD, protection données, vie privée, club tennis de table",
-});
+  // Meta tags for SEO optimization
+  useSeoMeta({
+    title: 'Politique de Confidentialité - Club Pongiste Libercourtois',
+    description:
+      'Politique de confidentialité et protection des données personnelles du Club Pongiste Libercourtois. Conforme RGPD.',
+    keywords:
+      'politique confidentialité, RGPD, protection données, vie privée, club tennis de table'
+  })
 
-// Fetch club configuration from API - uses centralized config
-const { data: clubConfig } = await useFetch("/api/club/config");
+  // Fetch club configuration from API - uses centralized config
+  const { data: clubConfig } = await useFetch('/api/club/config')
 </script>

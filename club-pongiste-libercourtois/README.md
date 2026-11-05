@@ -128,7 +128,8 @@ club-pongiste-libercourtois/
 
 - **Home** (`/`) - Homepage with club presentation and dynamic upcoming events
 - **Club** (`/club`) - History, mission and team with enriched data
-- **Calendar** (`/calendrier`) - Smart event calendar with registrations and automatic categorization
+- **Calendar** (`/calendrier`) - Smart event calendar with registrations and automatic
+  categorization
 - **Schedules & Prices** (`/horaires-tarifs`) - Training schedules and price list
 - **Contact** (`/contact`) - Contact form and practical information
 - **FAQ** (`/faq`) - Frequently asked questions with real-time calculated statistics
@@ -197,7 +198,8 @@ pnpm dev:open
 pnpm build
 ```
 
-The project uses **server-side rendering (SSR)** by default but can be configured for static generation if needed.
+The project uses **server-side rendering (SSR)** by default but can be configured for static
+generation if needed.
 
 ## �📊 APIs and Endpoints
 
@@ -365,3 +367,19 @@ This project is licensed under the **MIT License**. See the `LICENSE` file for c
 ## 🏓 Club Pongiste Libercourtois - Since 1970
 
 Modern, dynamic and accessible website for table tennis in Libercourt
+
+## Audience analytics
+
+The production site uses self-hosted Umami at `https://stats.jackruby.qzz.io` with website ID
+`ebd3012a-ab5b-467c-aa96-fb588890ddca`. Deploy the Umami application from `cdelgehier/k3s-homelab`
+before merging this integration.
+
+The client plugin loads the tracker only in production on `cplibercourt.netlify.app`, so localhost
+and Netlify preview deployments do not send analytics. Umami tracks client-side route changes as
+well as the first page view. The public page allowlist excludes admin, authentication, judge-arbitre
+and registration routes. URL queries, fragments, identity updates and private referrers are removed
+before collection.
+
+The contact page records `contact-email` and `contact-phone` clicks without sending form values or
+contact details as event properties. Do Not Track is respected; session recording and visitor
+identification are not enabled.

@@ -29,17 +29,17 @@
             <div class="space-y-4 adaptive-text">
               <div>
                 <strong>{{
-                  clubConfig?.name || "Club Pongiste Libercourtois"
+                  clubConfig?.name || 'Club Pongiste Libercourtois'
                 }}</strong
                 ><br />
                 Association loi 1901
               </div>
               <div>
                 <strong>Siège social :</strong><br />
-                {{ clubConfig?.complexe || "Complexe Sportif Léo Lagrange"
+                {{ clubConfig?.complexe || 'Complexe Sportif Léo Lagrange'
                 }}<br />
-                {{ clubConfig?.postalCode || "62820" }}
-                {{ clubConfig?.city || "Libercourt" }}
+                {{ clubConfig?.postalCode || '62820' }}
+                {{ clubConfig?.city || 'Libercourt' }}
               </div>
               <div>
                 <strong>Contact :</strong><br />
@@ -47,19 +47,19 @@
                 <a
                   :href="`mailto:${clubConfig?.email || 'cplibercourt@gmail.com'}`"
                   class="text-teal-700 underline"
-                  >{{ clubConfig?.email || "cplibercourt@gmail.com" }}</a
+                  >{{ clubConfig?.email || 'cplibercourt@gmail.com' }}</a
                 ><br />
                 Téléphone :
                 <a
                   :href="`tel:${clubConfig?.phone || '06 60 05 12 41'}`"
                   class="text-teal-700 underline"
-                  >{{ clubConfig?.phone || "06 60 05 12 41" }}</a
+                  >{{ clubConfig?.phone || '06 60 05 12 41' }}</a
                 >
               </div>
               <div>
                 <strong>Responsable de la publication :</strong><br />
                 Secrétaires du
-                {{ clubConfig?.name || "Club Pongiste Libercourtois" }}
+                {{ clubConfig?.name || 'Club Pongiste Libercourtois' }}
               </div>
             </div>
           </div>
@@ -126,7 +126,7 @@
                 <h3 class="text-lg font-semibold mb-3">Collecte des données</h3>
                 <p>
                   Le site
-                  {{ clubConfig?.name || "Club Pongiste Libercourtois" }}
+                  {{ clubConfig?.name || 'Club Pongiste Libercourtois' }}
                   ne collecte des données personnelles que dans le cadre de la
                   prise de contact (formulaire de contact) ou d'inscription aux
                   activités du club.
@@ -154,7 +154,7 @@
                   <a
                     :href="`mailto:${clubConfig?.email || 'cplibercourt@gmail.com'}`"
                     class="text-teal-700 underline"
-                    >{{ clubConfig?.email || "cplibercourt@gmail.com" }}</a
+                    >{{ clubConfig?.email || 'cplibercourt@gmail.com' }}</a
                   >
                 </p>
               </div>
@@ -197,11 +197,11 @@
                 L'utilisation des informations et contenus disponibles sur
                 l'ensemble du site ne pourra en aucun cas engager la
                 responsabilité du
-                {{ clubConfig?.name || "Club Pongiste Libercourtois" }}.
+                {{ clubConfig?.name || 'Club Pongiste Libercourtois' }}.
               </p>
               <p>
                 Le
-                {{ clubConfig?.name || "Club Pongiste Libercourtois" }} ne
+                {{ clubConfig?.name || 'Club Pongiste Libercourtois' }} ne
                 pourra être tenu responsable des dommages directs et indirects
                 causés au matériel de l'utilisateur lors de l'accès au site.
               </p>
@@ -218,7 +218,7 @@
             <div class="space-y-4 adaptive-text">
               <p>
                 Ce site peut contenir des liens vers d'autres sites web. Le
-                {{ clubConfig?.name || "Club Pongiste Libercourtois" }}
+                {{ clubConfig?.name || 'Club Pongiste Libercourtois' }}
                 n'exerce aucun contrôle sur ces sites et n'assume aucune
                 responsabilité quant à leur contenu.
               </p>
@@ -279,7 +279,7 @@
         <!-- Date de mise à jour -->
         <div class="text-center adaptive-text text-sm">
           <p>
-            Dernière mise à jour : {{ new Date().toLocaleDateString("fr-FR") }}
+            Dernière mise à jour : {{ new Date().toLocaleDateString('fr-FR') }}
           </p>
         </div>
       </div>
@@ -288,15 +288,15 @@
 </template>
 
 <script setup>
-// Meta tags for SEO optimization
-useSeoMeta({
-  title: "Mentions Légales - Club Pongiste Libercourtois",
-  description:
-    "Mentions légales, conditions d'utilisation et politique de confidentialité du site du Club Pongiste Libercourtois.",
-  keywords:
-    "mentions légales, RGPD, données personnelles, club tennis de table, Libercourt",
-});
+  // Meta tags for SEO optimization
+  useSeoMeta({
+    title: 'Mentions Légales - Club Pongiste Libercourtois',
+    description:
+      "Mentions légales, conditions d'utilisation et politique de confidentialité du site du Club Pongiste Libercourtois.",
+    keywords:
+      'mentions légales, RGPD, données personnelles, club tennis de table, Libercourt'
+  })
 
-// Fetch club configuration from API - uses centralized config
-const { data: clubConfig } = await useFetch("/api/club/config");
+  // Fetch club configuration from API - uses centralized config
+  const { data: clubConfig } = await useFetch('/api/club/config')
 </script>

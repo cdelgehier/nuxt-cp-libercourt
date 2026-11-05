@@ -128,7 +128,8 @@ club-pongiste-libercourtois/
 
 - **Home** (`/`) - Homepage with club presentation and dynamic upcoming events
 - **Club** (`/club`) - History, mission and team with enriched data
-- **Calendar** (`/calendrier`) - Smart event calendar with registrations and automatic categorization
+- **Calendar** (`/calendrier`) - Smart event calendar with registrations and automatic
+  categorization
 - **Schedules & Prices** (`/horaires-tarifs`) - Training schedules and price list
 - **Contact** (`/contact`) - Contact form and practical information
 - **FAQ** (`/faq`) - Frequently asked questions with real-time calculated statistics
@@ -197,7 +198,8 @@ pnpm dev:open
 pnpm build
 ```
 
-The project uses **server-side rendering (SSR)** by default but can be configured for static generation if needed.
+The project uses **server-side rendering (SSR)** by default but can be configured for static
+generation if needed.
 
 ## �📊 APIs and Endpoints
 

@@ -29,7 +29,7 @@
             <div class="space-y-4 adaptive-text">
               <p>
                 Le
-                {{ clubConfig?.name || "Club Pongiste Libercourtois" }}
+                {{ clubConfig?.name || 'Club Pongiste Libercourtois' }}
                 s'engage à protéger votre vie privée et vos données
                 personnelles. Cette politique de confidentialité explique
                 comment nous collectons, utilisons et protégeons vos
@@ -54,22 +54,22 @@
             <div class="space-y-4 adaptive-text">
               <div>
                 <strong>Responsable :</strong>
-                {{ clubConfig?.name || "Club Pongiste Libercourtois" }}<br />
+                {{ clubConfig?.name || 'Club Pongiste Libercourtois' }}<br />
                 <strong>Adresse :</strong>
-                {{ clubConfig?.complexe || "Complexe Sportif Léo Lagrange" }},
-                {{ clubConfig?.postalCode || "62820" }}
-                {{ clubConfig?.city || "Libercourt" }}<br />
+                {{ clubConfig?.complexe || 'Complexe Sportif Léo Lagrange' }},
+                {{ clubConfig?.postalCode || '62820' }}
+                {{ clubConfig?.city || 'Libercourt' }}<br />
                 <strong>Email :</strong>
                 <a
                   :href="`mailto:${clubConfig?.email || 'cplibercourt@gmail.com'}`"
                   class="text-teal-700 underline"
-                  >{{ clubConfig?.email || "cplibercourt@gmail.com" }}</a
+                  >{{ clubConfig?.email || 'cplibercourt@gmail.com' }}</a
                 ><br />
                 <strong>Téléphone :</strong>
                 <a
                   :href="`tel:${clubConfig?.phone || '06 60 05 12 41'}`"
                   class="text-teal-700 underline"
-                  >{{ clubConfig?.phone || "06 60 05 12 41" }}</a
+                  >{{ clubConfig?.phone || '06 60 05 12 41' }}</a
                 >
               </div>
             </div>
@@ -447,7 +447,7 @@
         <!-- Date de mise à jour -->
         <div class="text-center adaptive-text text-sm">
           <p>
-            Dernière mise à jour : {{ new Date().toLocaleDateString("fr-FR") }}
+            Dernière mise à jour : {{ new Date().toLocaleDateString('fr-FR') }}
           </p>
         </div>
       </div>
@@ -456,15 +456,15 @@
 </template>
 
 <script setup>
-// Meta tags for SEO optimization
-useSeoMeta({
-  title: "Politique de Confidentialité - Club Pongiste Libercourtois",
-  description:
-    "Politique de confidentialité et protection des données personnelles du Club Pongiste Libercourtois. Conforme RGPD.",
-  keywords:
-    "politique confidentialité, RGPD, protection données, vie privée, club tennis de table",
-});
+  // Meta tags for SEO optimization
+  useSeoMeta({
+    title: 'Politique de Confidentialité - Club Pongiste Libercourtois',
+    description:
+      'Politique de confidentialité et protection des données personnelles du Club Pongiste Libercourtois. Conforme RGPD.',
+    keywords:
+      'politique confidentialité, RGPD, protection données, vie privée, club tennis de table'
+  })
 
-// Fetch club configuration from API - uses centralized config
-const { data: clubConfig } = await useFetch("/api/club/config");
+  // Fetch club configuration from API - uses centralized config
+  const { data: clubConfig } = await useFetch('/api/club/config')
 </script>

@@ -1,3 +1,9 @@
+## v1.13.0 (2026-11-05)
+
+### Feat
+
+- **analytics**: track public club visits with self-hosted Umami
+
 ## v1.12.0 (2026-10-12)
 
 ### Feat

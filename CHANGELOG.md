@@ -1,3 +1,9 @@
+## v1.14.0 (2026-11-05)
+
+### Feat
+
+- **analytics**: track public navigation, documents and missing pages
+
 ## v1.13.0 (2026-11-05)
 
 ### Feat

@@ -383,3 +383,14 @@ before collection.
 The contact page records `contact-email` and `contact-phone` clicks without sending form values or
 contact details as event properties. Do Not Track is respected; session recording and visitor
 identification are not enabled.
+
+Public links also record `navigation` with a `destination` path, including news, members, teams,
+calendar and FAQ links in desktop and mobile menus. Links to official blank FFTT PDFs and their
+download portal record `document-download` with the public document path; URL parameters are
+removed. Clicks count interest, not completed downloads.
+
+Displayed 404 errors record `page-not-found`, including initial loads and client-side navigation.
+Unknown paths and error titles can contain personal data, so these events use `/404` and the fixed
+title `Page not found`. The public referring page is preserved where available to help locate broken
+links. Missing pages in private areas remain excluded. Server/API errors and requests without
+JavaScript are not counted.

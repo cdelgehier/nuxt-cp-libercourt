@@ -354,11 +354,16 @@
               </ul>
               <p class="mt-4">
                 Nous utilisons Umami, auto-hébergé, pour mesurer les visites des
-                pages publiques et les clics sur les liens de contact, sans
-                cookie publicitaire ni cookie de mesure d'audience. Les
-                paramètres des URL sont exclus de cette mesure. Les espaces
-                d'administration, les interfaces de juge-arbitre et les
-                formulaires d'inscription ne sont pas suivis.
+                pages publiques, les clics de navigation, les liens de contact
+                et les documents FFTT à télécharger, sans cookie publicitaire ni
+                cookie de mesure d'audience. Les paramètres des URL sont exclus
+                de cette mesure. Les espaces d'administration, les interfaces de
+                juge-arbitre et les formulaires d'inscription ne sont pas
+                suivis.
+              </p>
+              <p>
+                Les pages introuvables sont comptées sans transmettre le chemin
+                demandé ni le titre détaillé de l'erreur.
               </p>
               <p>
                 Aucun contenu saisi dans les formulaires n'est envoyé à Umami et

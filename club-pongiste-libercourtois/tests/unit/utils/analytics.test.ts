@@ -1,5 +1,59 @@
 import { describe, expect, it } from 'vitest'
-import { filterAnalyticsPayload } from '../../../app/utils/analytics'
+import {
+  filterAnalyticsPayload,
+  documentDestination,
+  navigationDestination
+} from '../../../app/utils/analytics'
+
+describe('public navigation clicks', () => {
+  it.each(['/actualites', '/licencies', '/equipes', '/calendrier', '/faq'])(
+    'keeps the public destination %s without URL parameters',
+    function (path) {
+      expect(
+        navigationDestination(`${path}?email=private@example.com#secret`)
+      ).toBe(path)
+    }
+  )
+
+  it.each([
+    '#section',
+    '/admin',
+    '/auth/login',
+    '/tournois/test/inscription',
+    'https://example.com/faq',
+    'mailto:private@example.com'
+  ])('ignores private, external and in-page links: %s', function (href) {
+    expect(navigationDestination(href)).toBeNull()
+  })
+})
+
+describe('public document clicks', () => {
+  it('keeps the official document path without its parameters', function () {
+    expect(
+      documentDestination(
+        'https://www.fftt.com/doc/administratif/documents/25-2-licence.pdf?token=secret#page=1'
+      )
+    ).toBe('/doc/administratif/documents/25-2-licence.pdf')
+  })
+
+  it('counts the official download portal used as a fallback', function () {
+    expect(
+      documentDestination(
+        'https://www.fftt.com/doc/administratif/telechargement.html'
+      )
+    ).toBe('/doc/administratif/telechargement.html')
+  })
+
+  it.each([
+    'https://example.com/doc/administratif/documents/licence.pdf',
+    'https://www.fftt.com/account/private.pdf',
+    '/api/private.pdf',
+    'javascript:alert(1)',
+    'https://www.fftt.com/doc/administratif/documents/page.html'
+  ])('does not collect unrelated or private documents: %s', function (href) {
+    expect(documentDestination(href)).toBeNull()
+  })
+})
 
 describe('public website analytics', () => {
   it.each(['/', '/contact', '/tournois', '/tournois/tournoi-annuel'])(
@@ -50,6 +104,36 @@ describe('public website analytics', () => {
   it('does not send identity updates', () => {
     expect(
       filterAnalyticsPayload('identify', { url: '/', id: 'a-member' })
+    ).toBeNull()
+  })
+
+  it('counts missing pages without sending the unknown path or its parameters', () => {
+    expect(
+      filterAnalyticsPayload('event', {
+        url: '/missing/private@example.com?token=secret',
+        title: '404 - /missing/private@example.com?token=secret',
+        referrer: '/faq?token=secret',
+        name: 'page-not-found'
+      })
+    ).toEqual({
+      url: 'https://cplibercourt.netlify.app/404',
+      title: 'Page not found',
+      referrer: '/faq',
+      name: 'page-not-found'
+    })
+  })
+
+  it.each([
+    '/admin/missing',
+    '/admin-fftt/missing',
+    '/auth/missing',
+    '/api/missing',
+    '/login',
+    '/tournois/test/ja/missing',
+    '/tournois/test/inscription/missing'
+  ])('does not track a missing private page: %s', function (url) {
+    expect(
+      filterAnalyticsPayload('event', { url, name: 'page-not-found' })
     ).toBeNull()
   })
 })
